@@ -1,171 +1,342 @@
 {
-  "openapi": "3.0.0",
-  "info": {
-    "title": "Simpler Grants API - Minimal",
-    "version": "1.0.0",
-    "description": "Minimal OpenAPI spec for grants search"
-  },
-  "servers": [
-    {
-      "url": "https://api.simpler.grants.gov"
-    }
-  ],
-  "paths": {
-    "/v1/opportunities/search": {
-      "post": {
-        "operationId": "searchOpportunities",
-        "summary": "Search for grant opportunities",
-        "description": "Search for federal grant opportunities using query and filters",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "query": {
-                    "type": "string",
-                    "description": "Search query string"
-                  },
-                  "pagination": {
-                    "type": "object",
-                    "required": ["page_offset", "page_size"],
-                    "properties": {
-                      "page_offset": {
-                        "type": "integer",
-                        "minimum": 1,
-                        "description": "Page number starting from 1"
-                      },
-                      "page_size": {
-                        "type": "integer",
-                        "minimum": 1,
-                        "maximum": 100,
-                        "description": "Number of results per page"
-                      },
-                      "sort_order": {
-                        "type": "array",
-                        "items": {
-                          "type": "object",
-                          "properties": {
-                            "order_by": {
-                              "type": "string",
-                              "enum": ["relevancy", "opportunity_number", "opportunity_title", "post_date", "close_date"]
-                            },
-                            "sort_direction": {
-                              "type": "string",
-                              "enum": ["ascending", "descending"]
-                            }
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "filters": {
-                    "type": "object",
-                    "properties": {
-                      "opportunity_status": {
-                        "type": "object",
-                        "properties": {
-                          "one_of": {
-                            "type": "array",
-                            "items": {
-                              "type": "string",
-                              "enum": ["forecasted", "posted", "closed", "archived"]
-                            }
-                          }
-                        }
-                      },
-                      "agency": {
-                        "type": "object",
-                        "properties": {
-                          "one_of": {
-                            "type": "array",
-                            "items": {
-                              "type": "string"
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                },
-                "required": ["pagination"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful search response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "type": "object"
-                      }
-                    },
-                    "pagination_info": {
-                      "type": "object"
-                    },
-                    "status_code": {
-                      "type": "integer"
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Simpler Grants API - Minimal",
+        "version": "1.0.0",
+        "description": "Minimal OpenAPI spec for grants search"
     },
-    "/v1/opportunities/{opportunity_id}": {
-      "get": {
-        "operationId": "getOpportunityDetails",
-        "summary": "Get opportunity details",
-        "description": "Retrieve detailed information about a specific opportunity",
-        "parameters": [
-          {
-            "name": "opportunity_id",
-            "in": "path",
-            "required": true,
-            "description": "The UUID of the opportunity",
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful response with opportunity details",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "type": "object"
-                    },
-                    "status_code": {
-                      "type": "integer"
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          }
+    "servers": [
+        {
+            "url": "https://api.simpler.grants.gov"
         }
-      }
+    ],
+    "paths": {
+        "/v1/opportunities/search": {
+            "post": {
+                "operationId": "searchOpportunities",
+                "summary": "Search for grant opportunities",
+                "description": "Search for federal grant opportunities using query and filters",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "query": {
+                                        "type": "string",
+                                        "description": "Search query string"
+                                    },
+                                    "pagination": {
+                                        "type": "object",
+                                        "required": [
+                                            "page_offset",
+                                            "page_size"
+                                        ],
+                                        "properties": {
+                                            "page_offset": {
+                                                "type": "integer",
+                                                "minimum": 1,
+                                                "description": "Page number starting from 1"
+                                            },
+                                            "page_size": {
+                                                "type": "integer",
+                                                "minimum": 1,
+                                                "maximum": 100,
+                                                "description": "Number of results per page"
+                                            },
+                                            "sort_order": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "order_by": {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                "relevancy",
+                                                                "opportunity_number",
+                                                                "opportunity_title",
+                                                                "post_date",
+                                                                "close_date"
+                                                            ]
+                                                        },
+                                                        "sort_direction": {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                "ascending",
+                                                                "descending"
+                                                            ]
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "filters": {
+                                        "type": "object",
+                                        "properties": {
+                                            "opportunity_status": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "one_of": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                "forecasted",
+                                                                "posted",
+                                                                "closed",
+                                                                "archived"
+                                                            ]
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "agency": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "one_of": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "required": [
+                                    "pagination"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful search response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        },
+                                        "pagination_info": {
+                                            "type": "object"
+                                        },
+                                        "status_code": {
+                                            "type": "integer"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/opportunities/{opportunity_id}": {
+            "get": {
+                "operationId": "getOpportunityDetails",
+                "summary": "Get opportunity details",
+                "description": "Retrieve detailed information about a specific opportunity",
+                "parameters": [
+                    {
+                        "name": "opportunity_id",
+                        "in": "path",
+                        "required": true,
+                        "description": "The UUID of the opportunity",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response with opportunity details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "status_code": {
+                                            "type": "integer"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/extracts": {
+            "post": {
+                "operationId": "getExtractMetadata",
+                "summary": "Get data extract metadata",
+                "description": "Retrieve metadata about available data extracts including file information, creation dates, and download URLs for bulk opportunity data",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "filters": {
+                                        "type": "object",
+                                        "properties": {
+                                            "extract_type": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "opportunities_json",
+                                                    "opportunities_csv"
+                                                ],
+                                                "description": "Filter by specific extract type"
+                                            },
+                                            "created_at": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "start_date": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "description": "Start date in YYYY-MM-DD format"
+                                                    },
+                                                    "end_date": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "description": "End date in YYYY-MM-DD format"
+                                                    }
+                                                },
+                                                "description": "Filter by extract creation date range"
+                                            }
+                                        }
+                                    },
+                                    "pagination": {
+                                        "type": "object",
+                                        "required": [
+                                            "page_offset",
+                                            "page_size"
+                                        ],
+                                        "properties": {
+                                            "page_offset": {
+                                                "type": "integer",
+                                                "minimum": 1,
+                                                "description": "Page number starting from 1"
+                                            },
+                                            "page_size": {
+                                                "type": "integer",
+                                                "minimum": 1,
+                                                "maximum": 100,
+                                                "description": "Number of results per page"
+                                            },
+                                            "sort_order": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "order_by": {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                "created_at"
+                                                            ]
+                                                        },
+                                                        "sort_direction": {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                "ascending",
+                                                                "descending"
+                                                            ]
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "required": [
+                                    "pagination"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful response with extract metadata",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "extract_metadata_id": {
+                                                        "type": "string",
+                                                        "format": "uuid"
+                                                    },
+                                                    "extract_type": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "opportunities_json",
+                                                            "opportunities_csv"
+                                                        ]
+                                                    },
+                                                    "file_name": {
+                                                        "type": "string"
+                                                    },
+                                                    "file_size": {
+                                                        "type": "integer"
+                                                    },
+                                                    "download_url": {
+                                                        "type": "string",
+                                                        "format": "uri"
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "pagination_info": {
+                                            "type": "object"
+                                        },
+                                        "status_code": {
+                                            "type": "integer"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
-  }
 }

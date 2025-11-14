@@ -11108,7 +11108,11 @@
       }
     }
   },
-  "servers": ".",
+  "servers": [
+    {
+      "url": "https://api.simpler.grants.gov"
+    }
+  ],
   "tags": [
     {
       "name": "Health"

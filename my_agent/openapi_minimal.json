@@ -1,0 +1,171 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Simpler Grants API - Minimal",
+    "version": "1.0.0",
+    "description": "Minimal OpenAPI spec for grants search"
+  },
+  "servers": [
+    {
+      "url": "https://api.simpler.grants.gov"
+    }
+  ],
+  "paths": {
+    "/v1/opportunities/search": {
+      "post": {
+        "operationId": "searchOpportunities",
+        "summary": "Search for grant opportunities",
+        "description": "Search for federal grant opportunities using query and filters",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "Search query string"
+                  },
+                  "pagination": {
+                    "type": "object",
+                    "required": ["page_offset", "page_size"],
+                    "properties": {
+                      "page_offset": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Page number starting from 1"
+                      },
+                      "page_size": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 100,
+                        "description": "Number of results per page"
+                      },
+                      "sort_order": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "order_by": {
+                              "type": "string",
+                              "enum": ["relevancy", "opportunity_number", "opportunity_title", "post_date", "close_date"]
+                            },
+                            "sort_direction": {
+                              "type": "string",
+                              "enum": ["ascending", "descending"]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "filters": {
+                    "type": "object",
+                    "properties": {
+                      "opportunity_status": {
+                        "type": "object",
+                        "properties": {
+                          "one_of": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "enum": ["forecasted", "posted", "closed", "archived"]
+                            }
+                          }
+                        }
+                      },
+                      "agency": {
+                        "type": "object",
+                        "properties": {
+                          "one_of": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "required": ["pagination"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful search response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "pagination_info": {
+                      "type": "object"
+                    },
+                    "status_code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/opportunities/{opportunity_id}": {
+      "get": {
+        "operationId": "getOpportunityDetails",
+        "summary": "Get opportunity details",
+        "description": "Retrieve detailed information about a specific opportunity",
+        "parameters": [
+          {
+            "name": "opportunity_id",
+            "in": "path",
+            "required": true,
+            "description": "The UUID of the opportunity",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with opportunity details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object"
+                    },
+                    "status_code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

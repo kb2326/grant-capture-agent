@@ -17,13 +17,14 @@ load_dotenv()
 API_KEY = os.getenv("GRANTS_API_KEY", "")
 
 # Load OpenAPI specification
-spec_path = os.path.join(os.path.dirname(__file__), "openapi.json")
+# Using minimal spec that's compatible with ADK's OpenAPIToolset
+spec_path = os.path.join(os.path.dirname(__file__), "openapi_minimal.json")
 with open(spec_path, "r") as f:
     openapi_spec = json.load(f)
 
 # Setup authentication if API key is provided
-auth_scheme = None
-auth_credential = None
+# Create OpenAPIToolset from the spec
+openapi_spec_str = json.dumps(openapi_spec)
 
 if API_KEY:
     # Configure API key authentication
@@ -34,14 +35,18 @@ if API_KEY:
         "X-API-Key",   # Parameter name
         API_KEY        # Your API key value
     )
-
-# Create OpenAPIToolset from the spec
-grants_toolset = OpenAPIToolset(
-    spec_str=json.dumps(openapi_spec),
-    spec_str_type='json',
-    auth_scheme=auth_scheme,
-    auth_credential=auth_credential,
-)
+    grants_toolset = OpenAPIToolset(
+        spec_str=openapi_spec_str,
+        spec_str_type='json',
+        auth_scheme=auth_scheme,
+        auth_credential=auth_credential,
+    )
+else:
+    # Create toolset without authentication
+    grants_toolset = OpenAPIToolset(
+        spec_str=openapi_spec_str,
+        spec_str_type='json',
+    )
 
 # Create the agent with OpenAPI tools
 root_agent = LlmAgent(
@@ -52,19 +57,19 @@ root_agent = LlmAgent(
     instruction="""You are an expert federal grants and proposals discovery assistant. You help users find grant opportunities, SBIR proposals, STTR programs, and other federal funding opportunities.
 
 **Your capabilities:**
-1. Search for opportunities using the 'searchOpportunities' tool
-2. Get detailed information using the 'getOpportunityDetails' tool
+1. Search for opportunities using the 'search_opportunities' tool
+2. Get detailed information using the 'get_opportunity_details' tool
 
 **How to handle user queries:**
 
 For queries like "Find SBIR proposals related to gallium":
-- Call searchOpportunities tool with a request body containing:
+- Call search_opportunities tool with a request body containing:
   - query: "SBIR gallium"
   - pagination: {"page_offset": 1, "page_size": 25, "sort_order": [{"order_by": "relevancy", "sort_direction": "descending"}]}
   - filters: {"opportunity_status": {"one_of": ["posted", "forecasted"]}}
 
 For queries about specific opportunity details:
-- Call getOpportunityDetails tool with the opportunity_id parameter (UUID format)
+- Call get_opportunity_details tool with the opportunity_id parameter (UUID format)
 
 **Response format:**
 - Present search results clearly with:
@@ -78,10 +83,10 @@ For queries about specific opportunity details:
 - Suggest viewing details for specific opportunities when showing search results
 
 **Query examples:**
-- "Find SBIR proposals related to gallium" → searchOpportunities with query="SBIR gallium"
-- "Show me NSF research grants" → searchOpportunities with query="NSF research"
-- "Search for education funding" → searchOpportunities with query="education"
-- "Get details for opportunity [UUID]" → getOpportunityDetails with opportunity_id parameter
+- "Find SBIR proposals related to gallium" → search_opportunities with query="SBIR gallium"
+- "Show me NSF research grants" → search_opportunities with query="NSF research"
+- "Search for education funding" → search_opportunities with query="education"
+- "Get details for opportunity [UUID]" → get_opportunity_details with opportunity_id parameter
 
 Always be helpful, accurate, and provide actionable information about federal funding opportunities.""",
 )

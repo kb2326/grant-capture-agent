@@ -56,8 +56,8 @@
                         "required": false,
                         "description": "Set to 1 to get only open solicitations",
                         "schema": {
-                            "type": "integer",
-                            "enum": [0, 1]
+                            "type": "string",
+                            "enum": ["0", "1"]
                         }
                     },
                     {
@@ -66,8 +66,8 @@
                         "required": false,
                         "description": "Set to 1 to get only closed solicitations",
                         "schema": {
-                            "type": "integer",
-                            "enum": [0, 1]
+                            "type": "string",
+                            "enum": ["0", "1"]
                         }
                     },
                     {

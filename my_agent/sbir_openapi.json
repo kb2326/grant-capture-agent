@@ -1,0 +1,224 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "SBIR.gov API",
+        "version": "1.0.0",
+        "description": "API for searching SBIR/STTR solicitations from SBIR.gov database"
+    },
+    "servers": [
+        {
+            "url": "https://api.www.sbir.gov/public/api"
+        }
+    ],
+    "paths": {
+        "/solicitations": {
+            "get": {
+                "operationId": "searchSBIRSolicitations",
+                "summary": "Search SBIR/STTR solicitations",
+                "description": "Search for SBIR/STTR solicitations by keyword, agency, and status. Returns solicitation details including topics and subtopics.",
+                "parameters": [
+                    {
+                        "name": "keyword",
+                        "in": "query",
+                        "required": false,
+                        "description": "Search keyword to find in solicitation titles",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "sbir"
+                    },
+                    {
+                        "name": "agency",
+                        "in": "query",
+                        "required": false,
+                        "description": "Filter by agency code",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "DOD",
+                                "HHS",
+                                "NASA",
+                                "NSF",
+                                "DOE",
+                                "USDA",
+                                "EPA",
+                                "DOC",
+                                "ED",
+                                "DOT",
+                                "DHS"
+                            ]
+                        },
+                        "example": "NASA"
+                    },
+                    {
+                        "name": "open",
+                        "in": "query",
+                        "required": false,
+                        "description": "Set to 1 to get only open solicitations",
+                        "schema": {
+                            "type": "integer",
+                            "enum": [0, 1]
+                        }
+                    },
+                    {
+                        "name": "closed",
+                        "in": "query",
+                        "required": false,
+                        "description": "Set to 1 to get only closed solicitations",
+                        "schema": {
+                            "type": "integer",
+                            "enum": [0, 1]
+                        }
+                    },
+                    {
+                        "name": "rows",
+                        "in": "query",
+                        "required": false,
+                        "description": "Number of results per page (max 50)",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 50,
+                            "default": 25
+                        }
+                    },
+                    {
+                        "name": "start",
+                        "in": "query",
+                        "required": false,
+                        "description": "Starting offset for pagination (0-based)",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "default": 0
+                        }
+                    },
+                    {
+                        "name": "format",
+                        "in": "query",
+                        "required": false,
+                        "description": "Response format (default is JSON)",
+                        "schema": {
+                            "type": "string",
+                            "enum": ["json", "xml"],
+                            "default": "json"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response with solicitations",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "solicitations": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "solicitation_title": {
+                                                        "type": "string"
+                                                    },
+                                                    "solicitation_number": {
+                                                        "type": "string"
+                                                    },
+                                                    "program": {
+                                                        "type": "string"
+                                                    },
+                                                    "phase": {
+                                                        "type": "string"
+                                                    },
+                                                    "agency": {
+                                                        "type": "string"
+                                                    },
+                                                    "branch": {
+                                                        "type": "string"
+                                                    },
+                                                    "solicitation_year": {
+                                                        "type": "string"
+                                                    },
+                                                    "release_date": {
+                                                        "type": "string"
+                                                    },
+                                                    "open_date": {
+                                                        "type": "string"
+                                                    },
+                                                    "close_date": {
+                                                        "type": "string"
+                                                    },
+                                                    "application_due_date": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "occurrence_number": {
+                                                        "type": "string"
+                                                    },
+                                                    "solicitation_agency_url": {
+                                                        "type": "string"
+                                                    },
+                                                    "current_status": {
+                                                        "type": "string"
+                                                    },
+                                                    "solicitation_topics": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "topic_title": {
+                                                                    "type": "string"
+                                                                },
+                                                                "branch": {
+                                                                    "type": "string"
+                                                                },
+                                                                "topic_number": {
+                                                                    "type": "string"
+                                                                },
+                                                                "topic_description": {
+                                                                    "type": "string"
+                                                                },
+                                                                "sbir_topic_link": {
+                                                                    "type": "string"
+                                                                },
+                                                                "subtopics": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "type": "object",
+                                                                        "properties": {
+                                                                            "subtopic_title": {
+                                                                                "type": "string"
+                                                                            },
+                                                                            "branch": {
+                                                                                "type": "string"
+                                                                            },
+                                                                            "subtopic_number": {
+                                                                                "type": "string"
+                                                                            },
+                                                                            "subtopic_description": {
+                                                                                "type": "string"
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "total": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

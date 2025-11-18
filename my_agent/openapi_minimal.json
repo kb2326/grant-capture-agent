@@ -102,6 +102,89 @@
                                                         }
                                                     }
                                                 }
+                                            },
+                                            "applicant_type": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "one_of": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                "state_governments",
+                                                                "county_governments",
+                                                                "city_or_township_governments",
+                                                                "independent_school_districts",
+                                                                "public_and_state_institutions_of_higher_education",
+                                                                "private_institutions_of_higher_education",
+                                                                "nonprofits_non_higher_education_with_501c3",
+                                                                "nonprofits_non_higher_education_without_501c3",
+                                                                "small_businesses",
+                                                                "for_profit_organizations_other_than_small_businesses",
+                                                                "individuals",
+                                                                "other"
+                                                            ]
+                                                        }
+                                                    }
+                                                },
+                                                "description": "Filter by eligible applicant types"
+                                            },
+                                            "funding_instrument": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "one_of": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                "cooperative_agreement",
+                                                                "grant",
+                                                                "procurement_contract",
+                                                                "other"
+                                                            ]
+                                                        }
+                                                    }
+                                                },
+                                                "description": "Filter by funding instrument type"
+                                            },
+                                            "funding_category": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "one_of": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                "recovery_act",
+                                                                "agriculture",
+                                                                "arts",
+                                                                "business_and_commerce",
+                                                                "community_development",
+                                                                "consumer_protection",
+                                                                "disaster_prevention_and_relief",
+                                                                "education",
+                                                                "employment_labor_and_training",
+                                                                "energy",
+                                                                "environment",
+                                                                "food_and_nutrition",
+                                                                "health",
+                                                                "housing",
+                                                                "humanities",
+                                                                "infrastructure_investment_and_jobs_act",
+                                                                "information_and_statistics",
+                                                                "income_security_and_social_services",
+                                                                "law_justice_and_legal_services",
+                                                                "natural_resources",
+                                                                "opportunity_zone_benefits",
+                                                                "regional_development",
+                                                                "science_technology_and_other_research_and_development",
+                                                                "transportation",
+                                                                "other"
+                                                            ]
+                                                        }
+                                                    }
+                                                },
+                                                "description": "Filter by funding category"
                                             }
                                         }
                                     }

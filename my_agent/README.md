@@ -8,6 +8,22 @@ An AI agent built with Google's Agent Development Kit (ADK) to search for federa
 - 📊 Get detailed information about specific opportunities
 - 💰 View funding ranges, deadlines, and eligibility requirements
 - 🎯 Natural language queries like "Find SBIR proposals related to gallium"
+- ✅ **NEW:** PEV Architecture with quality assurance and self-correction
+
+## Two Architecture Options
+
+### 1. Simple Tool Use (`agent.py`) - Default
+- Single LLM agent with direct tool access
+- Fast and efficient for straightforward queries
+- Best for: Simple searches, single topics, quick results
+
+### 2. PEV Architecture (`agent_pev.py`) - Advanced ⭐
+- Three-agent system: Planner → Executor → Verifier
+- Built-in quality assurance and retry logic
+- Self-correcting with up to 3 iterations
+- Best for: Complex queries, multi-criteria searches, high-quality results
+
+See [PEV_ARCHITECTURE.md](PEV_ARCHITECTURE.md) for detailed documentation.
 
 ## Setup
 
@@ -31,30 +47,61 @@ To avoid symlink privilege errors:
 
 ## Usage
 
-### Run the agent:
+### Run the Simple Agent (default):
 ```bash
 adk run my_agent
 ```
 
+### Run the PEV Agent (recommended for complex queries):
+```bash
+adk run my_agent.agent_pev
+```
+
+### Test and Compare Both:
+```bash
+python my_agent/test_pev.py
+```
+
 ### Example queries:
+
+**Simple queries (both agents work well):**
 - "Find SBIR proposals related to gallium"
 - "Show me NSF research grants"
 - "Search for education funding opportunities"
-- "Get details for opportunity [UUID]"
 
-## Implementation Approaches
+**Complex queries (PEV excels):**
+- "Find NASA and NSF grants for AI and robotics for small businesses"
+- "Show me open SBIR Phase I opportunities in quantum computing and materials science"
+- "Find grants for universities in clean energy from DOE and DOC"
 
-### 1. Custom Functions (agent.py) - Current
-Uses manually defined Python functions for API calls.
-- ✅ Full control over request/response handling
-- ✅ Custom error handling and formatting
-- ✅ Works with current ADK version
+## Architecture Comparison
 
-### 2. OpenAPI Tools (agent_openapi.py) - Alternative
-Uses ADK's OpenAPIToolset for automatic API integration.
-- ✅ Automatic tool generation from OpenAPI spec
-- ✅ Less code to maintain
-- ✅ Standardized API integration pattern
+| Feature | Simple Tool Use | PEV Architecture |
+|---------|----------------|------------------|
+| **Agents** | 1 agent | 3 specialized agents |
+| **Planning** | Implicit | Explicit planning phase |
+| **Verification** | None | Built-in quality checks |
+| **Retry Logic** | None | Up to 3 iterations |
+| **Self-Correction** | ❌ | ✅ |
+| **Complex Queries** | May miss aspects | Systematic handling |
+| **Speed** | Faster | Slightly slower |
+| **Quality Assurance** | Manual | Automatic |
+| **Best For** | Simple queries | Complex, multi-criteria |
+
+### When to Use Each:
+
+**Use Simple Agent (`agent.py`) when:**
+- Single topic or agency
+- Quick results needed
+- Straightforward search criteria
+- Testing or development
+
+**Use PEV Agent (`agent_pev.py`) when:**
+- Multiple topics or agencies
+- Complex eligibility requirements
+- High-quality results critical
+- Multi-criteria filtering needed
+- Production use with end users
 
 ## API Documentation
 

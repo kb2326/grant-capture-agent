@@ -58,11 +58,16 @@ sbir_toolset = OpenAPIToolset(
 )
 
 # Define exit loop tool for verification
-def exit_verification_loop(tool_context: ToolContext):
-    """Call this when verification passes and results are satisfactory."""
-    print(f"[Verification] Results verified successfully - exiting loop")
+from typing import Optional
+def exit_verification_loop(tool_context: ToolContext, output_data: Optional[dict] = None):
+    """Call this to exit the verification loop.
+    
+    Args:
+        output_data: Optional dictionary containing results or response to pass forward.
+    """
+    print(f"[Verification] Exiting loop")
     tool_context.actions.escalate = True
-    return {"status": "verification_passed", "message": "Results meet quality criteria"}
+    return {"status": "loop_exited", "output_data": output_data}
 
 
 # ============================================================================
@@ -167,8 +172,16 @@ Plan:
 **Instructions:**
 Look at the user's most recent message in the conversation history. Analyze it and create a comprehensive search plan in JSON format.
 
-If you see verification feedback from a previous iteration in the conversation, incorporate that feedback to refine your plan.""",
-    output_key="search_plan"
+**Handling Non-Search Queries:**
+If the user's query is NOT about finding grants (e.g., "who are you", "hello", "help", "what can you do"), do NOT create a search plan. Instead, output a direct response JSON:
+```json
+{
+  "is_chitchat": true,
+  "direct_response": "I am the Grant Discovery Agent, an AI assistant designed to help you find federal grants and SBIR/STTR opportunities from Simpler Grants and SBIR.gov. I can plan searches, execute them across multiple APIs, and verify the results for you. How can I help you find funding today?"
+}
+```
+
+If you see verification feedback from a previous iteration in the conversation, incorporate that feedback to refine your plan."""
 )
 
 
@@ -273,10 +286,14 @@ Execute the search plan created by the Planner by calling the appropriate API to
 - If no results found, indicate this clearly
 - If API returns errors, include error details
 
+**Handling Chitchat:**
+Check if the input JSON contains `"is_chitchat": true`.
+- If YES: Do NOT call any tools. Simply output the input JSON exactly as is.
+- If NO: Proceed with executing the search plan.
+
 If this is a retry iteration, check the conversation history for verification feedback and adjust your execution accordingly.
 
-Now execute the search plan and return the results.""",
-    output_key="search_results"
+Now execute the search plan and return the results."""
 )
 
 
@@ -333,101 +350,30 @@ After checking all criteria, make ONE of these decisions:
    - All quality criteria met
    - Results match user intent
    - Sufficient quantity and quality
-   - **ACTION:** Call the `exit_verification_loop` tool to approve results
+   - **ACTION:** 
+     1. Generate a helpful natural language response (like a helpful assistant).
+        - Start with a positive summary: "I found [X] verified opportunities..."
+        - Highlight top 3-5 results (Title, Agency, Deadline, Summary).
+        - Mention sources (SBIR.gov / Grants.gov).
+     2. Call `exit_verification_loop()` to end the process.
 
 **B) FAIL - Results need improvement:**
    - Identify specific issues
-   - Provide actionable feedback for retry
-   - Suggest plan modifications
-   - **ACTION:** Output feedback JSON (do NOT call exit_verification_loop)
+   - **ACTION:** Output feedback JSON (do NOT call exit_verification_loop).
+   - Do NOT output natural language text, ONLY the JSON.
 
-**Output Format for PASS:**
-Call `exit_verification_loop()` and output:
-```json
-{
-  "verification_status": "PASS",
-  "quality_score": 9,
-  "results_approved": 25,
-  "verification_notes": "Results are relevant, comprehensive, and meet all criteria.",
-  "user_ready_summary": "Found 25 relevant opportunities from NASA and NSF for AI research..."
-}
-```
+**C) Chitchat / Direct Response:**
+   - If input has `"is_chitchat": true`:
+     1. Output the `direct_response` text naturally.
+     2. Call `exit_verification_loop()` immediately.
 
-**Output Format for FAIL:**
-```json
-{
-  "verification_status": "FAIL",
-  "issues_found": [
-    "Only 2 results returned, expected at least 10",
-    "No SBIR.gov results included despite plan requiring it",
-    "Results don't match 'quantum computing' keyword"
-  ],
-  "feedback_for_planner": "Broaden search terms, add synonyms like 'quantum information science'",
-  "feedback_for_executor": "Retry SBIR.gov search with corrected parameters",
-  "suggested_modifications": {
-    "add_searches": [
-      {"api": "sbir", "keyword": "quantum information", "reason": "Broader term coverage"}
-    ],
-    "adjust_filters": "Remove overly restrictive agency filter"
-  }
-}
-```
-
-**Verification Rules:**
-
-- Be strict but reasonable - don't fail for minor issues
-- If 0 results found, check if query is too narrow
-- If 100+ results, that's okay (pagination handles it)
-- Duplicates across APIs are expected and acceptable
-- Missing optional fields (funding amount) is acceptable
-- If this is retry iteration 2+, be more lenient
+**Output Rules:**
+- **If PASS or Chitchat**: Output ONLY Natural Language text.
+- **If FAIL**: Output ONLY JSON.
 
 **Decision Time:**
 Analyze the results and make your verification decision now.
-
-If PASS: Call exit_verification_loop() immediately.
-If FAIL: Output detailed feedback JSON.""",
-    output_key="verification_result"
-)
-
-
-# ============================================================================
-# AGENT 4: FORMATTER
-# ============================================================================
-formatter_agent = LlmAgent(
-    model='gemini-2.5-flash',
-    name='response_formatter',
-    description="Formats the final output from the PEV loop into a helpful natural language response",
-    instruction="""You are a helpful assistant explaining grant search results to a user.
-    
-**Input:**
-You will receive the final output from a Plan-Execute-Verify (PEV) search process. This might be:
-1. A successful result (PASS) with a list of verified opportunities.
-2. A failed result (FAIL) with feedback on why it failed (e.g., API errors, no results found).
-
-**Your Goal:**
-Translate this structured JSON output into a clear, helpful, and professional natural language response.
-
-**Scenarios:**
-
-**Scenario A: Success (PASS)**
-- Start with a positive summary: "I found [X] verified opportunities matching your request."
-- Highlight the top 3-5 most relevant results with their Titles, Agencies, Deadlines, and a brief summary.
-- Mention if results came from SBIR.gov, Grants.gov, or both.
-- Ask if the user would like more details on any specific opportunity.
-
-**Scenario B: Failure (FAIL)**
-- Be honest but helpful. "I wasn't able to find specific grants matching your exact criteria right now."
-- Explain *why* in simple terms (e.g., "The SBIR API is currently down," or "No grants matched the specific keywords").
-- Use the `feedback_for_planner` or `suggested_modifications` from the input to suggest next steps.
-- Example: "However, I suggest we try broadening the search to [Topic] or checking back later."
-
-**Tone:**
-- Professional, encouraging, and concise.
-- Do NOT output raw JSON.
-- Do NOT mention "JSON", "Planner", "Executor", or "Verifier" internal names unless necessary for debugging (keep it user-focused).
-""",
-    output_key="final_response"
+"""
 )
 
 # ============================================================================
@@ -443,13 +389,8 @@ pev_loop = LoopAgent(
 )
 
 # Main PEV agent sequence
-# 1. Run the loop to get results
-# 2. Run the formatter to explain results to user
-root_agent = SequentialAgent(
-    name='grants_discovery_pev_agent',
-    description="AI agent for federal grant discovery using Plan-Execute-Verify architecture",
-    sub_agents=[pev_loop, formatter_agent]
-)
+# Root is now just the loop, as Verifier handles formatting
+root_agent = pev_loop
 
 if __name__ == "__main__":
     import asyncio
@@ -469,8 +410,10 @@ if __name__ == "__main__":
             elif event.agent_name == "search_executor":
                 print(f"🔍 [EXECUTOR] Executing searches...")
             elif event.agent_name == "result_verifier":
-                print(f"✅ [VERIFIER] Verifying results...")
-            elif event.agent_name == "response_formatter":
-                print(f"\n🤖 [RESPONSE]:\n{event.content}\n")
+                # If it looks like JSON, it's internal verification
+                if event.content.strip().startswith("{"):
+                    print(f"✅ [VERIFIER] Checking results (Feedback Loop)...")
+                else:
+                    print(f"\n🤖 [RESPONSE]:\n{event.content}\n")
 
     asyncio.run(main())

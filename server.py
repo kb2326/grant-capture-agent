@@ -34,18 +34,30 @@ async def chat(request: ChatRequest):
         
         final_response = ""
         
+        # Use a unique session ID for each request to avoid history corruption issues
+        # In a real app, you'd maintain this per user
+        import uuid
+        session_id = str(uuid.uuid4())
+        
+        # Create a message dictionary matching the ADK schema
+        user_msg = {
+            "role": "user",
+            "parts": [{"text": request.message}]
+        }
+        
         # Run the agent asynchronously
-        # We iterate through events to find the final response from the formatter
-        async for event in runner.run_async(user_id="user", session_id="session", new_message=request.message):
+        # We iterate through events to find the final response from the verifier
+        async for event in runner.run_async(user_id="user", session_id=session_id, new_message=user_msg):
             # Log events for debugging (optional)
             # print(f"[{event.agent_name}] {event.content}")
             
-            # Capture the output from the response_formatter agent
-            if event.agent_name == "response_formatter":
+            # Capture the output from the result_verifier agent
+            # If it's NOT JSON (doesn't start with {), it's the final natural language response
+            if event.agent_name == "result_verifier" and event.content and not event.content.strip().startswith("{"):
                 final_response = event.content
         
         if not final_response:
-            # Fallback if no formatter response found (shouldn't happen in happy path)
+            # Fallback if no verifier response found (e.g. loop didn't exit properly or only JSON output)
             return {"response": "I processed your request but couldn't generate a final response. Please check the logs."}
             
         return {"response": final_response}

@@ -99,7 +99,7 @@ def read_capabilities_doc(file_path: str) -> str:
     return load_capabilities(file_path)
 
 
-
+#This agent is the main agent that will be used to search for grants
 # ============================================================================
 # AGENT 1: PLANNER
 # ============================================================================

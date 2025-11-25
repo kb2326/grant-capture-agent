@@ -26,12 +26,13 @@ load_dotenv()
 API_KEY = os.getenv("GRANTS_API_KEY", "")
 
 # Load Simpler Grants API OpenAPI specification
-grants_spec_path = os.path.join(os.path.dirname(__file__), "data", "openapi_minimal.json")
+base_dir = os.path.dirname(os.path.dirname(__file__))
+grants_spec_path = os.path.join(base_dir, "data", "openapi_minimal.json")
 with open(grants_spec_path, "r") as f:
     grants_spec = json.load(f)
 
 # Load SBIR.gov API OpenAPI specification
-sbir_spec_path = os.path.join(os.path.dirname(__file__), "data", "sbir_openapi.json")
+sbir_spec_path = os.path.join(base_dir, "data", "sbir_openapi.json")
 with open(sbir_spec_path, "r") as f:
     sbir_spec = json.load(f)
 
@@ -170,11 +171,12 @@ Analyze the User's Query AND the Company Capabilities to create a highly targete
 ```
 
 **Handling Non-Search Queries:**
-If the user's query is NOT about finding grants (e.g., "who are you", "hello", "help", "what can you do"), do NOT create a search plan. Instead, output a direct response JSON:
+If the user's query is NOT about finding grants (e.g., "who are you", "hello", "help", "what can you do"), do NOT create a search plan. Instead, output a JSON object with the answer.
+Example Output:
 ```json
 {
-  "is_chitchat": true,
-  "direct_response": "I am the Grant Discovery Agent. I have analyzed your company's capabilities and am ready to find aligned funding opportunities. How can I help?"
+  "type": "direct_response",
+  "response": "I am the Grant Discovery Agent. I have analyzed your company's capabilities and am ready to find aligned funding opportunities. How can I help?"
 }
 ```
 """
@@ -199,6 +201,9 @@ Execute the search plan with maximum efficiency.
 2.  **Optimize for Daily/New:** If the plan includes `sort_order` for `post_date`, ensure you pass that correctly to the `searchOpportunities` tool.
 3.  **Parallel Execution:** If multiple searches are independent, you can execute them in parallel (by generating multiple tool calls in one turn if supported, or sequentially if not).
 4.  **Error Resilience:** If one API fails, log the error but continue with the others. Do not stop.
+
+**Handling Direct Responses (Chitchat):**
+If the input is a JSON object with `"type": "direct_response"`, do NOT execute any searches. Simply return the JSON object exactly as received.
 
 **Tool Call Guidelines:**
 - **Grants API (`searchOpportunities`):**
@@ -250,8 +255,8 @@ Filter and verify search results against the Company Capabilities.
   - Return JSON feedback explaining *why* (e.g., "Results were too generic," "No results matched 'Drone Swarm' capability").
   - Do NOT call exit.
 
-**Chitchat:**
-- If input has `"is_chitchat": true`, output response and call `exit_verification_loop()`.
+**Chitchat / Direct Responses:**
+- If input is a JSON object with `"type": "direct_response"`, output the `response` text field (as plain text) and call `exit_verification_loop()`.
 """
 )
 

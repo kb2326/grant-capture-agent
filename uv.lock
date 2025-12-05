@@ -598,7 +598,7 @@ wheels = [
 [[package]]
 name = "proposal-adk-search-agent"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "fastapi" },
     { name = "google-adk" },

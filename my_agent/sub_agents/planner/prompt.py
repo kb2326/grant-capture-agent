@@ -55,19 +55,14 @@ PLANNER_INSTRUCTION = """You are a Strategic Grant Proposal Planner for a specif
     "searches": [
       {
         "api": "grants",
-        "query": "technical keyword",
+        "query": "primary technical keyword",
+        "fallback_queries": ["broader keyword 1", "related keyword 2"],
         "filters": {
           "opportunity_status": {"one_of": ["posted"]},
           "applicant_type": {"one_of": ["small_businesses"]},
            "sort_order": [{"order_by": "post_date", "sort_direction": "descending"}]
         },
         "reason": "Matches company capability X"
-      },
-      {
-        "api": "sbir",
-        "keyword": "technical keyword",
-        "open": 1,
-        "reason": "Matches company capability Y"
       }
     ]
   },

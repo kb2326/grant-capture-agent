@@ -1,0 +1,112 @@
+# BIOMASS ENERGY SYSTEMS INC. (BESI) - COMPANY CAPABILITIES
+# ------------------------------------------------------------------
+# INSTRUCTIONS FOR AGENT:
+# This document defines the core competencies, technologies, and strategic interests of BESI.
+# Use these details to filter, rank, and match grant opportunities.
+# IGNORE opportunities that do not align with these domains.
+
+## 1. CORE COMPETENCIES (PRIMARY SEARCH DOMAINS)
+
+### Waste-to-Energy & Advanced Thermal Conversion
+- **Flagship Tech**: TURNW2E® Rotary Kiln Gasification System.
+- **Capacity**: 5–100 tons/day of mixed solid waste.
+- **Feedstocks**: Plastics, biomass, municipal solid waste (MSW), agricultural residues.
+- **Outputs**: Syngas, heat, renewable fuels.
+- **Target Environments**: DoD installations, disaster zones, remote communities.
+
+### Bioenergy & Renewable Natural Gas (RNG)
+- **Systems**: Anaerobic & Aerobic Digestion.
+- **Inputs**: Food waste, biomass, organic residues.
+- **Outputs**: Biogas, biomethane, upgraded RNG (pipeline or on-site).
+- **Features**: Modular, containerized systems.
+
+### Carbonless Fuels (Hydrogen & Ammonia)
+- **Focus**: Distributed systems for renewable hydrogen and carbon-free ammonia.
+- **Integration**: Microgrids, renewable sources, storage.
+- **Methods**: CO2 conversion pathways to low-carbon fuels.
+
+### Distributed Microgrids & Energy Systems
+- **Components**: EV charging, battery storage, solar, W2E, hydrogen systems.
+- **Management**: Real-time energy management.
+- **Use Case**: Energy resilience, emergency ops, Forward Operating Bases (FOBs).
+
+### Atmospheric Water Generation (AWG)
+- **Tech**: Low-energy water harvesting from air.
+- **Output**: Potable drinking water.
+- **Power**: Solar or microgrid-integrated.
+
+### Carbon Capture & Emissions Reduction
+- **Goals**: CO2 sequestration, Methane capture (preventing gas-flares).
+- **Mandates**: Supports U.S. federal climate/resilience mandates.
+
+### Biomass-Based & Sustainable Materials
+- **Products**: 100% biomass-based, PLA-free, PFAS-free food packaging.
+- **Applications**: Military food service, national parks, disaster response.
+
+---
+
+## 2. OPTIMIZED SEARCH KEYWORDS
+# Use these terms to query grant databases. Combine Primary + Secondary for specific niches.
+
+**Primary Domains:**
+- Waste-to-energy
+- Gasification
+- Biomass conversion
+- Renewable energy
+- Microgrids
+- Hydrogen production
+- Carbonless fuels (Ammonia)
+- Carbon capture / CO2 sequestration
+- Methane capture
+- Atmospheric water generation
+- Anaerobic digestion / Bioenergy
+- PFAS remediation
+
+**Secondary / Contextual Terms:**
+- Syngas
+- Gas flares
+- Biofuels
+- PFAS-free materials / PLA-free packaging
+- EV charging / Battery storage
+- Off-grid infrastructure / Remote energy systems
+- DoD operational energy
+- Sustainable logistics
+- Climate mitigation technologies
+- Circular economy
+
+---
+
+## 3. DETAILED PROJECT VERTICALS (FOR DEEP MATCHING)
+
+### Vertical A: PFAS Remediation & Soil Health
+- **Technologies**: Biochar-derived graphene, Graphene oxide (GO) sorbents, Nanostructured adsorbents.
+- **Applications**: 
+  - Wastewater/Drinking water treatment.
+  - Biosolids separation & management.
+  - Soil remediation (immobilization/capture).
+- **Keywords**: PFAS destruction, agricultural biosolids, soil carbon stabilization.
+
+### Vertical B: Water Harvesting & Recovery
+- **Technologies**: 
+  - Wet Air Oxidation (WAO).
+  - Biodigester wastewater processing.
+  - Atmospheric water harvesting (IDM).
+- **Processes**: Sludge-to-water conversion, Oxidative water recovery.
+
+### Vertical C: Methane to Methanol Conversion
+- **Technologies**: 
+  - Direct electrocatalytic methane-to-methanol (DECMMT).
+  - Dielectric barrier discharge (DBD) plasma reactor.
+  - Non-thermal plasma conversion.
+- **Feed Sources**: Landfill gas, Biodigesters, Oil/Gas flares.
+
+### Vertical D: Agricultural Innovations (USDA Focus)
+- **Edible Biocoatings**: Chitosan/Lignin nanoparticles for shelf-life extension.
+- **Sugarcane/Bagasse Energy**: Combustion/CHP for distilleries and farms.
+
+---
+
+## 4. EXCLUSION CRITERIA (WHAT TO IGNORE)
+- Do NOT match: Residential solar installation (unless microgrid context).
+- Do NOT match: Purely theoretical physics (unless applied energy).
+- Do NOT match: IT/Software (unless energy management/microgrid control).

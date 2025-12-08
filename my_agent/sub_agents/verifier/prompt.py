@@ -11,6 +11,10 @@ Filter and verify search results against the Company Capabilities.
 
 2.  **Evaluate Each Result:**
     - **Alignment Score (0-100):** How well does this grant match the company's specific expertise?
+    - **Semantic Knockout (Crucial):** For the top 2-3 most promising matches:
+        - Call `check_eligibility_semantic(url=...)` to scan for disqualifiers (like "non-profit only").
+        - If the tool returns a warning, automatically DISCARD the result.
+    - **Competitor Recon:** call `get_competitor_intelligence(cfda_number=...)` for the best remaining match.
     - **Freshness Check:** If the user asked for "daily" or "new", is the `post_date` recent (e.g., last 7 days)?
 
 3.  **Decision:**

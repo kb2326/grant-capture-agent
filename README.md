@@ -1,138 +1,99 @@
-# Simpler Grants Discovery Agent
+# Proposal ADK Search Agent
 
-An AI agent built with Google's Agent Development Kit (ADK) to search for federal grant opportunities and SBIR/STTR proposals.
+An advanced AI agent built with Google's Agent Development Kit (ADK) designed to automate the discovery and analysis of federal grant opportunities and SBIR/STTR proposals.
 
-## Features
+This agent utilizes a **Plan-Execute-Verify (PEV)** architecture to ensure high-quality search results, automated eligibility verification, and competitive intelligence gathering.
 
-- 🔍 Search for federal grants and SBIR/STTR proposals by keyword
-- 📊 Get detailed information about specific opportunities
-- 💰 View funding ranges, deadlines, and eligibility requirements
-- 🎯 Natural language queries like "Find SBIR proposals related to gallium"
-- ✅ **NEW:** PEV Architecture with quality assurance and self-correction
+## 🚀 Key Features
 
-## Two Architecture Options
+- **🧠 Intelligent Search Planning**: The **Planner** agent breaks down complex user queries (e.g., "Find renewable energy grants for a small business in Ohio") into targeted search strategies.
+- **🕵️ Semantic Eraser (Eligibility Check)**: Automatically scans full solicitation documents to identify "knockout" criteria (e.g., "non-profit only" restrictions) and filters out irrelevant opportunities.
+- **📊 Competitor Intelligence**: Integrates with the **USAspending API** to analyze past award data, identifying top competitors and funding trends for specific grant categories.
+- **🛡️ Quality Assurance (Verifier)**: A dedicated **Verifier** agent reviews search results against the user's original request, triggering self-correction loops if the results are unsatisfactory.
+- **🏛️ Federal Data Integration**: Accesses real-time data from **Grants.gov** and **SBIR.gov** (via Simpler Grants API).
 
-### 1. Simple Tool Use (`agent.py`) - Default
-- Single LLM agent with direct tool access
-- Fast and efficient for straightforward queries
-- Best for: Simple searches, single topics, quick results
+## 🏗️ Architecture
 
-### 2. PEV Architecture (`agent_pev.py`) - Advanced ⭐
-- Three-agent system: Planner → Executor → Verifier
-- Built-in quality assurance and retry logic
-- Self-correcting with up to 3 iterations
-- Best for: Complex queries, multi-criteria searches, high-quality results
+This project employs a robust **PEV (Plan-Execute-Verify)** pattern:
 
-See [PEV_ARCHITECTURE.md](PEV_ARCHITECTURE.md) for detailed documentation.
+1.  **Planner**: Analyzes the user's intent and creates a step-by-step search plan.
+2.  **Executor**: Executes the plan using available tools (Keyword Search, Semantic Check, Competitor Intel).
+3.  **Verifier**: Evaluates the output. If the result is poor, it provides feedback to the Planner for a retry (up to 3 iterations).
 
-## Setup
+See [docs/PEV_ARCHITECTURE.md](docs/PEV_ARCHITECTURE.md) for a deep dive into the system design.
 
-1. **Install dependencies:**
-```bash
-pip install google-adk python-dotenv requests
-```
+## 🛠️ Setup & Installation
 
-2. **Configure environment variables:**
-Create a `.env` file:
-```env
-GOOGLE_GENAI_USE_VERTEXAI=0
-GOOGLE_API_KEY=your_google_api_key_here
-GRANTS_API_KEY=your_grants_api_key_here  # Optional
-```
+This project uses `uv` for modern, fast Python dependency management.
 
-3. **Enable Developer Mode (Windows):**
-To avoid symlink privilege errors:
-- Settings → Privacy & Security → For developers
-- Enable "Developer Mode"
+### Prerequisites
+- Python 3.13+
+- `uv` (Recommended) or `pip`
+- Google Cloud Project with Vertex AI API enabled (if using Vertex) or Google AI Studio Key.
 
-## Usage
+### Installation
 
-### Run the Simple Agent (default):
+1.  **Clone the repository:**
+    ```bash
+    git clone <repository-url>
+    cd "Proposal ADK search Agent"
+    ```
+
+2.  **Install dependencies:**
+    Using `uv` (Recommended):
+    ```bash
+    uv sync
+    ```
+    Or using standard `pip`:
+    ```bash
+    pip install .
+    ```
+
+3.  **Configure Environment:**
+    Create a `.env` file in the root directory:
+    ```env
+    GOOGLE_GENAI_USE_VERTEXAI=0  # Set to 1 for Vertex AI, 0 for AI Studio
+    GOOGLE_API_KEY=your_google_api_key_here
+    GRANTS_API_KEY=your_grants_api_key_here  # Optional, for Simpler Grants API
+    ```
+
+4.  **Developer Mode (Windows Users):**
+    To avoid symlink privilege errors during execution:
+    - Go to **Settings** → **Privacy & Security** → **For developers**.
+    - Enable **Developer Mode**.
+
+## 🏃 Usage
+
+Run the agent using the ADK CLI:
+
 ```bash
 adk run my_agent
 ```
 
-### Run the PEV Agent (recommended for complex queries):
-```bash
-adk run my_agent.agent_pev
-```
+### Example Queries
 
-### Test and Compare Both:
-```bash
-python my_agent/test_pev.py
-```
+- **Discovery**: "Find open SBIR Phase I opportunities related to underwater robotics."
+- **Specifics**: "Search for NSF grants for AI education and tell me if a for-profit company is eligible."
+- **Intelligence**: "Who are the past winners of Dept of Energy grants for solar panel recycling?"
+- **Complex**: "Find NASA grants for materials science, check my eligibility as a startup, and show me the competition."
 
-### Example queries:
+## 📂 Project Structure
 
-**Simple queries (both agents work well):**
-- "Find SBIR proposals related to gallium"
-- "Show me NSF research grants"
-- "Search for education funding opportunities"
+- `my_agent/`
+    - `agent.py`: Main entry point defining the PEV Loop Agent.
+    - `sub_agents/`: Contains the `planner`, `executor`, and `verifier` agent definitions.
+    - `tools/`
+        - `advanced_search.py`: Implementation of Semantic Eraser and Competitor Intel.
+        - `apis.py`: API setup for Grants and SBIR data.
+- `docs/`: Detailed documentation.
 
-**Complex queries (PEV excels):**
-- "Find NASA and NSF grants for AI and robotics for small businesses"
-- "Show me open SBIR Phase I opportunities in quantum computing and materials science"
-- "Find grants for universities in clean energy from DOE and DOC"
+## ⚠️ Troubleshooting
 
-## Architecture Comparison
+**429 Rate Limit Error**
+- If using the free tier of Google AI API, wait a minute between complex requests due to the multiple agent calls involved in the PEV loop.
 
-| Feature | Simple Tool Use | PEV Architecture |
-|---------|----------------|------------------|
-| **Agents** | 1 agent | 3 specialized agents |
-| **Planning** | Implicit | Explicit planning phase |
-| **Verification** | None | Built-in quality checks |
-| **Retry Logic** | None | Up to 3 iterations |
-| **Self-Correction** | ❌ | ✅ |
-| **Complex Queries** | May miss aspects | Systematic handling |
-| **Speed** | Faster | Slightly slower |
-| **Quality Assurance** | Manual | Automatic |
-| **Best For** | Simple queries | Complex, multi-criteria |
-
-### When to Use Each:
-
-**Use Simple Agent (`agent.py`) when:**
-- Single topic or agency
-- Quick results needed
-- Straightforward search criteria
-- Testing or development
-
-**Use PEV Agent (`agent_pev.py`) when:**
-- Multiple topics or agencies
-- Complex eligibility requirements
-- High-quality results critical
-- Multi-criteria filtering needed
-- Production use with end users
-
-## API Documentation
-
-The agent uses the [Simpler Grants API](https://api.simpler.grants.gov):
-- **Search**: `POST /v1/opportunities/search`
-- **Details**: `GET /v1/opportunities/{opportunity_id}`
-
-See `initial.MD` for complete API documentation.
-
-## Troubleshooting
-
-### 429 Rate Limit Error
-- Wait 1-2 minutes between requests
-- Using free tier of Google AI API
-- Consider upgrading to paid tier for higher limits
-
-### Windows Symlink Error
-- Enable Developer Mode in Windows Settings
-- Or run terminal as Administrator
-
-### Model Not Found
-- Ensure using valid model: `gemini-1.5-flash` or `gemini-2.0-flash`
-- Check Google API key is valid
-
-## Files
-
-- `agent.py` - Main agent implementation (custom functions)
-- `agent_openapi.py` - Alternative using OpenAPIToolset
-- `simpler_grants_openapi.json` - OpenAPI specification
-- `.env` - Environment variables (create this)
-- `initial.MD` - ADK documentation and API reference
+**Windows Symlink Error**
+- Ensure "Developer Mode" is enabled in Windows settings.
 
 ## License
 

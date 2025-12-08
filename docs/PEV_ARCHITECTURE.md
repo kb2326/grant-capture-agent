@@ -263,8 +263,8 @@ pev_loop = LoopAgent(
 ### Running the PEV Agent
 
 ```bash
-# Use the PEV agent instead of the simple agent
-adk run my_agent.agent_pev
+# Run the main agent (which implements the PEV architecture)
+adk run my_agent
 ```
 
 ### Example Queries
@@ -332,19 +332,34 @@ verifier_agent = LlmAgent(model='gemini-2.5-pro', ...)  # Thorough verification
 
 ---
 
-## Comparison: Simple vs PEV
+## Why PEV Architecture?
 
-| Aspect | Simple Tool Use (agent.py) | PEV Architecture (agent_pev.py) |
-|--------|---------------------------|--------------------------------|
-| **Agents** | 1 agent | 3 specialized agents |
-| **Planning** | Implicit in instructions | Explicit planning phase |
-| **Verification** | None | Built-in quality checks |
-| **Retry Logic** | None | Up to 3 iterations |
-| **Complex Queries** | May miss aspects | Systematic decomposition |
-| **Quality Assurance** | User must verify | Automatic verification |
-| **Error Recovery** | Fails immediately | Self-correcting |
-| **Transparency** | Black box | Clear stages |
-| **Best For** | Simple, single-topic queries | Complex, multi-criteria queries |
+The **Plan-Execute-Verify** architecture offers significant advantages over a standard single-agent approach:
+
+### 1. **Self-Correcting**
+- Automatically retries with refined queries if initial results are poor
+- Learns from verification feedback
+- Adapts search strategy based on what worked/didn't work
+
+### 2. **Quality Assurance**
+- Built-in verification ensures results meet criteria
+- Catches common issues (wrong agency, irrelevant results, too few results)
+- Validates data integrity before presenting to user
+
+### 3. **Better Complex Query Handling**
+- Breaks down complex queries into structured plans
+- Handles multi-topic, multi-agency searches systematically
+- Ensures comprehensive coverage across both APIs
+
+### 4. **Transparency**
+- Clear separation of planning, execution, and verification
+- Traceable decision-making process
+- Detailed feedback on why results passed/failed
+
+### 5. **Robustness**
+- Handles API errors gracefully
+- Continues execution even if one search fails
+- Provides best available results even if verification fails
 
 ---
 

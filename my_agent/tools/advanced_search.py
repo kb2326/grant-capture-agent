@@ -3,8 +3,8 @@ Advanced Search and Verification Tools for Proposal ADK Agent.
 """
 import requests
 from bs4 import BeautifulSoup
-import re
-import json
+from typing import Optional
+
 
 def check_eligibility_semantic(url: str, entity_type: str = "for-profit") -> str:
     """
@@ -46,8 +46,8 @@ def check_eligibility_semantic(url: str, entity_type: str = "for-profit") -> str
             if "non-profit only" in eligibility_text or "501(c)(3) status is required" in eligibility_text:
                 warnings.append("⚠️ KNOCKOUT: Seems restricted to Non-Profits/501(c)(3).")
             if "university" in eligibility_text and "consortium" not in eligibility_text:
-                # Weak check, but flags if it's purely academic
-                 pass 
+                                                # Weak check, but flags if it's purely academic
+                                                pass
 
         if not warnings:
             return f"✅ ELIGIBILITY CHECK PASSED (Heuristic). Scan of text found no obvious blockers.\n\nExtracted Context:\n{eligibility_text[:500]}..."
@@ -56,8 +56,6 @@ def check_eligibility_semantic(url: str, entity_type: str = "for-profit") -> str
 
     except Exception as e:
         return f"Error checking eligibility: {str(e)}"
-
-from typing import Optional
 
 def get_competitor_intelligence(cfda_number: Optional[str] = None, keyword: Optional[str] = None) -> str:
     """
@@ -75,7 +73,7 @@ def get_competitor_intelligence(cfda_number: Optional[str] = None, keyword: Opti
     payload = {
         "filters": {
             "time_period": [{"start_date": "2023-01-01", "end_date": "2025-12-31"}],
-            "award_type_codes": ["A", "B", "C", "D"], # Grants
+            "award_type_codes": ["A", "B", "C", "D"],  # Grants
             "limit": 5
         },
         "fields": ["Recipient Name", "Award Amount"],

@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "https://api.sam.gov/prod/opportunities/v2"
+      "url": "https://api.sam.gov/opportunities/v2"
     }
   ],
   "paths": {
@@ -102,7 +102,10 @@
             "description": "Filter by active status (Yes/No). Default is Yes (active only) for this endpoint usually.",
             "schema": {
               "type": "string",
-              "enum": ["Yes", "No"]
+              "enum": [
+                "Yes",
+                "No"
+              ]
             }
           }
         ],
@@ -114,19 +117,35 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "totalRecords": { "type": "integer" },
+                    "totalRecords": {
+                      "type": "integer"
+                    },
                     "opportunitiesData": {
                       "type": "array",
                       "items": {
                         "type": "object",
                         "properties": {
-                          "noticeId": { "type": "string" },
-                          "title": { "type": "string" },
-                          "solicitationNumber": { "type": "string" },
-                          "postedDate": { "type": "string" },
-                          "type": { "type": "string" },
-                          "description": { "type": "string" },
-                          "uiLink": { "type": "string" }
+                          "noticeId": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "solicitationNumber": {
+                            "type": "string"
+                          },
+                          "postedDate": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "uiLink": {
+                            "type": "string"
+                          }
                         }
                       }
                     }

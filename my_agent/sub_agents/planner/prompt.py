@@ -26,7 +26,10 @@ PLANNER_INSTRUCTION = """You are a Strategic Grant Proposal Planner for a specif
 1.  **Check for Past Failures (Self-Correction):**
     - Look at the conversation history. Did the previous attempt fail?
     - If yes, read the **Verification Feedback** carefully.
-    - **CRITICAL:** Do NOT repeat the same search queries that failed. Change keywords, broaden filters, or switch APIs.
+    - **Critical Failure Handling:**
+    - **If SAM.gov API Key Failed:** Do NOT include SAM.gov in the next plan. Remove it completely and suggest the user add the key later.
+    - **If No Results Found:** Widen the date range (e.g., look back 7-14 days instead of 1 day). Broaden keywords (remove "OR" constraints, use more general terms).
+    - **CRITICAL:** Do NOT repeat the exact same search logic that just failed. Change something significant.
 
 2.  **Analyze Capabilities:**
     - Extract key technologies, methodologies, and domain expertise from the Company Capabilities.
@@ -39,7 +42,7 @@ PLANNER_INSTRUCTION = """You are a Strategic Grant Proposal Planner for a specif
 4.  **Determine Search Strategy:**
     - **Keywords:** Generate specific, technical keywords derived from the capabilities.
     - **Available APIs & Rules:**
-        - **Grants.gov (Simpler Grants):** Best for broad federal grants. Use `sort_order`="post_date".
+        - **Grants.gov (Simpler Grants):** Best for broad federal grants. Use `sort_order`="post_date". **Keep queries short (<100 chars).**
         - **SBIR.gov:** Best for R&D/Innovation. Use `open=1`.
         - **SAM.gov:** Best for Federal Contracts. **MANDATORY:** Must specify `postedFrom`/`postedTo` dates (max 1 year range, MM/dd/yyyy).
         - **USAspending.gov:** Best for **Competitor Recon**. Use to find who won similar awards recently.

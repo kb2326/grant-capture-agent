@@ -1,0 +1,185 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "USAspending API",
+        "version": "v2",
+        "description": "API to search for federal spending information."
+    },
+    "servers": [
+        {
+            "url": "https://api.usaspending.gov"
+        }
+    ],
+    "paths": {
+        "/api/v2/search/spending_by_award/": {
+            "post": {
+                "operationId": "searchSpendingByAward",
+                "description": "Search for specific awards (grants, contracts, etc.) based on filters. Useful for competitor analysis.",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "filters": {
+                                        "type": "object",
+                                        "properties": {
+                                            "keywords": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                },
+                                                "description": "Keywords to match against award description or title."
+                                            },
+                                            "time_period": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "start_date": {
+                                                            "type": "string",
+                                                            "format": "date",
+                                                            "example": "2023-01-01"
+                                                        },
+                                                        "end_date": {
+                                                            "type": "string",
+                                                            "format": "date",
+                                                            "example": "2023-12-31"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "start_date",
+                                                        "end_date"
+                                                    ]
+                                                }
+                                            },
+                                            "award_type_codes": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                },
+                                                "description": "A=Contract, B=Contract IDV, C=Grant, D=Direct Payment, etc. Use ['A','B','C','D'] generally.",
+                                                "example": [
+                                                    "A",
+                                                    "B",
+                                                    "C",
+                                                    "D"
+                                                ]
+                                            },
+                                            "agencies": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "type": {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                "awarding",
+                                                                "funding"
+                                                            ]
+                                                        },
+                                                        "tier": {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                "toptier",
+                                                                "subtier"
+                                                            ]
+                                                        },
+                                                        "name": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "type",
+                                                        "tier",
+                                                        "name"
+                                                    ]
+                                                }
+                                            },
+                                            "recipient_search_text": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                },
+                                                "description": "Name of the recipient organization to find specific awards."
+                                            }
+                                        }
+                                    },
+                                    "fields": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "default": [
+                                            "Award ID",
+                                            "Recipient Name",
+                                            "Start Date",
+                                            "End Date",
+                                            "Award Amount",
+                                            "Description",
+                                            "Awarding Agency"
+                                        ],
+                                        "description": "Fields to return. Recommend: ['Award ID', 'Recipient Name', 'Start Date', 'Award Amount', 'Description', 'Awarding Agency']"
+                                    },
+                                    "sort": {
+                                        "type": "string",
+                                        "default": "Award Amount",
+                                        "description": "Field to sort by."
+                                    },
+                                    "order": {
+                                        "type": "string",
+                                        "enum": [
+                                            "asc",
+                                            "desc"
+                                        ],
+                                        "default": "desc"
+                                    },
+                                    "limit": {
+                                        "type": "integer",
+                                        "default": 10,
+                                        "maximum": 100
+                                    },
+                                    "page": {
+                                        "type": "integer",
+                                        "default": 1
+                                    }
+                                },
+                                "required": [
+                                    "filters"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {
+                                            "type": "integer"
+                                        },
+                                        "results": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "additionalProperties": true
+                                            }
+                                        },
+                                        "page_metadata": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

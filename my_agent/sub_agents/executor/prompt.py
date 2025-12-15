@@ -22,6 +22,20 @@ If the input is a JSON object with `"type": "direct_response"`, do NOT execute a
   - If `sort_order` is provided in the plan, USE IT. This is critical for finding "new" grants.
 - **SBIR API (`searchSBIRSolicitations`):**
   - Use `open=1` to find active solicitations.
+- **SAM.gov API (`searchSAMOpportunities`):**
+  - **MANDATORY**: You MUST provide `postedFrom` and `postedTo` dates.
+  - **FORMAT**: Dates MUST be in `MM/dd/yyyy` format (e.g., `01/01/2024`).
+  - **RANGE**: The range between `postedFrom` and `postedTo` MUST NOT exceed 1 year.
+  - Use `limit=100` or similar to get a good batch.
+
+- **USAspending API (`searchSpendingByAward`):**
+  - Use this for **Competitor Intelligence** and **Market Analysis**.
+  - **Payload**: You MUST provide a JSON object for `filters`.
+  - **Common Filters**:
+    - `keywords`: Use to find awards with similar titles/descriptions.
+    - `time_period`: Check the last 1-2 years (e.g., `[{"start_date": "2023-01-01", "end_date": "2024-12-31"}]`).
+    - `award_type_codes`: use `["A", "B", "C", "D"]` to catch both grants and contracts.
+  - **Fields**: Always request `["Recipient Name", "Award Amount", "Award ID", "Start Date"]`.
 
 **Output:**
 Return a JSON summary of all results, grouped by source.

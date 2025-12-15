@@ -1,0 +1,142 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "SAM.gov Opportunities API",
+    "version": "v2",
+    "description": "API to search for federal contract opportunities on SAM.gov"
+  },
+  "servers": [
+    {
+      "url": "https://api.sam.gov/prod/opportunities/v2"
+    }
+  ],
+  "paths": {
+    "/search": {
+      "get": {
+        "operationId": "searchSAMOpportunities",
+        "description": "Search for federal contract opportunities. MANDATORY: 'postedFrom' and 'postedTo' must be provided in MM/dd/yyyy format and the range must not exceed 1 year.",
+        "parameters": [
+          {
+            "name": "api_key",
+            "in": "query",
+            "required": true,
+            "description": "User's Public API Key",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "postedFrom",
+            "in": "query",
+            "required": true,
+            "description": "Posted date From. Format: MM/dd/yyyy. Required.",
+            "schema": {
+              "type": "string",
+              "pattern": "^(0[1-9]|1[0-2])/(0[1-9]|[12][0-9]|3[01])/\\d{4}$"
+            }
+          },
+          {
+            "name": "postedTo",
+            "in": "query",
+            "required": true,
+            "description": "Posted date To. Format: MM/dd/yyyy. Required. Must be within 1 year of postedFrom.",
+            "schema": {
+              "type": "string",
+              "pattern": "^(0[1-9]|1[0-2])/(0[1-9]|[12][0-9]|3[01])/\\d{4}$"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Number of records to retrieve (Max 1000). Default 10.",
+            "schema": {
+              "type": "integer",
+              "maximum": 1000,
+              "default": 10
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Page index. Default 0.",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "title",
+            "in": "query",
+            "description": "Opportunity Title Keyword",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "solnum",
+            "in": "query",
+            "description": "Solicitation Number",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ptype",
+            "in": "query",
+            "description": "Procurement Type (p=Presolicitation, a=Award Notice, r=Sources Sought, s=Special Notice, o=Solicitation, k=Combined Synopsis/Solicitation)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ncode",
+            "in": "query",
+            "description": "NAICS Code (max 6 digits)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "active",
+            "in": "query",
+            "description": "Filter by active status (Yes/No). Default is Yes (active only) for this endpoint usually.",
+            "schema": {
+              "type": "string",
+              "enum": ["Yes", "No"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "totalRecords": { "type": "integer" },
+                    "opportunitiesData": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "noticeId": { "type": "string" },
+                          "title": { "type": "string" },
+                          "solicitationNumber": { "type": "string" },
+                          "postedDate": { "type": "string" },
+                          "type": { "type": "string" },
+                          "description": { "type": "string" },
+                          "uiLink": { "type": "string" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -37,32 +37,46 @@ PLANNER_INSTRUCTION = """You are a Strategic Grant Proposal Planner for a specif
     - If "General Search": Focus on overall alignment.
 
 4.  **Determine Search Strategy:**
-    - **Keywords:** Generate specific, technical keywords derived from the capabilities (not just generic terms).
-    - **Filters:**
-        - **Grants API:** Use `sort_order` = `post_date` (descending) for daily checks. Use `applicant_type` matching the company (e.g., small_business).
-        - **SBIR API:** Filter by relevant agencies and `open=1`.
+    - **Keywords:** Generate specific, technical keywords derived from the capabilities.
+    - **Available APIs & Rules:**
+        - **Grants.gov (Simpler Grants):** Best for broad federal grants. Use `sort_order`="post_date".
+        - **SBIR.gov:** Best for R&D/Innovation. Use `open=1`.
+        - **SAM.gov:** Best for Federal Contracts. **MANDATORY:** Must specify `postedFrom`/`postedTo` dates (max 1 year range, MM/dd/yyyy).
+        - **USAspending.gov:** Best for **Competitor Recon**. Use to find who won similar awards recently.
 
 **Output Plan (JSON):**
 
 ```json
 {
   "analysis": {
-    "company_focus": "Brief summary of what the company does",
-    "search_intent": "daily_update" or "deep_dive",
+    "company_focus": "Brief summary",
+    "search_intent": "daily_update" or "competitor_analysis",
     "key_terms": ["term1", "term2"]
   },
   "search_plan": {
     "searches": [
       {
         "api": "grants",
-        "query": "primary technical keyword",
-        "fallback_queries": ["broader keyword 1", "related keyword 2"],
+        "query": "tech keyword",
+        "reason": "Find open grants",
+        "filters": { "sort_order": [{"order_by": "post_date", "sort_direction": "descending"}] }
+      },
+      {
+        "api": "sam",
+        "query": "tech keyword",
+        "reason": "Find contracts",
         "filters": {
-          "opportunity_status": {"one_of": ["posted"]},
-          "applicant_type": {"one_of": ["small_businesses"]},
-           "sort_order": [{"order_by": "post_date", "sort_direction": "descending"}]
-        },
-        "reason": "Matches company capability X"
+          "postedFrom": "01/01/2024",
+          "postedTo": "12/31/2024" 
+        }
+      },
+      {
+        "api": "usa_spending",
+        "query": "tech keyword",
+        "reason": "Analyze competitors",
+        "filters": {
+          "time_period": [{"start_date": "2023-01-01", "end_date": "2024-01-01"}]
+        }
       }
     ]
   },

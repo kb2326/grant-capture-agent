@@ -1,0 +1,432 @@
+<title>Grant Capture Agent Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a federal "solicitation binder" — sticky section index on the left, numbered sections on the right, clause-style callouts. */
+:root{
+  --bg:#f5f6f8; --surface:#ffffff; --ink:#18212b; --muted:#5a6675; --line:#d8dde4;
+  --accent:#1d5c8a; --accent-soft:#e3edf5; --ok:#2f7a4d; --ok-soft:#e2f1e7; --warn:#9a6411; --warn-soft:#f7ecd9; --todo:#6b7480; --todo-soft:#eceef1;
+  --f-display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#11161c; --surface:#18202a; --ink:#e4e9ef; --muted:#9aa6b4; --line:#2a3542;
+  --accent:#7db4de; --accent-soft:#1c2f40; --ok:#79c79a; --ok-soft:#183024; --warn:#e2b25f; --warn-soft:#352914; --todo:#a3acb7; --todo-soft:#232c36; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11161c; --surface:#18202a; --ink:#e4e9ef; --muted:#9aa6b4; --line:#2a3542;
+  --accent:#7db4de; --accent-soft:#1c2f40; --ok:#79c79a; --ok-soft:#183024; --warn:#e2b25f; --warn-soft:#352914; --todo:#a3acb7; --todo-soft:#232c36; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6;padding-inline:16px;padding-block:0 64px}
+a{color:var(--accent)}
+a:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+code,.mono{font-family:var(--f-mono);font-size:.9em}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.2;margin:0}
+h1{font-size:clamp(2rem,5vw,3rem);font-weight:800;letter-spacing:-.01em}
+h2{font-size:1.6rem;font-weight:700}
+h3{font-size:1.1rem;font-weight:700}
+p{margin:0;max-width:68ch}
+.eyebrow{font-family:var(--f-mono);font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+
+.wrap{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:220px minmax(0,1fr);gap:48px}
+@media (max-width:860px){.wrap{grid-template-columns:minmax(0,1fr);gap:24px}.toc{position:static!important;border:0!important;padding:0!important}}
+
+header.masthead{max-width:1180px;margin:0 auto;padding-block:48px 32px;display:grid;gap:16px;border-bottom:1px solid var(--line);margin-bottom:32px}
+.masthead .lede{font-size:1.15rem;color:var(--muted);max-width:62ch}
+.meta{display:flex;flex-wrap:wrap;gap:8px 20px;font-family:var(--f-mono);font-size:.8rem;color:var(--muted)}
+
+.toc{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);align-self:start;border-right:1px solid var(--line);padding-right:20px}
+.toc ol{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:2px;counter-reset:s}
+.toc li{counter-increment:s}
+.toc a{display:flex;gap:10px;text-decoration:none;color:var(--ink);padding:5px 0;font-size:.92rem}
+.toc a::before{content:counter(s,decimal-leading-zero);font-family:var(--f-mono);color:var(--muted);font-size:.8rem;padding-top:2px}
+.toc a:hover{color:var(--accent)}
+
+main{display:grid;gap:56px;min-width:0}
+section{display:grid;gap:16px;min-width:0;scroll-margin-top:24px}
+section > header{display:grid;gap:4px}
+
+.clause{border-left:3px solid var(--accent);background:var(--accent-soft);padding:14px 18px;display:grid;gap:6px;max-width:72ch}
+.clause .eyebrow{color:var(--accent)}
+
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:18px;display:grid;gap:8px;align-content:start;min-width:0}
+
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.93rem;min-width:620px}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--f-mono);font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;background:var(--bg)}
+tr:last-child td{border-bottom:0}
+td.num{font-variant-numeric:tabular-nums;font-family:var(--f-mono)}
+
+.pill{display:inline-block;font-family:var(--f-mono);font-size:.72rem;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.pill.done{background:var(--ok-soft);color:var(--ok)}
+.pill.now{background:var(--warn-soft);color:var(--warn)}
+.pill.todo{background:var(--todo-soft);color:var(--todo)}
+
+.phases{display:grid;gap:0;border:1px solid var(--line);border-radius:6px;background:var(--surface);overflow:hidden}
+.phase{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:14px;padding:14px 18px;border-bottom:1px solid var(--line);align-items:start}
+.phase:last-child{border-bottom:0}
+.phase .n{font-family:var(--f-mono);color:var(--muted);font-size:.85rem;padding-top:2px}
+.phase.current{background:var(--warn-soft)}
+.phase p{color:var(--muted);font-size:.92rem}
+@media (max-width:520px){.phase{grid-template-columns:32px minmax(0,1fr)}.phase .pill{grid-column:2}}
+
+details.stack{background:var(--surface);border:1px solid var(--line);border-radius:6px}
+details.stack + details.stack{margin-top:8px}
+details.stack summary{cursor:pointer;padding:14px 18px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:baseline;list-style:none}
+details.stack summary::-webkit-details-marker{display:none}
+details.stack summary .layer{font-family:var(--f-mono);font-size:.74rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+details.stack summary strong{font-family:var(--f-display);font-size:1.05rem}
+details.stack summary .chev{font-family:var(--f-mono);color:var(--muted)}
+details.stack[open] summary .chev{transform:rotate(90deg)}
+.stack .body{padding:0 18px 18px;display:grid;gap:10px}
+.stack dl{display:grid;grid-template-columns:150px minmax(0,1fr);gap:6px 16px;margin:0;font-size:.93rem}
+.stack dt{color:var(--muted);font-family:var(--f-mono);font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;padding-top:3px}
+.stack dd{margin:0}
+@media (max-width:520px){.stack dl{grid-template-columns:minmax(0,1fr)}.stack dt{padding-top:6px}}
+
+.steps{counter-reset:st;display:grid;gap:10px;padding:0;margin:0;list-style:none}
+.steps li{counter-increment:st;display:grid;grid-template-columns:36px minmax(0,1fr);gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:12px 16px}
+.steps li::before{content:counter(st);font-family:var(--f-display);font-weight:800;font-size:1.3rem;color:var(--accent)}
+.steps li span{color:var(--muted);font-size:.92rem;display:block}
+
+pre.mermaid{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:16px;overflow-x:auto;margin:0}
+.gloss{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.gloss div{border-top:2px solid var(--line);padding-top:8px}
+.gloss b{font-family:var(--f-display)}
+.gloss p{color:var(--muted);font-size:.92rem}
+.small{font-size:.88rem;color:var(--muted)}
+ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<header class="masthead">
+  <span class="eyebrow">Project field guide · living document</span>
+  <h1>grant-capture-agent</h1>
+  <p class="lede">An AI system that finds federal funding a small R&amp;D company can actually win, rules out the ones it is not allowed to win, and drafts the proposal from the company's own evidence. It is an open, measured rebuild of the workflow SweetSpot AI pioneered, built on Google ADK and Google Cloud, and run the way an AI product team would run it.</p>
+  <div class="meta">
+    <span>Owner: Karthick Balaje (kb2326)</span>
+    <span>Current phase: PRD and system design in review</span>
+    <span>Last updated: 6 Oct 2026</span>
+  </div>
+</header>
+
+<div class="wrap">
+<nav class="toc" aria-label="Sections">
+  <span class="eyebrow">Sections</span>
+  <ol>
+    <li><a href="#status">Where we are</a></li>
+    <li><a href="#why">Why this exists</a></li>
+    <li><a href="#product">What we're building</a></li>
+    <li><a href="#process">How a team runs it</a></li>
+    <li><a href="#arch">Architecture</a></li>
+    <li><a href="#agents">The agents</a></li>
+    <li><a href="#rag">RAG from scratch</a></li>
+    <li><a href="#stack">The stack, explained</a></li>
+    <li><a href="#evals">How we measure</a></li>
+    <li><a href="#milestones">Milestones</a></li>
+    <li><a href="#resume">Résumé mapping</a></li>
+    <li><a href="#glossary">Glossary</a></li>
+    <li><a href="#log">Decision log</a></li>
+  </ol>
+</nav>
+
+<main>
+
+<section id="status">
+  <header><span class="eyebrow">Section 01</span><h2>Where we are</h2></header>
+  <p>The first version was a prototype built at BESI between November and December 2025, when this was a one-person project. It proved the idea, but most of what the résumé describes was never built or measured. This rebuild starts from a clean slate. The old code is kept under the git tag <code>v0-besi-prototype</code> so the before and after can be compared.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Part</th><th>v0 prototype (BESI)</th><th>v1 rebuild (target)</th></tr></thead>
+    <tbody>
+      <tr><td>Search agent</td><td>ADK loop of three prompts; the verifier scores itself out of 100</td><td>ADK 2 workflow graph with typed hand-offs; the quality gate is code</td></tr>
+      <tr><td>Data</td><td>Calls Grants.gov, SBIR.gov and USAspending live on every search</td><td>Nightly ingestion into an index; live calls only as a fallback</td></tr>
+      <tr><td>Eligibility screen</td><td>Looks for two fixed phrases on the web page</td><td>Reads the full solicitation, extracts each clause, rules decide, accuracy measured</td></tr>
+      <tr><td>Proposal drafting</td><td>Not built</td><td>Corrective RAG over company documents with citations</td></tr>
+      <tr><td>Quality</td><td>One test file, no evals, no CI, not deployed</td><td>Eval sets, CI eval gate, tracing, live on Google Cloud</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="why">
+  <header><span class="eyebrow">Section 02</span><h2>Why this exists</h2></header>
+  <p>A grants lead at a small deep-tech company spends hours searching Grants.gov, SBIR.gov and SAM.gov. They read a 40-page solicitation and find a disqualifying clause on page 31. Then they spend days writing a technical section from old proposals scattered across shared drives.</p>
+  <div class="clause">
+    <span class="eyebrow">Example knockout clause</span>
+    <p>"Only small business concerns (SBCs) are eligible to submit proposals. An SBC must have 500 or fewer employees, including affiliates, and be more than 50% owned and controlled by U.S. citizens or permanent resident aliens."</p>
+    <p class="small">One sentence like this decides whether a week of proposal writing is worth starting. Finding it reliably, and explaining why it applies, is the core of the Analyze module.</p>
+  </div>
+  <p><b>Primary user:</b> the capture or grants lead at a 15–50 person deep-tech company. Our test company is fictional: <b>Lumen Grid Labs</b>, a grid-storage and power-electronics R&amp;D firm. Using a made-up company means no real company's data is published.</p>
+</section>
+
+<section id="product">
+  <header><span class="eyebrow">Section 03</span><h2>What we're building</h2></header>
+  <p>SweetSpot AI sells this workflow as a commercial product. We rebuild its three AI modules in the open, and measure each one.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Our module</th><th>SweetSpot equivalent</th><th>What it does for the user</th></tr></thead>
+    <tbody>
+      <tr><td><b>Discover</b></td><td>AI search across 1M+ opportunities</td><td>"Show me open opportunities that fit what we do," in plain English</td></tr>
+      <tr><td><b>Analyze</b></td><td>Bid/no-bid by asking AI about any solicitation</td><td>Reads the full solicitation and turns it into a brief: eligibility, requirements, scoring criteria, page limits, deadlines. Flags knockouts with the exact clause quoted. Answers questions with citations.</td></tr>
+      <tr><td><b>Draft</b></td><td>Proposal copilot trained on company data</td><td>Writes each required section from the company's real evidence, cites every claim, and marks gaps instead of inventing</td></tr>
+      <tr><td><b>Saved list</b></td><td>Pipeline management</td><td>A simple list of opportunities you're pursuing. Full CRM is out of scope.</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small"><b>Out of scope for v1:</b> multiple customer accounts, state and local portals, submitting proposals, FedRAMP/SOC 2. <b>Guardrails:</b> a person approves the search plan and every draft; every verdict and claim cites its source; the system never submits anything.</p>
+</section>
+
+<section id="process">
+  <header><span class="eyebrow">Section 04</span><h2>How a product team runs it</h2></header>
+  <p>Each phase produces a document. Those documents are what you'll talk through in interviews: what you decided, what you rejected, and how you knew it worked.</p>
+  <div class="phases">
+    <div class="phase"><span class="n">01</span><div><h3>Product discovery</h3><p>PRD: problem, user, success metrics, non-goals. <code>docs/product/PRD.md</code></p></div><span class="pill now">written, in review</span></div>
+    <div class="phase current"><span class="n">02</span><div><h3>System design</h3><p>Architecture, data model, typed hand-offs, workflows, knockout rules, evals, security, deployment. <code>docs/design/system-design.md</code></p></div><span class="pill now">written, in review</span></div>
+    <div class="phase"><span class="n">03</span><div><h3>Decision records (ADRs)</h3><p>One short file per big choice, with the options we turned down and why. <code>docs/adr/</code></p></div><span class="pill todo">next</span></div>
+    <div class="phase"><span class="n">04</span><div><h3>Evals first</h3><p>Decide what "correct" means and label test data before writing features. <code>evals/</code></p></div><span class="pill todo">to do</span></div>
+    <div class="phase"><span class="n">05</span><div><h3>Implementation plan</h3><p>Each milestone broken into small, testable tasks. <code>docs/plans/</code></p></div><span class="pill todo">to do</span></div>
+    <div class="phase"><span class="n">06</span><div><h3>Build</h3><p>Tests first, small pull requests, CI on every pull request.</p></div><span class="pill todo">to do</span></div>
+    <div class="phase"><span class="n">07</span><div><h3>Ship</h3><p>Deploy to Google Cloud with a demo UI, tracing, and an eval gate that blocks a bad release.</p></div><span class="pill todo">to do</span></div>
+    <div class="phase"><span class="n">08</span><div><h3>Operate and report</h3><p>Eval report, cost report, and a write-up of what went wrong and what you'd change.</p></div><span class="pill todo">to do</span></div>
+  </div>
+</section>
+
+<section id="arch">
+  <header><span class="eyebrow">Section 05</span><h2>Architecture</h2></header>
+  <p>The system has two halves. The <b>offline</b> half runs every night: it collects opportunities and documents and prepares them for search. The <b>online</b> half runs when a user asks for something: agents search what was prepared, reason about it, and ask a person to approve before acting.</p>
+<pre class="mermaid">
+flowchart LR
+  subgraph OFF["Offline · nightly"]
+    S[Grants.gov · SBIR.gov<br/>SAM.gov · USAspending] --> I[Ingestion job<br/>Cloud Run Job]
+    C[Company documents<br/>profile · past proposals · CVs] --> I
+    I --> G[(Raw files<br/>Cloud Storage)]
+    I --> P[(Postgres + pgvector<br/>Cloud SQL)]
+  end
+  subgraph ON["Online · per request"]
+    U[Web UI<br/>Cloud Run] --> R[Root agent<br/>Agent Engine]
+    R --> D[Discover]
+    R --> A[Analyze]
+    R --> W[Draft]
+    D & A & W --> L[RAG library<br/>hybrid search · rerank · grade]
+    L --> P
+    D -. approve plan .-> U
+    W -. approve draft .-> U
+  end
+</pre>
+  <div class="grid2">
+    <div class="panel"><h3>Why prepare data offline?</h3><p>Searching an index is fast, and the results stay the same between runs, which makes evaluations repeatable. SweetSpot gets its speed the same way. Live API calls remain as a fallback for opportunities posted today.</p></div>
+    <div class="panel"><h3>Why typed hand-offs?</h3><p>In v0, each agent read the previous agent's paragraph of text and guessed its meaning. In v1 they pass structured objects such as <code>SearchPlan</code> and <code>SolicitationBrief</code>, which are checked automatically, so a malformed result fails loudly instead of quietly.</p></div>
+    <div class="panel"><h3>The LLM extracts, rules decide</h3><p>The model finds and quotes the eligibility clause. Plain code compares it with the company profile and makes the call. Decisions with consequences stay in code a person can read and test.</p></div>
+    <div class="panel"><h3>A person approves</h3><p>ADK 2 can pause a workflow, wait for a person's approval, and resume exactly where it stopped. That replaces v0's workaround of breaking out of the loop.</p></div>
+  </div>
+</section>
+
+<section id="agents">
+  <header><span class="eyebrow">Section 06</span><h2>The agents</h2></header>
+  <div class="grid2">
+    <div class="panel"><span class="eyebrow">Discover</span><h3>Plan → Execute → Verify</h3><p>The planner turns a request into a structured search plan. You approve it. The executor runs hybrid searches against the index. The verifier checks the results with rules (still open? deadline far enough out? matches the company's field?) and sends the executor back with a sharper query if too few pass.</p></div>
+    <div class="panel"><span class="eyebrow">Analyze</span><h3>The Solicitation agent</h3><p>Reads every attached document for one opportunity and fills a <code>SolicitationBrief</code>: eligibility clauses, "shall" requirements, scoring criteria, page limits, required sections, deadlines. The knockout screen runs on the eligibility clauses. You can ask follow-up questions, and each answer cites the page it came from.</p></div>
+    <div class="panel"><span class="eyebrow">Draft</span><h3>Corrective RAG writer</h3><p>For each section the solicitation requires, it retrieves evidence from the company's documents and grades every passage. If the evidence is weak it rewrites the query and tries again. If evidence is still missing it writes "needs input from the team" rather than making something up. A final check confirms every sentence is supported.</p></div>
+  </div>
+</section>
+
+<section id="rag">
+  <header><span class="eyebrow">Section 07</span><h2>RAG from scratch</h2></header>
+  <p>RAG (retrieval-augmented generation) means finding the right passages first and then asking the model to answer using only those passages. We build every stage ourselves as a small library that all three agents share, so each stage can be explained and tested on its own.</p>
+  <ol class="steps">
+    <li><div><b>Parse</b><span>Turn PDFs and Word files into clean text that keeps headings, tables and page numbers. Page numbers are what make citations possible.</span></div></li>
+    <li><div><b>Chunk</b><span>Split the text into passages along section boundaries, so "Section 3.2 Eligibility" stays together instead of being cut mid-sentence.</span></div></li>
+    <li><div><b>Embed</b><span>Turn each passage into a list of numbers that captures its meaning, so passages with similar meaning sit close together.</span></div></li>
+    <li><div><b>Hybrid search</b><span>Run two searches at once: keyword search (exact terms like "SBIR Phase I") and meaning search (similar ideas worded differently). Merge the two ranked lists with Reciprocal Rank Fusion.</span></div></li>
+    <li><div><b>Rerank</b><span>A specialised ranking model re-reads the top 50 candidates against the question and keeps the best 8.</span></div></li>
+    <li><div><b>Grade (the "corrective" part)</b><span>A fast model labels each kept passage relevant, ambiguous or irrelevant. If too few are relevant, rewrite the query and search again, up to two times.</span></div></li>
+    <li><div><b>Generate with citations</b><span>Write the answer using only the graded passages, attaching a source to every claim.</span></div></li>
+    <li><div><b>Check faithfulness</b><span>Confirm every sentence in the answer is supported by a cited passage, and flag any that aren't.</span></div></li>
+  </ol>
+</section>
+
+<section id="stack">
+  <header><span class="eyebrow">Section 08</span><h2>The stack, explained</h2></header>
+  <p>Each choice is current as of October 2026 and was picked because it fits this project, not just because it's popular. Open any item for a plain explanation, the alternative we turned down, and the skill it teaches. Exact model IDs get pinned and checked in milestone M0.</p>
+
+  <div class="clause">
+    <span class="eyebrow">Google renamed things in 2026</span>
+    <p>At Cloud Next '26, Vertex AI became <b>Gemini Enterprise Agent Platform</b> ("Agent Platform"). Agent Engine is now <b>Agent Runtime</b>. The Python package is still called <code>vertexai</code>, and many tutorials still use the old names. Both sets of names refer to the same products.</p>
+  </div>
+
+  <div class="tablewrap"><table>
+    <thead><tr><th>Google piece</th><th>Version checked (6 Oct 2026)</th><th>Role in this project</th></tr></thead>
+    <tbody>
+      <tr><td><b>agents-cli</b></td><td class="num">1.9.0 (yours: 0.2.1, needs an upgrade)</td><td>Google's official CLI and skill pack for ADK: scaffold, local playground, eval, deploy, CI/CD, Terraform. We use its <code>agentic_rag</code> template as the starting point.</td></tr>
+      <tr><td><b>ADK for Python</b> (<code>google-adk</code>)</td><td class="num">2.11.0</td><td>The agent framework: workflow graphs, tool confirmation, resumable approval steps, evals</td></tr>
+      <tr><td><b>Gen AI SDK</b> (<code>google-genai</code>)</td><td class="num">2.28.0</td><td>Direct Gemini calls outside agents: grading, embeddings, extraction. Replaces the old <code>google-generativeai</code> package.</td></tr>
+      <tr><td><b>Agent Runtime</b> (was Agent Engine)</td><td>Generally available</td><td>Hosts the agents, with managed Sessions and Memory Bank</td></tr>
+      <tr><td><b>MCP Toolbox for Databases</b></td><td>Open source, built into ADK</td><td>Exposes safe, parameterised SQL tools over Cloud SQL (filters, deadlines, saved list) without writing database plumbing by hand</td></tr>
+      <tr><td><b>Model Armor</b></td><td>Generally available</td><td>Screens solicitation text and tool results for prompt injection and data leaks</td></tr>
+      <tr><td><b>Agent Registry · Agent Gateway</b></td><td>New at Next '26</td><td>Stretch goal: register our agents and MCP server, and route traffic through the gateway for policy checks</td></tr>
+      <tr><td><b>gcloud CLI</b></td><td class="num">577.0.0 (installed)</td><td>Project setup, authentication, one-off operations</td></tr>
+      <tr><td><b>Gemini CLI</b></td><td class="num">0.21.1 (installed)</td><td>Optional. agents-cli skills also work inside Claude Code, which is what we use.</td></tr>
+      <tr><td><b>Terraform</b></td><td>Not installed</td><td>Needed in M0, because agents-cli generates Terraform for infrastructure</td></tr>
+    </tbody>
+  </table></div>
+
+  <details class="stack" open><summary><span><span class="layer">Toolchain</span><br><strong>agents-cli (Google's official ADK lifecycle CLI)</strong></span><span class="chev">›</span></summary><div class="body"><dl>
+    <dt>In plain terms</dt><dd>One command-line tool that creates a correctly structured ADK project and gives it a local test playground, an eval runner, deployment to Agent Runtime, and generated CI/CD plus Terraform.</dd>
+    <dt>Why here</dt><dd>It's how Google itself recommends teams start an ADK project in 2026. Starting from its <code>agentic_rag</code> template gives us the standard layout, eval boilerplate and deployment pipeline, so our effort goes into the agents and the RAG library.</dd>
+    <dt>Turned down</dt><dd>Setting up the project by hand (we'd spend days rebuilding CI, Terraform and eval scaffolding that already exists). The older Agent Starter Pack, which agents-cli replaces.</dd>
+    <dt>Skill it teaches</dt><dd>The standard Google Cloud workflow for agents, from scaffold to production.</dd></dl></div></details>
+
+  <details class="stack"><summary><span><span class="layer">Agents</span><br><strong>Google ADK 2.x (Python)</strong></span><span class="chev">›</span></summary><div class="body"><dl>
+    <dt>In plain terms</dt><dd>Google's open-source kit for building agents. Version 2 runs agents as a graph: you draw which step runs next, where it loops, and where it pauses for a person.</dd>
+    <dt>Why here</dt><dd>Plan → Execute → Verify is a graph with a loop and two approval points. ADK 2 supports exactly that, deploys directly to Agent Engine, and includes its own evaluation tooling.</dd>
+    <dt>Turned down</dt><dd>LangGraph (you already know it from ClaimLens; ADK broadens your range and is Google's own framework). ADK 1's <code>LoopAgent</code> (being phased out in favour of workflows).</dd>
+    <dt>Skill it teaches</dt><dd>Multi-agent orchestration, human-in-the-loop workflows, resumable state.</dd></dl></div></details>
+
+  <details class="stack"><summary><span><span class="layer">Models</span><br><strong>Gemini 3.8 Flash · 3.5 Flash-Lite · 3.1 Pro · gemini-embedding-2</strong></span><span class="chev">›</span></summary><div class="body"><dl>
+    <dt>In plain terms</dt><dd>Different models for different jobs. Flash handles planning and extraction. Flash-Lite, the cheapest, grades thousands of passages. Pro, the most capable, writes the drafts. The embedding model turns text into searchable vectors.</dd>
+    <dt>Why here</dt><dd>Matching model size to the task is how real teams control cost. Every call is logged with its token count and cost.</dd>
+    <dt>Turned down</dt><dd>Using Pro for everything (several times the cost with no measured benefit for grading).</dd>
+    <dt>Skill it teaches</dt><dd>Model routing, cost budgeting, structured output.</dd></dl></div></details>
+
+  <details class="stack"><summary><span><span class="layer">Data store</span><br><strong>Cloud SQL Postgres + pgvector</strong></span><span class="chev">›</span></summary><div class="body"><dl>
+    <dt>In plain terms</dt><dd>One ordinary database that stores opportunity details, passage text, keyword indexes and meaning vectors together. Hybrid search becomes one SQL query you can read.</dd>
+    <dt>Why here</dt><dd>Tens of thousands of passages is a small dataset. One database is simpler to run, cheap at about $10–15 a month, and you learn exactly how hybrid search works.</dd>
+    <dt>Turned down</dt><dd>AlloyDB (faster ScaNN index, but far more expensive at the smallest size). Vertex AI Vector Search (a separate system to keep in sync). Vertex AI RAG Engine (managed, but it hides the stages you're here to learn).</dd>
+    <dt>Skill it teaches</dt><dd>Vector indexes (HNSW), full-text search, schema migrations with Alembic.</dd></dl></div></details>
+
+  <details class="stack"><summary><span><span class="layer">Parsing</span><br><strong>Docling</strong></span><span class="chev">›</span></summary><div class="body"><dl>
+    <dt>In plain terms</dt><dd>An open-source tool that reads PDFs and Word files and keeps their structure: headings, tables, page numbers.</dd>
+    <dt>Why here</dt><dd>Solicitations are long, table-heavy PDFs. Structure-aware parsing is what makes section-level chunks and page citations possible.</dd>
+    <dt>Turned down</dt><dd>Document AI Layout Parser (good, but billed per page; kept as an option to compare against in an ADR). Plain text extraction (loses tables and headings).</dd>
+    <dt>Skill it teaches</dt><dd>Document understanding, the step most RAG systems get wrong.</dd></dl></div></details>
+
+  <details class="stack"><summary><span><span class="layer">Retrieval</span><br><strong>Hybrid search + RRF + Vertex AI Ranking API</strong></span><span class="chev">›</span></summary><div class="body"><dl>
+    <dt>In plain terms</dt><dd>Keyword and meaning search run together, their results are merged, and a ranking model re-orders the best candidates.</dd>
+    <dt>Why here</dt><dd>Grant language mixes exact codes ("NAICS 541715", "Phase I") with ideas worded many ways. Each search type catches what the other misses.</dd>
+    <dt>Turned down</dt><dd>Vector-only search (misses exact codes). A self-hosted cross-encoder (more to run; worth comparing in the eval report).</dd>
+    <dt>Skill it teaches</dt><dd>Retrieval engineering, measured with recall@k and nDCG.</dd></dl></div></details>
+
+  <details class="stack"><summary><span><span class="layer">Tools</span><br><strong>MCP server for opportunity search</strong></span><span class="chev">›</span></summary><div class="body"><dl>
+    <dt>In plain terms</dt><dd>Model Context Protocol is a standard way to package tools so any agent can use them. We wrap search and the solicitation brief as an MCP server.</dd>
+    <dt>Why here</dt><dd>The same tools work from our ADK agents and from Claude Desktop or any other MCP client. That makes a good demo of reuse.</dd>
+    <dt>Also used</dt><dd>MCP Toolbox for Databases for the plain SQL tools (filter by agency, deadline or amount; saved list). The hybrid search itself stays hand-built in our RAG library, so you can explain it line by line.</dd>
+    <dt>Turned down</dt><dd>A2A (agent-to-agent protocol): kept as a stretch goal because v1 has one team of agents, not separate services. agents-cli has an <code>adk_a2a</code> template if we add it later.</dd>
+    <dt>Skill it teaches</dt><dd>Tool design and scoping, a core skill in agent hiring right now.</dd></dl></div></details>
+
+  <details class="stack"><summary><span><span class="layer">Contracts</span><br><strong>Pydantic v2 + Gemini structured output</strong></span><span class="chev">›</span></summary><div class="body"><dl>
+    <dt>In plain terms</dt><dd>Every agent output has a defined shape, and the model is required to fill that shape.</dd>
+    <dt>Why here</dt><dd>It removes the guessing between agents that made v0 fragile, and makes outputs easy to test.</dd>
+    <dt>Skill it teaches</dt><dd>Designing schemas for LLM systems.</dd></dl></div></details>
+
+  <details class="stack"><summary><span><span class="layer">Quality</span><br><strong>Eval harness + ADK eval + calibrated LLM judge + red-team set</strong></span><span class="chev">›</span></summary><div class="body"><dl>
+    <dt>In plain terms</dt><dd>Labeled test sets with automatic scoring. Where a model does the grading, we first measure how often it agrees with your own labels. Solicitation text is untrusted, so we also test for prompt injection hidden in documents, and Model Armor screens it in production.</dd>
+    <dt>Tools</dt><dd><code>agents-cli eval run</code> (ADK evalsets: tool path and response quality) for agent behaviour. Our own pytest-based harness for retrieval and extraction metrics. <code>agents-cli eval compare</code> to compare runs before and after a change.</dd>
+    <dt>Why here</dt><dd>Every résumé number comes from these evals. The CI eval gate blocks a release if scores drop.</dd>
+    <dt>Skill it teaches</dt><dd>Evaluation design, judge calibration, and AI security, three of the most in-demand AI engineering skills.</dd></dl></div></details>
+
+  <details class="stack"><summary><span><span class="layer">Serving</span><br><strong>Agent Runtime (formerly Agent Engine) + FastAPI and web UI on Cloud Run</strong></span><span class="chev">›</span></summary><div class="body"><dl>
+    <dt>In plain terms</dt><dd>Agent Runtime hosts the agents and remembers each conversation (Sessions, now generally available). A small API and web page on Cloud Run give users somewhere to click.</dd>
+    <dt>Why here</dt><dd>It's Google's managed home for ADK agents, and it fills the GCP gap on your résumé. Memory Bank can remember company preferences across sessions.</dd>
+    <dt>Turned down</dt><dd>Running everything ourselves on Cloud Run (more control, but less to learn about managed agent hosting). We may compare the two in an ADR.</dd>
+    <dt>Skill it teaches</dt><dd>Deploying agents to production, and session and memory management.</dd></dl></div></details>
+
+  <details class="stack"><summary><span><span class="layer">Ops</span><br><strong>Terraform · GitHub Actions · Cloud Trace · Secret Manager · Cloud Scheduler</strong></span><span class="chev">›</span></summary><div class="body"><dl>
+    <dt>In plain terms</dt><dd>Infrastructure written as code, automatic tests and deploys on every change, a trace of every agent step, secrets kept out of the code, and a nightly timer for ingestion.</dd>
+    <dt>Why here</dt><dd>This is what turns a demo into a product someone else could run. GitHub signs in to Google Cloud without stored keys (Workload Identity Federation).</dd>
+    <dt>Skill it teaches</dt><dd>MLOps/LLMOps: CI/CD, observability, infrastructure as code.</dd></dl></div></details>
+
+  <details class="stack"><summary><span><span class="layer">Dev tooling</span><br><strong>uv · ruff · pyright · pytest · pre-commit · Docker</strong></span><span class="chev">›</span></summary><div class="body"><dl>
+    <dt>In plain terms</dt><dd>A fast package manager, a linter, a type checker, a test runner, checks that run before every commit, and containers.</dd>
+    <dt>Why here</dt><dd>The baseline any team expects in a Python repo. v0 already used uv.</dd></dl></div></details>
+</section>
+
+<section id="evals">
+  <header><span class="eyebrow">Section 09</span><h2>How we measure</h2></header>
+  <p>These targets are hypotheses until the evals run. Whatever is measured goes on the résumé, even if it's lower.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Module</th><th>Metric</th><th>Target</th><th>Test data</th></tr></thead>
+    <tbody>
+      <tr><td>Discover</td><td>Time to a qualified shortlist vs. manual search</td><td class="num">≥ 50% faster</td><td>Timed sessions on 10 search tasks</td></tr>
+      <tr><td>Discover</td><td>Precision@10 on golden queries</td><td class="num">≥ 0.70</td><td>20 queries with labeled relevant opportunities</td></tr>
+      <tr><td>Analyze</td><td>Knockout recall / precision</td><td class="num">≥ 0.95 / ≥ 0.85</td><td>25+ real solicitations you label by hand</td></tr>
+      <tr><td>Analyze</td><td>Requirement extraction recall</td><td class="num">≥ 0.85</td><td>Hand-listed "shall" requirements on 10 solicitations</td></tr>
+      <tr><td>Draft</td><td>Context relevance / faithfulness</td><td class="num">≥ 0.60 / ≥ 0.90</td><td>Section prompts with labeled evidence</td></tr>
+      <tr><td>Draft</td><td>Time to first draft vs. writing by hand</td><td class="num">≥ 40% faster</td><td>Timed drafting of 3 sections</td></tr>
+      <tr><td>System</td><td>Cost per full run · p95 latency</td><td class="num">&lt; $0.25 · &lt; 90 s</td><td>From traces</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">Why recall matters most for knockouts: missing one means the team writes a whole proposal they can never win. A false alarm costs one person a few minutes of checking.</p>
+</section>
+
+<section id="milestones">
+  <header><span class="eyebrow">Section 10</span><h2>Milestones</h2></header>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Milestone</th><th>What gets built</th><th>What you learn</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td><b>M0 Foundation</b></td><td>New repo layout, Lumen Grid Labs profile, ingestion job, Postgres schema, CI, eval harness skeleton</td><td>Data pipelines, schema design, CI</td><td><span class="pill todo">to do</span></td></tr>
+      <tr><td><b>M1 Analyze</b></td><td>Parsing and chunking, Solicitation agent, knockout rules, labeled set of 25+ solicitations</td><td>Document parsing, structured extraction, labeling, precision/recall</td><td><span class="pill todo">to do</span></td></tr>
+      <tr><td><b>M2 Discover</b></td><td>Hybrid search, reranking, ADK 2 PEV workflow, approval step, timing benchmark</td><td>Retrieval engineering, agent graphs, human-in-the-loop</td><td><span class="pill todo">to do</span></td></tr>
+      <tr><td><b>M3 Draft</b></td><td>Corrective RAG over company documents, faithfulness check, MCP server</td><td>CRAG, LLM judges, citation design, MCP</td><td><span class="pill todo">to do</span></td></tr>
+      <tr><td><b>M4 Ship</b></td><td>Agent Engine deploy, web UI, Terraform, tracing, CI eval gate, red-team set, eval report</td><td>Production deployment, LLMOps, AI security</td><td><span class="pill todo">to do</span></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="resume">
+  <header><span class="eyebrow">Section 11</span><h2>Résumé mapping</h2></header>
+  <p>Each bullet stays on the résumé only once the eval that backs it has run. If a measured number differs, the measured number replaces the old one.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Bullet</th><th>Backed by</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td>Plan-Execute-Verify multi-agent system on Google ADK, discovery 40 → 15 min</td><td>M2 timing benchmark, P@10 eval</td><td><span class="pill todo">not yet measured</span></td></tr>
+      <tr><td>Knockout eligibility screen across 25 solicitations</td><td>M1 labeled set, recall and precision</td><td><span class="pill todo">not yet measured</span></td></tr>
+      <tr><td>Corrective RAG drafting, 5 days → 3, 60%+ relevance</td><td>M3 relevance and timing evals</td><td><span class="pill todo">not yet measured</span></td></tr>
+    </tbody>
+  </table></div>
+  <p class="small"><b>How it's listed:</b> the BESI role keeps only what was built there (the v0 prototype). The rebuild goes under Projects as "Proposal-ADK: open rebuild of the AI grant-discovery workflow pioneered by SweetSpot AI." SweetSpot is credited as the inspiration and never named as an employer.</p>
+</section>
+
+<section id="glossary">
+  <header><span class="eyebrow">Section 12</span><h2>Glossary</h2></header>
+  <div class="gloss">
+    <div><b>Solicitation / NOFO</b><p>The official document announcing funding and its rules. NOFO stands for Notice of Funding Opportunity.</p></div>
+    <div><b>SBIR / STTR</b><p>U.S. federal programs that fund small businesses doing R&amp;D, in phases (Phase I is feasibility, Phase II is development).</p></div>
+    <div><b>Knockout</b><p>A rule that makes you ineligible no matter how good the proposal is, such as a size limit or a non-profit-only restriction.</p></div>
+    <div><b>Agent</b><p>An LLM that can decide which tool to call next and act on the result, instead of just answering once.</p></div>
+    <div><b>PEV</b><p>Plan, Execute, Verify: one step plans, one does the work, one checks it and can send it back.</p></div>
+    <div><b>Human-in-the-loop</b><p>The workflow pauses for a person's approval before something important happens.</p></div>
+    <div><b>Embedding</b><p>A list of numbers representing a text's meaning; similar texts get similar numbers.</p></div>
+    <div><b>Hybrid search</b><p>Keyword search and meaning search combined.</p></div>
+    <div><b>RRF</b><p>Reciprocal Rank Fusion: a simple way to merge two ranked lists by rewarding items that rank high in either.</p></div>
+    <div><b>Reranker</b><p>A model that re-reads the top results against the question and re-orders them more accurately.</p></div>
+    <div><b>Corrective RAG</b><p>RAG that grades what it retrieved and searches again when the evidence is weak.</p></div>
+    <div><b>Faithfulness</b><p>Whether every statement in an answer is supported by the cited sources.</p></div>
+    <div><b>Precision / recall</b><p>Precision: of what we flagged, how much was right. Recall: of what we should have flagged, how much we caught.</p></div>
+    <div><b>LLM-as-judge</b><p>Using a model to grade outputs. Only trusted after measuring how often it agrees with a person.</p></div>
+    <div><b>MCP</b><p>Model Context Protocol: a standard plug for giving any agent access to tools and data.</p></div>
+    <div><b>ADR</b><p>Architecture Decision Record: a one-page note of a decision, the options, and why.</p></div>
+    <div><b>Eval gate</b><p>A CI step that blocks a release when evaluation scores drop below a threshold.</p></div>
+    <div><b>Prompt injection</b><p>Hidden instructions inside a document that try to make the agent misbehave.</p></div>
+  </div>
+</section>
+
+<section id="log">
+  <header><span class="eyebrow">Section 13</span><h2>Decision log</h2></header>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Date</th><th>Decision</th></tr></thead>
+    <tbody>
+      <tr><td class="num">2026-10-06</td><td>Rebuild from scratch; the v0 prototype is preserved under the git tag <code>v0-besi-prototype</code>.</td></tr>
+      <tr><td class="num">2026-10-06</td><td>Scope: the Discover, Analyze and Draft modules, modeled on SweetSpot AI; a simple saved list instead of full pipeline management.</td></tr>
+      <tr><td class="num">2026-10-06</td><td>Added the Solicitation agent (Analyze) and a hand-built RAG library shared by all agents.</td></tr>
+      <tr><td class="num">2026-10-06</td><td>Fictional test company "Lumen Grid Labs" replaces BESI's real capability document.</td></tr>
+      <tr><td class="num">2026-10-06</td><td>Stack: ADK 2.x, Gemini 3.x, Cloud SQL Postgres + pgvector, Docling, Agent Runtime (pending your review).</td></tr>
+      <tr><td class="num">2026-10-06</td><td>PRD and system design written. Key calls: knockout rules E0–E7 decide eligibility (anything unparsed becomes "needs review"); quotes are checked verbatim in code; golden sets are hand-labeled and frozen; the CI gate blocks if knockout recall drops below 0.95 or faithfulness below 0.90.</td></tr>
+      <tr><td class="num">2026-10-06</td><td>Repo renamed to <b>grant-capture-agent</b>. The v0 code moved to <code>legacy/</code>, BESI's capability document was removed, and the rebuild happens on the <code>v1-rebuild</code> branch.</td></tr>
+      <tr><td class="num">2026-10-06</td><td>Researched the full Google toolchain. agents-cli 1.9 becomes the project's starting point and lifecycle tool; MCP Toolbox for Databases and Model Armor are added; Agent Registry and Gateway are stretch goals.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+</main>
+</div>

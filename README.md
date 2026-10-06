@@ -1,100 +1,47 @@
-# Proposal ADK Search Agent
+# grant-capture-agent
 
-An advanced AI agent built with Google's Agent Development Kit (ADK) designed to automate the discovery and analysis of federal grant opportunities and SBIR/STTR proposals.
+**AI grant capture for small R&D companies: find federal funding you can win, rule out what you can't, and draft the proposal from your own evidence.**
 
-This agent utilizes a **Plan-Execute-Verify (PEV)** architecture to ensure high-quality search results, automated eligibility verification, and competitive intelligence gathering.
+An open, measured rebuild of the grant-capture workflow pioneered by SweetSpot AI, built on Google ADK and Gemini Enterprise Agent Platform.
 
-## 🚀 Key Features
+> **Status: v1 rebuild in progress (started Oct 2026).** The design phase is under way. The v0 prototype is preserved in [`legacy/`](legacy/) and under the git tag `v0-besi-prototype`.
 
-- **🧠 Intelligent Search Planning**: The **Planner** agent breaks down complex user queries (e.g., "Find renewable energy grants for a small business in Ohio") into targeted search strategies.
-- **🕵️ Semantic Eraser (Eligibility Check)**: Automatically scans full solicitation documents to identify "knockout" criteria (e.g., "non-profit only" restrictions) and filters out irrelevant opportunities.
-- **📊 Competitor Intelligence**: Integrates with the **USAspending API** to analyze past award data, identifying top competitors and funding trends for specific grant categories.
-- **🛡️ Quality Assurance (Verifier)**: A dedicated **Verifier** agent reviews search results against the user's original request, triggering self-correction loops if the results are unsatisfactory.
-- **🏛️ Federal Data Integration**: Accesses real-time data from **Grants.gov** and **SBIR.gov** (via Simpler Grants API).
+## What it does
 
-## 🏗️ Architecture
+| Module | The question it answers | How |
+|---|---|---|
+| **Discover** | "Which open opportunities fit what we do?" | Plan-Execute-Verify agents on ADK over a hybrid-search index of Grants.gov, SBIR.gov and SAM.gov |
+| **Analyze** | "Are we even eligible, and what does this solicitation require?" | Solicitation agent: the LLM extracts each clause, rules decide the knockouts, and every verdict quotes its source |
+| **Draft** | "Write the technical section using only our real evidence." | Corrective RAG over company documents: grade the retrieved passages, re-query when evidence is weak, cite every claim, flag gaps |
 
-This project employs a robust **PEV (Plan-Execute-Verify)** pattern:
+A person approves the search plan and every draft. The system never submits anything.
 
-1.  **Planner**: Analyzes the user's intent and creates a step-by-step search plan.
-2.  **Executor**: Executes the plan using available tools (Keyword Search, Semantic Check, Competitor Intel).
-3.  **Verifier**: Evaluates the output. If the result is poor, it provides feedback to the Planner for a retry (up to 3 iterations).
+## How it's being built
 
-See [docs/PEV_ARCHITECTURE.md](docs/PEV_ARCHITECTURE.md) for a deep dive into the system design.
+The project follows the same steps an AI product team would: PRD → system design → decision records → eval sets → plan → test-first build → deploy → eval report. Every metric is measured on labeled data before it is claimed.
 
-## 🛠️ Setup & Installation
+**Planned stack:** Google ADK 2.x · agents-cli · Gemini 3.x · Gen AI SDK · Cloud SQL Postgres + pgvector · Docling · Vertex AI Ranking API · MCP (Toolbox for Databases + a custom server) · Agent Runtime · Model Armor · Cloud Run · Terraform · GitHub Actions · Cloud Trace
 
-This project uses `uv` for modern, fast Python dependency management.
+## Repository layout
 
-### Prerequisites
-- Python 3.13+
-- `uv` (Recommended) or `pip`
-- Google Cloud Project with Vertex AI API enabled (if using Vertex) or Google AI Studio Key.
-
-### Installation
-
-1.  **Clone the repository:**
-    ```bash
-    git clone <repository-url>
-    cd "Proposal ADK search Agent"
-    ```
-
-2.  **Install dependencies:**
-    Using `uv` (Recommended):
-    ```bash
-    uv sync
-    ```
-    Or using standard `pip`:
-    ```bash
-    pip install .
-    ```
-
-3.  **Configure Environment:**
-    Create a `.env` file in the root directory:
-    ```env
-    GOOGLE_GENAI_USE_VERTEXAI=0  # Set to 1 for Vertex AI, 0 for AI Studio
-    GOOGLE_API_KEY=your_google_api_key_here
-    GRANTS_API_KEY=your_grants_api_key_here  # Optional, for Simpler Grants API
-    ```
-
-4.  **Developer Mode (Windows Users):**
-    To avoid symlink privilege errors during execution:
-    - Go to **Settings** → **Privacy & Security** → **For developers**.
-    - Enable **Developer Mode**.
-
-## 🏃 Usage
-
-Run the agent using the ADK CLI:
-
-```bash
-adk run my_agent
+```
+docs/
+  guide/          project field guide (plain-language overview of the whole build)
+  reference/      public API specs (Simpler Grants, SBIR.gov)
+legacy/
+  v0-besi-prototype/   first prototype (Nov–Dec 2025), kept for comparison
 ```
 
-### Example Queries
+The v1 source tree (`app/`, `rag/`, `evals/`, `deploy/`) will be added in milestone M0.
 
-- **Discovery**: "Find open SBIR Phase I opportunities related to underwater robotics."
-- **Specifics**: "Search for NSF grants for AI education and tell me if a for-profit company is eligible."
-- **Intelligence**: "Who are the past winners of Dept of Energy grants for solar panel recycling?"
-- **Complex**: "Find NASA grants for materials science, check my eligibility as a startup, and show me the competition."
+## Roadmap
 
-## 📂 Project Structure
+- [ ] **M0 Foundation:** scaffold, ingestion job, Postgres schema, CI, eval harness
+- [ ] **M1 Analyze:** parsing, Solicitation agent, knockout rules, 25+ hand-labeled solicitations
+- [ ] **M2 Discover:** hybrid search, reranking, PEV workflow with an approval step, timing benchmark
+- [ ] **M3 Draft:** corrective RAG, faithfulness check, MCP server
+- [ ] **M4 Ship:** Agent Runtime deployment, web UI, tracing, CI eval gate, red-team set, eval report
 
-- `my_agent/`
-    - `agent.py`: Main entry point defining the PEV Loop Agent.
-    - `sub_agents/`: Contains the `planner`, `executor`, and `verifier` agent definitions.
-    - `tools/`
-        - `advanced_search.py`: Implementation of Semantic Eraser and Competitor Intel.
-        - `apis.py`: API setup for Grants and SBIR data.
-- `docs/`: Detailed documentation.
+## Author
 
-## ⚠️ Troubleshooting
-
-**429 Rate Limit Error**
-- If using the free tier of Google AI API, wait a minute between complex requests due to the multiple agent calls involved in the PEV loop.
-
-**Windows Symlink Error**
-- Ensure "Developer Mode" is enabled in Windows settings.
-
-## License
-
-Copyright 2025 - Built with Google Agent Development Kit
+Karthick Balaje · [LinkedIn](https://linkedin.com/in/karthickbalajege) · [Medium](https://medium.com/@karthickbalaje01)

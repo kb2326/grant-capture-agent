@@ -1,4 +1,4 @@
-<title>Proposal-ADK Field Guide</title>
+<title>Grant Capture Agent Guide</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -105,7 +105,7 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
 
 <header class="masthead">
   <span class="eyebrow">Project field guide · living document</span>
-  <h1>Proposal-ADK</h1>
+  <h1>grant-capture-agent</h1>
   <p class="lede">An AI system that finds federal funding a small R&amp;D company can actually win, rules out the ones it is not allowed to win, and drafts the proposal from the company's own evidence. It is an open, measured rebuild of the workflow SweetSpot AI pioneered, built on Google ADK and Google Cloud, and run the way an AI product team would run it.</p>
   <div class="meta">
     <span>Owner: Karthick Balaje (kb2326)</span>
@@ -421,6 +421,7 @@ flowchart LR
       <tr><td class="num">2026-10-06</td><td>Added the Solicitation agent (Analyze) and a hand-built RAG library shared by all agents.</td></tr>
       <tr><td class="num">2026-10-06</td><td>Fictional test company "Lumen Grid Labs" replaces BESI's real capability document.</td></tr>
       <tr><td class="num">2026-10-06</td><td>Stack: ADK 2.x, Gemini 3.x, Cloud SQL Postgres + pgvector, Docling, Agent Runtime (pending your review).</td></tr>
+      <tr><td class="num">2026-10-06</td><td>Repo renamed to <b>grant-capture-agent</b>. The v0 code moved to <code>legacy/</code>, BESI's capability document was removed, and the rebuild happens on the <code>v1-rebuild</code> branch.</td></tr>
       <tr><td class="num">2026-10-06</td><td>Researched the full Google toolchain. agents-cli 1.9 becomes the project's starting point and lifecycle tool; MCP Toolbox for Databases and Model Armor are added; Agent Registry and Gateway are stretch goals.</td></tr>
     </tbody>
   </table></div>

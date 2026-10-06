@@ -109,7 +109,7 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
   <p class="lede">An AI system that finds federal funding a small R&amp;D company can actually win, rules out the ones it is not allowed to win, and drafts the proposal from the company's own evidence. It is an open, measured rebuild of the workflow SweetSpot AI pioneered, built on Google ADK and Google Cloud, and run the way an AI product team would run it.</p>
   <div class="meta">
     <span>Owner: Karthick Balaje (kb2326)</span>
-    <span>Current phase: 2 · System design</span>
+    <span>Current phase: PRD and system design in review</span>
     <span>Last updated: 6 Oct 2026</span>
   </div>
 </header>
@@ -181,8 +181,8 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
   <header><span class="eyebrow">Section 04</span><h2>How a product team runs it</h2></header>
   <p>Each phase produces a document. Those documents are what you'll talk through in interviews: what you decided, what you rejected, and how you knew it worked.</p>
   <div class="phases">
-    <div class="phase"><span class="n">01</span><div><h3>Product discovery</h3><p>PRD: problem, user, success metrics, non-goals. <code>docs/product/PRD.md</code></p></div><span class="pill done">agreed</span></div>
-    <div class="phase current"><span class="n">02</span><div><h3>System design</h3><p>Architecture, data flow, agent design, cost and latency budget. <code>docs/design/system-design.md</code></p></div><span class="pill now">in progress</span></div>
+    <div class="phase"><span class="n">01</span><div><h3>Product discovery</h3><p>PRD: problem, user, success metrics, non-goals. <code>docs/product/PRD.md</code></p></div><span class="pill now">written, in review</span></div>
+    <div class="phase current"><span class="n">02</span><div><h3>System design</h3><p>Architecture, data model, typed hand-offs, workflows, knockout rules, evals, security, deployment. <code>docs/design/system-design.md</code></p></div><span class="pill now">written, in review</span></div>
     <div class="phase"><span class="n">03</span><div><h3>Decision records (ADRs)</h3><p>One short file per big choice, with the options we turned down and why. <code>docs/adr/</code></p></div><span class="pill todo">next</span></div>
     <div class="phase"><span class="n">04</span><div><h3>Evals first</h3><p>Decide what "correct" means and label test data before writing features. <code>evals/</code></p></div><span class="pill todo">to do</span></div>
     <div class="phase"><span class="n">05</span><div><h3>Implementation plan</h3><p>Each milestone broken into small, testable tasks. <code>docs/plans/</code></p></div><span class="pill todo">to do</span></div>
@@ -421,6 +421,7 @@ flowchart LR
       <tr><td class="num">2026-10-06</td><td>Added the Solicitation agent (Analyze) and a hand-built RAG library shared by all agents.</td></tr>
       <tr><td class="num">2026-10-06</td><td>Fictional test company "Lumen Grid Labs" replaces BESI's real capability document.</td></tr>
       <tr><td class="num">2026-10-06</td><td>Stack: ADK 2.x, Gemini 3.x, Cloud SQL Postgres + pgvector, Docling, Agent Runtime (pending your review).</td></tr>
+      <tr><td class="num">2026-10-06</td><td>PRD and system design written. Key calls: knockout rules E0–E7 decide eligibility (anything unparsed becomes "needs review"); quotes are checked verbatim in code; golden sets are hand-labeled and frozen; the CI gate blocks if knockout recall drops below 0.95 or faithfulness below 0.90.</td></tr>
       <tr><td class="num">2026-10-06</td><td>Repo renamed to <b>grant-capture-agent</b>. The v0 code moved to <code>legacy/</code>, BESI's capability document was removed, and the rebuild happens on the <code>v1-rebuild</code> branch.</td></tr>
       <tr><td class="num">2026-10-06</td><td>Researched the full Google toolchain. agents-cli 1.9 becomes the project's starting point and lifecycle tool; MCP Toolbox for Databases and Model Armor are added; Agent Registry and Gateway are stretch goals.</td></tr>
     </tbody>

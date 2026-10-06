@@ -5,7 +5,6 @@
 | Owner | Karthick Balaje (kb2326) |
 | Status | In review |
 | Date | 2026-10-06 |
-| Reference product | SweetSpot AI (sweetspot.so): commercial AI for government contract and grant capture |
 | System design | [`docs/design/system-design.md`](../design/system-design.md) |
 
 ## 1. Problem
@@ -16,7 +15,7 @@ Small R&D companies compete for federal funding (SBIR/STTR, agency grants, R&D c
 2. **Qualify** each one by reading long solicitations. A single eligibility clause (size limit, ownership, entity type, registration) can make the company ineligible, and it is often buried deep in an attachment.
 3. **Draft** technical sections from scattered past proposals, CVs and project reports.
 
-Commercial tools such as SweetSpot AI solve this for paying customers. This project rebuilds the AI core of that workflow in the open and measures each part.
+Commercial GovCon platforms solve this for paying customers. This project rebuilds the AI core of that workflow in the open and measures each part.
 
 ## 2. Users
 
@@ -79,9 +78,9 @@ Targets are hypotheses. The measured values go into the eval report and the rés
 | SAM.gov Opportunities API | Free api.data.gov key | Federal contract solicitations in R&D NAICS codes (5417xx) |
 | USAspending API | Public | Incumbents and past awards in a topic area (context only) |
 
-## 8. Positioning against SweetSpot AI
+## 8. Positioning against commercial capture platforms
 
-| SweetSpot capability | v1 equivalent | Difference |
+| Typical commercial capability | v1 equivalent | Difference |
 |---|---|---|
 | AI search over 1M+ opportunities | Discover over a focused R&D index (~5k opportunities) | Smaller index; quality is measured with P@10 |
 | Bid/no-bid Q&A on any solicitation | Analyze: brief, knockout verdict, cited Q&A | Knockouts are rule-based and measured for recall |

@@ -405,6 +405,7 @@ evals/
 | **M2 Discover** | Hybrid search + rerank with retrieval metrics reported; PEV workflow with an approval step; P@10 reported; timing benchmark run and reported |
 | **M3 Draft** | Grader calibrated (κ reported); CRAG drafting with gaps; relevance and faithfulness reported; drafting timing reported; MCP server working from an MCP client |
 | **M4 Ship** | Terraform-provisioned prod; agents on Agent Runtime; UI live on Cloud Run; tracing and cost dashboards; CI eval gate enforced; red-team results; final eval report and README with measured numbers |
+| **M5 Specialize** | (a) **Fine-tuning:** supervised fine-tune of Gemini Flash-Lite on the labeled dev grading data (Vertex AI supervised tuning), compared with the prompted grader on κ, latency and cost, and the winner shipped. (b) **Multimodal parsing:** Gemini reads scanned and table-heavy PDF pages natively as images, compared with Docling on clause-extraction recall; used as the fallback for pages Docling can't parse. Results go in the eval report. |
 
 ## 17. Architecture decision records (written in M0)
 
@@ -419,6 +420,10 @@ evals/
 | 0007 | Offline index with live API fallback | Live API calls per query (v0) |
 | 0008 | Shared demo access code + daily run cap | Identity-Aware Proxy; full multi-tenant auth |
 | 0009 | Single prod project with preview deploys | Separate staging project |
+| 0010 | Tuned vs. prompted grader: decided by measurement in M5 | Choosing without data |
+| 0011 | Docling first, Gemini multimodal as the fallback for hard pages | Gemini-only parsing (cost); Docling-only (fails on scans) |
+
+M5 runs after M4 so the shipped product never depends on it. Its results update the live system through the normal eval gate.
 
 ## 18. Open items resolved by this spec
 

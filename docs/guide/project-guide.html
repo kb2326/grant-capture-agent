@@ -106,7 +106,7 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
 <header class="masthead">
   <span class="eyebrow">Project field guide · living document</span>
   <h1>grant-capture-agent</h1>
-  <p class="lede">An AI system that finds federal funding a small R&amp;D company can actually win, rules out the ones it is not allowed to win, and drafts the proposal from the company's own evidence. It is an open, measured rebuild of the workflow SweetSpot AI pioneered, built on Google ADK and Google Cloud, and run the way an AI product team would run it.</p>
+  <p class="lede">An AI system that finds federal funding a small R&amp;D company can actually win, rules out the ones it is not allowed to win, and drafts the proposal from the company's own evidence. It is an open, measured take on the workflow commercial GovCon platforms sell, built on Google ADK and Google Cloud, and run the way an AI product team would run it.</p>
   <div class="meta">
     <span>Owner: Karthick Balaje (kb2326)</span>
     <span>Current phase: PRD and system design in review</span>
@@ -164,9 +164,9 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
 
 <section id="product">
   <header><span class="eyebrow">Section 03</span><h2>What we're building</h2></header>
-  <p>SweetSpot AI sells this workflow as a commercial product. We rebuild its three AI modules in the open, and measure each one.</p>
+  <p>Commercial capture platforms sell this workflow. We build its three AI modules in the open, and measure each one.</p>
   <div class="tablewrap"><table>
-    <thead><tr><th>Our module</th><th>SweetSpot equivalent</th><th>What it does for the user</th></tr></thead>
+    <thead><tr><th>Our module</th><th>Typical commercial feature</th><th>What it does for the user</th></tr></thead>
     <tbody>
       <tr><td><b>Discover</b></td><td>AI search across 1M+ opportunities</td><td>"Show me open opportunities that fit what we do," in plain English</td></tr>
       <tr><td><b>Analyze</b></td><td>Bid/no-bid by asking AI about any solicitation</td><td>Reads the full solicitation and turns it into a brief: eligibility, requirements, scoring criteria, page limits, deadlines. Flags knockouts with the exact clause quoted. Answers questions with citations.</td></tr>
@@ -215,7 +215,7 @@ flowchart LR
   end
 </pre>
   <div class="grid2">
-    <div class="panel"><h3>Why prepare data offline?</h3><p>Searching an index is fast, and the results stay the same between runs, which makes evaluations repeatable. SweetSpot gets its speed the same way. Live API calls remain as a fallback for opportunities posted today.</p></div>
+    <div class="panel"><h3>Why prepare data offline?</h3><p>Searching an index is fast, and the results stay the same between runs, which makes evaluations repeatable. Commercial search platforms get their speed the same way. Live API calls remain as a fallback for opportunities posted today.</p></div>
     <div class="panel"><h3>Why typed hand-offs?</h3><p>In v0, each agent read the previous agent's paragraph of text and guessed its meaning. In v1 they pass structured objects such as <code>SearchPlan</code> and <code>SolicitationBrief</code>, which are checked automatically, so a malformed result fails loudly instead of quietly.</p></div>
     <div class="panel"><h3>The LLM extracts, rules decide</h3><p>The model finds and quotes the eligibility clause. Plain code compares it with the company profile and makes the call. Decisions with consequences stay in code a person can read and test.</p></div>
     <div class="panel"><h3>A person approves</h3><p>ADK 2 can pause a workflow, wait for a person's approval, and resume exactly where it stopped. That replaces v0's workaround of breaking out of the loop.</p></div>
@@ -384,7 +384,7 @@ flowchart LR
       <tr><td>Corrective RAG drafting, 5 days → 3, 60%+ relevance</td><td>M3 relevance and timing evals</td><td><span class="pill todo">not yet measured</span></td></tr>
     </tbody>
   </table></div>
-  <p class="small"><b>How it's listed:</b> the BESI role keeps only what was built there (the v0 prototype). The rebuild goes under Projects as "Proposal-ADK: open rebuild of the AI grant-discovery workflow pioneered by SweetSpot AI." SweetSpot is credited as the inspiration and never named as an employer.</p>
+  <p class="small"><b>How it's listed:</b> the BESI role keeps only what was built there (the v0 prototype). The rebuild goes under Projects as "grant-capture-agent", with the measured numbers.</p>
 </section>
 
 <section id="glossary">
@@ -417,7 +417,7 @@ flowchart LR
     <thead><tr><th>Date</th><th>Decision</th></tr></thead>
     <tbody>
       <tr><td class="num">2026-10-06</td><td>Rebuild from scratch; the v0 prototype is preserved under the git tag <code>v0-besi-prototype</code>.</td></tr>
-      <tr><td class="num">2026-10-06</td><td>Scope: the Discover, Analyze and Draft modules, modeled on SweetSpot AI; a simple saved list instead of full pipeline management.</td></tr>
+      <tr><td class="num">2026-10-06</td><td>Scope: the Discover, Analyze and Draft modules, modeled on commercial capture platforms; a simple saved list instead of full pipeline management.</td></tr>
       <tr><td class="num">2026-10-06</td><td>Added the Solicitation agent (Analyze) and a hand-built RAG library shared by all agents.</td></tr>
       <tr><td class="num">2026-10-06</td><td>Fictional test company "Lumen Grid Labs" replaces BESI's real capability document.</td></tr>
       <tr><td class="num">2026-10-06</td><td>Stack: ADK 2.x, Gemini 3.x, Cloud SQL Postgres + pgvector, Docling, Agent Runtime (pending your review).</td></tr>

@@ -11,7 +11,7 @@
 
 Small R&D companies compete for federal funding (SBIR/STTR, agency grants, R&D contracts) with no capture team. One person does three jobs:
 
-1. **Find** opportunities across Grants.gov, SBIR.gov and SAM.gov, each with its own search UI and vocabulary.
+1. **Find** opportunities across Grants.gov and SAM.gov, each with its own search UI and vocabulary.
 2. **Qualify** each one by reading long solicitations. A single eligibility clause (size limit, ownership, entity type, registration) can make the company ineligible, and it is often buried deep in an attachment.
 3. **Draft** technical sections from scattered past proposals, CVs and project reports.
 
@@ -74,9 +74,12 @@ Targets are hypotheses. The measured values go into the eval report and the rés
 | Source | Access | Used for |
 |---|---|---|
 | Simpler Grants API (Grants.gov) | Free API key, `X-API-Key` header | Grant opportunities and NOFO attachments |
-| SBIR.gov API | Public | SBIR/STTR solicitations and topics; award history |
-| SAM.gov Opportunities API | Free api.data.gov key | Federal contract solicitations in R&D NAICS codes (5417xx) |
-| USAspending API | Public | Incumbents and past awards in a topic area (context only) |
+| SAM.gov Opportunities API | Free api.data.gov key | Federal contract solicitations in R&D NAICS codes (5417xx), including DoD and NASA SBIR/STTR notices |
+| USAspending API | Public, no key | Incumbents and past awards in a topic area (context only) |
+| NIH RePORTER API | Public, no key | Previously funded research on a topic: likely competition (context only) |
+| NSF Awards API | Public, no key | Previously funded research on a topic: likely competition (context only) |
+
+The SBIR.gov API (403, "under maintenance") and the DoD SBIR/STTR Innovation Portal (blocks programmatic access) were tested on 2026-10-07 and are not used. Their solicitations are also posted to Grants.gov or SAM.gov. Opportunities are normalized to fields compatible with the CommonGrants protocol.
 
 ## 8. Positioning against commercial capture platforms
 

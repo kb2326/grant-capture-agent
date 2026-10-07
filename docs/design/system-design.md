@@ -20,7 +20,7 @@ Sources ──► Ingestion job (Cloud Run Job, nightly) ──► GCS (raw file
                                                               ▲
 Web UI + API (Cloud Run) ──► Agent Runtime: Discover | Analyze | Draft
                                     │ tools: rag lib · MCP Toolbox SQL tools · live API fallback
-                                    └─► Gemini (Flash / Flash-Lite / Pro / embedding-2) · Vertex AI Ranking API
+                                    └─► Gemini (Flash / Flash-Lite / Pro / embedding-001) · Vertex AI Ranking API
 Cross-cutting: Cloud Trace · Cloud Logging · Secret Manager · Model Armor · Terraform · GitHub Actions
 ```
 
@@ -47,7 +47,8 @@ app/                      ADK agents (deployed to Agent Runtime)
 rag/                      hand-built RAG library (no ADK dependency)
   parse.py chunk.py embed.py store.py search.py rerank.py grade.py crag.py cite.py faithfulness.py
 ingest/                   source adapters + pipeline + Cloud Run Job entry point
-  sources/ grants_gov.py sbir_gov.py sam_gov.py usaspending.py
+  sources/ grants_gov.py sam_gov.py
+app/tools/context/          on-demand context tools: usaspending.py nih_reporter.py nsf_awards.py
 db/                       SQLAlchemy models + Alembic migrations
 mcp_server/               MCP server exposing search + brief (FastMCP)
 toolbox/                  MCP Toolbox for Databases config (tools.yaml)
@@ -65,10 +66,12 @@ The project starts from `agents-cli scaffold create` with the `adk` template, de
 ## 4. Data sources and ingestion
 
 **Scope of the index.** Open and forecasted opportunities, refreshed nightly:
-- Grants.gov via the Simpler Grants API: all open grant opportunities, with NOFO attachments.
-- SBIR.gov: open SBIR/STTR solicitations and topics.
-- SAM.gov: solicitations and presolicitations with NAICS 541713, 541714 or 541715 (R&D), plus combined synopses.
-- USAspending: queried on demand for incumbent context. Not indexed.
+- **Grants.gov via the Simpler Grants API:** all posted and forecasted grant opportunities, with NOFO attachments. NSF, DOE, NIH and other civilian agencies post their SBIR/STTR solicitations here. A full refresh uses the API's daily bulk extract (`/v1/extracts`); nightly runs page through `/v1/opportunities/search` sorted by post date.
+- **SAM.gov Opportunities API v2:** solicitations (`o`), presolicitations (`p`) and combined synopses (`k`) with NAICS 541713, 541714 or 541715 (R&D). This covers DoD and NASA SBIR/STTR notices. Attachments come from each record's `resourceLinks`.
+- **Context sources** (queried on demand by tools, not indexed): USAspending (past awards and incumbents), NIH RePORTER and NSF Awards (previously funded research on a topic, which shows the likely competition).
+- **Dropped, as verified on 2026-10-07:** the SBIR.gov API (returns 403 "under maintenance") and the DoD SBIR/STTR Innovation Portal (blocks programmatic access). Their solicitations reach us through Grants.gov and SAM.gov.
+
+**Normalized format.** Every source maps to one `Opportunity` model whose field names follow the CommonGrants protocol's opportunity base model (title, status, key dates, funding, source URL, custom fields), so state and local portals can be added later as more adapters (ADR-0015).
 
 The expected size is about 5,000 opportunities and about 20,000 attachment pages.
 
@@ -123,7 +126,7 @@ runs(id uuid pk, workflow text, session_id text, trace_id text, started_at times
 ingest_runs(id uuid pk, started_at timestamptz, ended_at timestamptz, stats jsonb)
 ```
 
-Embeddings use `gemini-embedding-2` with `output_dimensionality=768`, which keeps the HNSW index small with little quality loss. The dimension choice is validated on the retrieval eval in M2 (ADR-0005). Migrations are managed with Alembic.
+Embeddings use `gemini-embedding-001` with `output_dimensionality=768` in `us-central1`, which keeps the HNSW index small with little quality loss. `gemini-embedding-2` is listed for the project but returned 404 on 2026-10-07; it is retried in M2 and compared on the retrieval eval (ADR-0005). Migrations are managed with Alembic.
 
 ## 6. Hand-off contracts (`app/contracts.py`)
 
@@ -227,9 +230,9 @@ All three workflows are ADK 2 workflow graphs. State lives in the ADK session, a
 
 | Role | Model |
 |---|---|
-| Planning, extraction, refinement, faithfulness judge | Gemini 3.8 Flash |
-| Grading | Gemini 3.5 Flash-Lite |
-| Drafting | Gemini 3.1 Pro |
+| Planning, extraction, refinement, faithfulness judge | `gemini-3.8-flash` |
+| Grading | `gemini-3.5-flash-lite` |
+| Drafting | `gemini-3.1-pro-preview` (moves to GA Pro when available to the project) |
 
 Exact IDs are pinned in M0 by listing the available models with `google-genai`.
 
@@ -304,7 +307,7 @@ An ADK `LlmAgent` routes chat requests to the right workflow ("find…" → Disc
 
 ## 9. Tools and MCP
 
-- **ADK tools** (`app/tools/`) wrap `rag.search`, `rag.answer`, the live API fallback and the USAspending lookup.
+- **ADK tools** (`app/tools/`) wrap `rag.search`, `rag.answer`, the live API fallback and the context tools (USAspending, NIH RePORTER, NSF Awards).
 - **MCP Toolbox for Databases** (`toolbox/tools.yaml`) provides parameterised, read-only SQL tools: `list_open_by_agency`, `get_opportunity`, `list_saved`, and `save_opportunity` (the only write, limited to `saved_opportunities`). ADK loads them through its built-in Toolbox integration.
 - **Custom MCP server** (`mcp_server/`, FastMCP) exposes `search_opportunities`, `get_brief` and `check_eligibility`, so Claude Desktop or any other MCP client can use the same capabilities. This is demoed in the README.
 
@@ -434,7 +437,7 @@ These capabilities make the system behave like a governed enterprise deployment 
 | 0002 | Google ADK 2 workflow graphs | LangGraph; ADK 1 `LoopAgent` |
 | 0003 | Cloud SQL Postgres + pgvector for metadata, full-text and vectors | AlloyDB; Vertex AI Vector Search; RAG Engine |
 | 0004 | Docling for parsing | Document AI Layout Parser |
-| 0005 | gemini-embedding-2 at 768 dimensions | Full 3072 dimensions; text-embedding-005 |
+| 0005 | gemini-embedding-001 at 768 dimensions (embedding-2 retried in M2) | Full 3072 dimensions; text-embedding-005 |
 | 0006 | LLM extracts, rules decide eligibility | LLM-judged eligibility |
 | 0007 | Offline index with live API fallback | Live API calls per query (v0) |
 | 0008 | Shared demo access code + daily run cap | Identity-Aware Proxy; full multi-tenant auth |
@@ -444,6 +447,7 @@ These capabilities make the system behave like a governed enterprise deployment 
 | 0012 | Agent Runtime for agents; Cloud Run for API, UI and ingestion | Cloud Run for everything; GKE |
 | 0013 | Analyze as a separate A2A service | All agents in one deployment |
 | 0014 | Per-agent Agent Identity with PAB policies | One shared service account |
+| 0015 | CommonGrants-compatible `Opportunity` model; Grants.gov + SAM.gov indexed, USAspending/NIH/NSF as live context tools | Source-specific schemas; indexing award databases |
 
 M5 runs after M4 so the shipped product never depends on it. Its results update the live system through the normal eval gate.
 

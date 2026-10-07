@@ -74,12 +74,14 @@ Targets are hypotheses. The measured values go into the eval report and the rés
 | Source | Access | Used for |
 |---|---|---|
 | Simpler Grants API (Grants.gov) | Free API key, `X-API-Key` header | Grant opportunities and NOFO attachments |
-| SAM.gov Opportunities API | Free api.data.gov key | Federal contract solicitations in R&D NAICS codes (5417xx), including DoD and NASA SBIR/STTR notices |
+| SAM.gov daily public extract (CSV) | Public, no key | All active federal contract notices with full descriptions; filtered to R&D NAICS codes (5417xx), including DoD and NASA SBIR/STTR notices |
+| SAM.gov Opportunities API | Free key, about 10 requests/day | On-demand attachment links for a shortlisted notice |
 | USAspending API | Public, no key | Incumbents and past awards in a topic area (context only) |
 | NIH RePORTER API | Public, no key | Previously funded research on a topic: likely competition (context only) |
 | NSF Awards API | Public, no key | Previously funded research on a topic: likely competition (context only) |
+| SBIR.gov award data (bulk CSV) | Public, no key, monthly | Every past SBIR/STTR award with abstracts: past winners and competitors (context only) |
 
-The SBIR.gov API (403, "under maintenance") and the DoD SBIR/STTR Innovation Portal (blocks programmatic access) were tested on 2026-10-07 and are not used. Their solicitations are also posted to Grants.gov or SAM.gov. Opportunities are normalized to fields compatible with the CommonGrants protocol.
+The SBIR.gov search API (403, "under maintenance") and the DoD SBIR/STTR Innovation Portal (blocks programmatic access) were tested on 2026-10-07 and are not used; SBIR.gov's bulk award files still download and are used for context. Their solicitations are also posted to Grants.gov or SAM.gov. Opportunities are normalized to fields compatible with the CommonGrants protocol.
 
 ## 8. Positioning against commercial capture platforms
 

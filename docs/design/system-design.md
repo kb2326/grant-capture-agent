@@ -67,11 +67,11 @@ The project starts from `agents-cli scaffold create` with the `adk` template, de
 
 **Scope of the index.** Open and forecasted opportunities, refreshed nightly:
 - **Grants.gov via the Simpler Grants API:** all posted and forecasted grant opportunities, with NOFO attachments. NSF, DOE, NIH and other civilian agencies post their SBIR/STTR solicitations here. A full refresh uses the API's daily bulk extract (`/v1/extracts`); nightly runs page through `/v1/opportunities/search` sorted by post date.
-- **SAM.gov Opportunities API v2:** solicitations (`o`), presolicitations (`p`) and combined synopses (`k`) with NAICS 541713, 541714 or 541715 (R&D). This covers DoD and NASA SBIR/STTR notices. Attachments come from each record's `resourceLinks`.
-- **Context sources** (queried on demand by tools, not indexed): USAspending (past awards and incumbents), NIH RePORTER and NSF Awards (previously funded research on a topic, which shows the likely competition).
+- **SAM.gov daily public extract** (`ContractOpportunitiesFullCSV.csv`, about 210 MB, refreshed daily, no key, with full description text): solicitations, presolicitations and combined synopses with NAICS 541713, 541714 or 541715 (R&D). This covers DoD and NASA SBIR/STTR notices. The **SAM.gov Opportunities API v2** (about 10 requests/day on a public key) is used only on demand, to fetch a shortlisted notice's attachment links (`resourceLinks`).
+- **Context sources** (not part of the opportunity index): USAspending (past awards and incumbents), NIH RePORTER and NSF Awards (previously funded research on a topic, queried live), and the **SBIR.gov award data bulk file** (`award_data.csv`, every SBIR/STTR award with abstracts, refreshed monthly; its download still works while the SBIR.gov API is down). It is loaded into an `sbir_awards` table in M2 to show past winners and likely competitors.
 - **Dropped, as verified on 2026-10-07:** the SBIR.gov API (returns 403 "under maintenance") and the DoD SBIR/STTR Innovation Portal (blocks programmatic access). Their solicitations reach us through Grants.gov and SAM.gov.
 
-**Normalized format.** Every source maps to one `Opportunity` model whose field names follow the CommonGrants protocol's opportunity base model (title, status, key dates, funding, source URL, custom fields), so state and local portals can be added later as more adapters (ADR-0015).
+**Normalized format.** Every source maps to one internal `Opportunity` model, which exports to the official CommonGrants `OpportunityBase` (validated with `common-grants-sdk`) and is stored in `opportunities.raw`. State and local portals that speak CommonGrants can be added later as more adapters (ADR-0015).
 
 The expected size is about 5,000 opportunities and about 20,000 attachment pages.
 
@@ -447,7 +447,7 @@ These capabilities make the system behave like a governed enterprise deployment 
 | 0012 | Agent Runtime for agents; Cloud Run for API, UI and ingestion | Cloud Run for everything; GKE |
 | 0013 | Analyze as a separate A2A service | All agents in one deployment |
 | 0014 | Per-agent Agent Identity with PAB policies | One shared service account |
-| 0015 | CommonGrants-compatible `Opportunity` model; Grants.gov + SAM.gov indexed, USAspending/NIH/NSF as live context tools | Source-specific schemas; indexing award databases |
+| 0015 | Grants.gov API + SAM.gov daily bulk extract indexed; SAM API only on demand; USAspending/NIH/NSF live and SBIR award bulk file as context; records validated against the CommonGrants SDK | SAM API for bulk loading (10 requests/day); source-specific schemas |
 
 M5 runs after M4 so the shipped product never depends on it. Its results update the live system through the normal eval gate.
 

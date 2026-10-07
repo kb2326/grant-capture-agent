@@ -18,8 +18,9 @@
 - Python `>=3.11,<3.14` (scaffold constraint); CI uses 3.12.
 - Indexed sources: Grants.gov (Simpler Grants API, header `X-API-Key`) and SAM.gov Opportunities API v2 (`api_key` query parameter). Never call the SBIR.gov API or the DoD DSIP portal.
 - Simpler Grants keys allow 60 requests/minute and 10,000/day, and are disabled after 30 days unused. The adapter waits at least `GRANTS_MIN_INTERVAL_S` (default 1.1 s) between requests.
-- SAM.gov public keys allow about 10 requests per day. The adapter must never exceed `SAM_DAILY_REQUEST_BUDGET` (default 8).
+- SAM.gov notices come from the **public daily bulk extract** (`ContractOpportunitiesFullCSV.csv`, about 210 MB, refreshed daily, no key, includes full descriptions). The SAM.gov API is used only for on-demand attachment lookups, because public keys allow about 10 requests per day. The adapter must never exceed `SAM_DAILY_REQUEST_BUDGET` (default 8).
 - SAM.gov R&D NAICS codes: `541713`, `541714`, `541715`. Notice types: `o`, `p`, `k`.
+- Normalized records export to the official CommonGrants `OpportunityBase` model (`common-grants-sdk`), validated, and stored in `opportunities.raw`.
 - Opportunity statuses stored: `forecasted`, `open`, `closed`, `custom`. Kinds: `grant`, `sbir`, `sttr`, `contract`.
 - Attachments: only `application/pdf`, `application/vnd.openxmlformats-officedocument.wordprocessingml.document`, `application/msword`, `text/html`, `text/plain`, each ≤ 25 MB.
 - Secrets are never committed. `.env` is git-ignored; cloud secrets live in Secret Manager.
@@ -57,7 +58,8 @@ ingest/http.py                           NEW  retrying JSON client + capped down
 ingest/storage.py                        NEW  BlobStore protocol, LocalBlobStore, GCSBlobStore, safe_key
 ingest/sources/base.py                   NEW  SourceAdapter protocol
 ingest/sources/grants_gov.py             NEW  Simpler Grants adapter + mapper
-ingest/sources/sam_gov.py                NEW  SAM.gov adapter + mapper + request budget
+ingest/sources/sam_gov.py                NEW  SAM.gov API adapter + request budget (on-demand)
+ingest/sources/sam_gov_bulk.py           NEW  SAM.gov daily bulk CSV adapter (primary)
 ingest/pipeline.py                       NEW  upsert + attachment handling + run stats
 ingest/company.py                        NEW  seed the companies table from profile.json
 data/company/profile.json, data/company/docs/*.md   NEW  synthetic Lumen Grid Labs
@@ -198,7 +200,8 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 ```bash
 uv add "pydantic-settings>=2.6" "httpx>=0.28" "tenacity>=9.0" "sqlalchemy>=2.0.36" \
   "psycopg[binary]>=3.2" "alembic>=1.14" "pgvector>=0.3.6" "typer>=0.15" \
-  "google-cloud-storage>=2.19" "google-cloud-secret-manager>=2.22"
+  "google-cloud-storage>=2.19" "google-cloud-secret-manager>=2.22" \
+  "common-grants-sdk>=0.8.1"
 uv add --dev "respx>=0.22" "pre-commit>=4.0"
 ```
 In `pyproject.toml`, change `[tool.hatch.build.targets.wheel] packages = ["app","frontend"]` to `packages = ["app", "ingest", "db", "evals"]` and `known-first-party = ["app", "frontend"]` to `known-first-party = ["app", "ingest", "db", "evals"]`. Add:
@@ -827,14 +830,17 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 - Test: `tests/unit/test_ingest_models.py`
 
 **Interfaces:**
-- Produces: `ingest.models.OppStatus` (StrEnum: `forecasted`, `open`, `closed`, `custom`), `Money`, `OppFunding`, `OppTimeline`, `AttachmentRef`, `Opportunity` (fields below, `.content_hash() -> str`, `.to_commongrants() -> dict`), `infer_kind(*texts: str | None, default: str) -> str`, `parse_date(value: str | None) -> date | None`, `parse_money(value) -> Money | None`.
+- Produces: `ingest.models.OppStatus` (StrEnum: `forecasted`, `open`, `closed`, `custom`), `Money`, `OppFunding`, `OppTimeline`, `AttachmentRef`, `Opportunity` (fields below, `.content_hash() -> str`, `.to_commongrants(*, record_id: uuid.UUID, created_at: datetime, last_modified_at: datetime) -> common_grants_sdk.schemas.pydantic.OpportunityBase`), `to_cg_applicant_type(code: str) -> dict`, `infer_kind(*texts: str | None, default: str) -> str`, `parse_date(value: str | None) -> date | None`, `parse_money(value) -> Money | None`.
 
 - [ ] **Step 1: Write the failing tests**
 
 ```python
 # tests/unit/test_ingest_models.py
-from datetime import date
+import uuid
+from datetime import UTC, date, datetime
 from decimal import Decimal
+
+from common_grants_sdk.schemas.pydantic import OpportunityBase
 
 from ingest.models import (
     AttachmentRef, Money, Opportunity, OppStatus, OppTimeline, infer_kind, parse_date, parse_money,
@@ -856,14 +862,28 @@ def test_content_hash_is_stable_and_sensitive():
     assert _opp(attachments=[AttachmentRef(url="https://f/1.pdf", file_name="1.pdf")]).content_hash() != a.content_hash()
 
 
-def test_commongrants_export_uses_camel_case():
-    o = _opp(key_dates=OppTimeline(post_date=date(2026, 9, 1), close_date=date(2026, 11, 3)))
-    cg = o.to_commongrants()
-    assert cg["title"] == "Grid storage R&D"
-    assert cg["status"] == {"value": "open"}
-    assert cg["keyDates"]["closeDate"] == {"date": "2026-11-03"}
-    assert cg["source"] == "https://x/abc"
-    assert cg["customFields"]["sourceId"] == "abc"
+def test_commongrants_export_validates_against_official_sdk():
+    o = _opp(key_dates=OppTimeline(post_date=date(2026, 9, 1), close_date=date(2026, 11, 3)),
+             accepted_applicant_types=["small_businesses", "weird_new_code"])
+    rid = uuid.UUID("11111111-1111-1111-1111-111111111111")
+    now = datetime(2026, 10, 7, tzinfo=UTC)
+    cg = o.to_commongrants(record_id=rid, created_at=now, last_modified_at=now)
+    assert isinstance(cg, OpportunityBase)
+    d = cg.model_dump(mode="json", by_alias=True, exclude_none=True)
+    assert d["id"] == str(rid) and d["title"] == "Grid storage R&D"
+    assert d["status"]["value"] == "open"
+    assert d["keyDates"]["closeDate"]["eventType"] == "singleDate"
+    assert d["keyDates"]["closeDate"]["date"] == "2026-11-03"
+    assert d["acceptedApplicantTypes"][0]["value"] == "for_profit_small_business"
+    assert d["acceptedApplicantTypes"][1] == {"value": "custom", "customValue": "weird_new_code"}
+    assert d["customFields"]["sourceId"]["value"] == "abc"
+    assert d["source"] == "https://x/abc"
+
+
+def test_empty_description_still_exports():
+    now = datetime(2026, 10, 7, tzinfo=UTC)
+    cg = _opp(description="").to_commongrants(record_id=uuid.uuid4(), created_at=now, last_modified_at=now)
+    assert cg.description == "(no description provided)"
 
 
 def test_infer_kind():
@@ -876,6 +896,7 @@ def test_parse_helpers_tolerate_messy_values():
     assert parse_date("2026-11-03") == date(2026, 11, 3)
     assert parse_date("2026-11-03T17:00:00-04:00") == date(2026, 11, 3)
     assert parse_date("11/03/2026") == date(2026, 11, 3)
+    assert parse_date("2026-10-06 16:33:21.123-04") == date(2026, 10, 6)  # SAM bulk CSV format
     assert parse_date(None) is None and parse_date("") is None and parse_date("TBD") is None
     assert parse_money(150000) == Money(amount=Decimal("150000"))
     assert parse_money("1,250,000.50") == Money(amount=Decimal("1250000.50"))
@@ -895,11 +916,13 @@ Expected: FAIL with `ModuleNotFoundError: No module named 'ingest'`.
 import hashlib
 import json
 import re
+import uuid
 from datetime import date, datetime
 from decimal import Decimal, InvalidOperation
 from enum import StrEnum
 from typing import Any, Literal
 
+from common_grants_sdk.schemas.pydantic import OpportunityBase
 from pydantic import BaseModel, ConfigDict, Field
 
 Kind = Literal["grant", "sbir", "sttr", "contract"]
@@ -966,18 +989,31 @@ class Opportunity(BaseModel):
         payload = json.dumps(self.model_dump(mode="json"), sort_keys=True, separators=(",", ":"))
         return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
-    def to_commongrants(self) -> dict[str, Any]:
+    def to_commongrants(self, *, record_id: uuid.UUID, created_at: datetime,
+                        last_modified_at: datetime) -> OpportunityBase:
+        """Export as the official CommonGrants OpportunityBase (validated by the SDK)."""
+
         def money(m: Money | None) -> dict[str, str] | None:
             return None if m is None else {"amount": str(m.amount), "currency": m.currency}
 
-        def event(d: date | None) -> dict[str, str] | None:
-            return None if d is None else {"date": d.isoformat()}
+        def event(name: str, d: date | None) -> dict[str, str] | None:
+            return None if d is None else {"name": name, "eventType": "singleDate", "date": d.isoformat()}
+
+        def custom(name: str, value: Any) -> dict[str, Any]:
+            kind = ("boolean" if isinstance(value, bool) else "integer" if isinstance(value, int)
+                    else "number" if isinstance(value, float) else "array" if isinstance(value, list)
+                    else "object" if isinstance(value, dict) else "string")
+            return {"name": name, "fieldType": kind, "value": value}
 
         f, k = self.funding, self.key_dates
-        return {
+        extra = {"sourceSystem": self.source, "sourceId": self.source_id, "kind": self.kind,
+                 "agency": self.agency, "naics": list(self.naics),
+                 "assistanceListings": list(self.assistance_listings), **self.custom_fields}
+        payload = {
+            "id": str(record_id),
             "title": self.title,
             "status": {"value": self.status.value},
-            "description": self.description,
+            "description": self.description or "(no description provided)",
             "funding": {
                 "totalAmountAvailable": money(f.total_amount_available),
                 "minAwardAmount": money(f.min_award_amount),
@@ -986,22 +1022,42 @@ class Opportunity(BaseModel):
                 "details": f.details,
             },
             "keyDates": {
-                "postDate": event(k.post_date),
-                "closeDate": event(k.close_date),
-                "otherDates": {name: {"date": d.isoformat()} for name, d in k.other_dates.items()},
+                "postDate": event("Posted", k.post_date),
+                "closeDate": event("Close date", k.close_date),
+                "otherDates": {n: event(n, d) for n, d in k.other_dates.items()} or None,
             },
-            "acceptedApplicantTypes": list(self.accepted_applicant_types),
+            "acceptedApplicantTypes": [to_cg_applicant_type(c) for c in self.accepted_applicant_types],
             "source": self.source_url,
-            "customFields": {
-                "sourceSystem": self.source,
-                "sourceId": self.source_id,
-                "kind": self.kind,
-                "agency": self.agency,
-                "naics": list(self.naics),
-                "assistanceListings": list(self.assistance_listings),
-                **self.custom_fields,
-            },
+            "customFields": {n: custom(n, v) for n, v in extra.items() if v is not None},
+            "createdAt": created_at.isoformat(),
+            "lastModifiedAt": last_modified_at.isoformat(),
         }
+        return OpportunityBase.model_validate(payload)
+
+
+# Grants.gov applicant type codes -> CommonGrants ApplicantTypeOptions
+_APPLICANT_TYPES = {
+    "small_businesses": "for_profit_small_business",
+    "for_profit_organizations_other_than_small_businesses": "for_profit_not_small_business",
+    "individuals": "individual",
+    "nonprofits_non_higher_education_with_501c3": "non_profit_with_501c3",
+    "nonprofits_non_higher_education_without_501c3": "nonprofit_without_501c3",
+    "public_and_state_institutions_of_higher_education": "higher_education_public",
+    "private_institutions_of_higher_education": "higher_education_private",
+    "state_governments": "government_state",
+    "county_governments": "government_county",
+    "city_or_township_governments": "government_municipal",
+    "special_district_governments": "government_special_district",
+    "independent_school_districts": "school_district_independent",
+    "federally_recognized_native_american_tribal_governments": "government_tribal",
+    "native_american_tribal_organizations": "organization_tribal_other",
+    "unrestricted": "unrestricted",
+}
+
+
+def to_cg_applicant_type(code: str) -> dict[str, str]:
+    value = _APPLICANT_TYPES.get(code)
+    return {"value": value} if value else {"value": "custom", "customValue": code}
 
 
 _STTR = re.compile(r"\bSTTR\b|technology transfer", re.IGNORECASE)
@@ -1024,6 +1080,7 @@ def parse_date(value: str | None) -> date | None:
     for parser in (
         lambda s: datetime.fromisoformat(s).date(),
         lambda s: datetime.strptime(s, "%m/%d/%Y").date(),
+        lambda s: date.fromisoformat(s[:10]),  # e.g. SAM bulk "2026-10-06 16:33:21.123-04"
     ):
         try:
             return parser(text)
@@ -1048,7 +1105,7 @@ def parse_money(value: Any) -> Money | None:
 - [ ] **Step 4: Run tests**
 
 Run: `uv run pytest tests/unit/test_ingest_models.py -v`
-Expected: 4 PASS.
+Expected: 5 PASS.
 
 - [ ] **Step 5: Commit**
 
@@ -1654,7 +1711,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 
 ---
 
-### Task 7: SAM.gov adapter with a hard daily request budget
+### Task 7: SAM.gov API adapter with a hard daily request budget (on-demand use)
 
 **Files:**
 - Create: `ingest/sources/sam_gov.py`, `tests/fixtures/sam_gov/search_o_541715.json`
@@ -1809,7 +1866,7 @@ def map_sam_gov(r: dict[str, Any]) -> Opportunity:
 
 
 class SamGovAdapter:
-    name = "sam_gov"
+    name = "sam_gov_api"
 
     def __init__(self, client: httpx.Client, api_key: str, *, request_budget: int,
                  today: date | None = None, page_size: int = 1000) -> None:
@@ -1885,6 +1942,210 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 
 ---
 
+### Task 7b: SAM.gov daily bulk extract adapter (primary SAM source)
+
+**Files:**
+- Create: `ingest/sources/sam_gov_bulk.py`, `tests/fixtures/sam_gov/bulk_sample.csv`
+- Modify: `.gitignore` (add `data/cache/`)
+- Test: `tests/unit/test_sam_gov_bulk.py`
+
+**Interfaces:**
+- Consumes: `httpx.Client`, `Opportunity` and the helpers from Task 4, `R_AND_D_NAICS` from Task 7.
+- Produces:
+  - `ingest.sources.sam_gov_bulk.SAM_BULK_URL`
+  - `map_sam_csv_row(row: dict[str, str]) -> Opportunity`
+  - `SamBulkAdapter(client, *, cache_path: Path, url: str = SAM_BULK_URL, max_age_hours: float = 20, naics: tuple[str, ...] = R_AND_D_NAICS)`, `name = "sam_gov"`
+
+Why: SAM.gov publishes every notice as one public CSV each day. It's about 210 MB, needs no key, has no quota, and **includes the full description text**. For bulk loading that beats the 10-requests/day API. The API (Task 7) stays for fetching a single notice's attachment links on demand.
+
+- [ ] **Step 1: Fixture** (`tests/fixtures/sam_gov/bulk_sample.csv`; the column names are the real extract headers, trimmed to the ones we read plus two we ignore)
+
+```csv
+"NoticeId","Title","Sol#","Department/Ind.Agency","Sub-Tier","Office","PostedDate","Type","BaseType","SetASideCode","ResponseDeadLine","NaicsCode","Active","Link","Description","PopCity","Awardee"
+"n-101","SBIR Phase I: Grid-Forming Inverter Controls","W911NF-27-S-0101","DEPT OF DEFENSE","DEPT OF THE ARMY","ARL","2026-10-01 09:12:00.000-04","Solicitation","Solicitation","SBA","2026-11-20T17:00:00-05:00","541715","Yes","https://sam.gov/opp/n-101/view","Seeking grid-forming inverter control research.","Adelphi",""
+"n-102","Janitorial Services","FA001-27-Q-0001","DEPT OF DEFENSE","DEPT OF THE AIR FORCE","","2026-10-02 10:00:00.000-04","Solicitation","Solicitation","","2026-10-30","561720","Yes","https://sam.gov/opp/n-102/view","Clean buildings.","",""
+"n-103","Battery Test Services","","NATIONAL AERONAUTICS AND SPACE ADMINISTRATION","","","2026-09-29 08:00:00.000-04","Award Notice","Award Notice","","","541715","Yes","https://sam.gov/opp/n-103/view","Award.","","Acme"
+"n-104","Power Electronics Sources Sought","","DEPT OF ENERGY","","","2026-09-28 08:00:00.000-04","Presolicitation","Presolicitation","","","541714","No","https://sam.gov/opp/n-104/view","","",""
+```
+
+- [ ] **Step 2: Write the failing tests**
+
+```python
+# tests/unit/test_sam_gov_bulk.py
+import os
+import time
+from datetime import date
+from pathlib import Path
+
+import httpx
+import respx
+
+from ingest.http import build_client
+from ingest.models import OppStatus
+from ingest.sources.sam_gov_bulk import SAM_BULK_URL, SamBulkAdapter, map_sam_csv_row
+
+SAMPLE = Path("tests/fixtures/sam_gov/bulk_sample.csv").read_bytes()
+
+
+def test_map_row():
+    row = {"NoticeId": "n-101", "Title": "SBIR Phase I: Grid-Forming Inverter Controls", "Sol#": "W911",
+           "Department/Ind.Agency": "DEPT OF DEFENSE", "Sub-Tier": "DEPT OF THE ARMY", "Office": "ARL",
+           "PostedDate": "2026-10-01 09:12:00.000-04", "Type": "Solicitation", "BaseType": "Solicitation",
+           "SetASideCode": "SBA", "ResponseDeadLine": "2026-11-20T17:00:00-05:00", "NaicsCode": "541715",
+           "Active": "Yes", "Link": "https://sam.gov/opp/n-101/view", "Description": "Seeking research."}
+    o = map_sam_csv_row(row)
+    assert o.source == "sam_gov" and o.kind == "sbir" and o.status is OppStatus.open
+    assert o.agency == "DEPT OF DEFENSE > DEPT OF THE ARMY > ARL"
+    assert o.key_dates.post_date == date(2026, 10, 1) and o.key_dates.close_date == date(2026, 11, 20)
+    assert o.description == "Seeking research." and o.attachments == []
+    assert o.custom_fields["set_aside"] == "SBA"
+
+
+@respx.mock
+def test_filters_to_rd_naics_and_notice_types(tmp_path: Path):
+    respx.get(SAM_BULK_URL).mock(return_value=httpx.Response(200, content=SAMPLE))
+    with build_client() as c:
+        opps = list(SamBulkAdapter(c, cache_path=tmp_path / "sam.csv").iter_opportunities())
+    # n-102: wrong NAICS; n-103: award notice; n-104 kept although inactive (status closed)
+    assert [o.source_id for o in opps] == ["n-101", "n-104"]
+    assert opps[1].status is OppStatus.closed
+
+
+@respx.mock
+def test_fresh_cache_skips_download_and_stale_cache_refreshes(tmp_path: Path):
+    cache = tmp_path / "sam.csv"
+    cache.write_bytes(SAMPLE)
+    route = respx.get(SAM_BULK_URL).mock(return_value=httpx.Response(200, content=SAMPLE))
+    with build_client() as c:
+        assert len(list(SamBulkAdapter(c, cache_path=cache).iter_opportunities())) == 2
+    assert route.call_count == 0
+    old = time.time() - 30 * 3600
+    os.utime(cache, (old, old))
+    with build_client() as c:
+        list(SamBulkAdapter(c, cache_path=cache).iter_opportunities())
+    assert route.call_count == 1
+```
+
+- [ ] **Step 3: Run to see them fail**
+
+Run: `uv run pytest tests/unit/test_sam_gov_bulk.py -v`
+Expected: FAIL with `ModuleNotFoundError`.
+
+- [ ] **Step 4: Implement**
+
+```python
+# ingest/sources/sam_gov_bulk.py
+"""SAM.gov Contract Opportunities daily public extract (no key, no quota, includes descriptions)."""
+
+import csv
+import time
+from collections.abc import Iterator
+from pathlib import Path
+
+import httpx
+
+from ingest.models import Opportunity, OppStatus, OppTimeline, infer_kind, parse_date
+from ingest.sources.sam_gov import R_AND_D_NAICS
+
+csv.field_size_limit(10_000_000)  # descriptions can be very long
+
+SAM_BULK_URL = ("https://s3.amazonaws.com/falextracts/Contract%20Opportunities/datagov/"
+                "ContractOpportunitiesFullCSV.csv")
+BASE_TYPES = frozenset({"Solicitation", "Presolicitation", "Combined Synopsis/Solicitation"})
+
+
+def _get(r: dict[str, str], key: str) -> str:
+    return (r.get(key) or "").strip()
+
+
+def map_sam_csv_row(r: dict[str, str]) -> Opportunity:
+    notice_id = _get(r, "NoticeId")
+    agency_parts = [_get(r, k) for k in ("Department/Ind.Agency", "Sub-Tier", "Office")]
+    return Opportunity(
+        source="sam_gov",
+        source_id=notice_id,
+        kind=infer_kind(_get(r, "Title"), _get(r, "Sol#"), default="contract"),
+        title=_get(r, "Title") or "(untitled)",
+        status=OppStatus.open if _get(r, "Active").lower() == "yes" else OppStatus.closed,
+        description=_get(r, "Description"),
+        agency=" > ".join(p for p in agency_parts if p) or "Unknown agency",
+        source_url=_get(r, "Link") or f"https://sam.gov/opp/{notice_id}/view",
+        key_dates=OppTimeline(post_date=parse_date(_get(r, "PostedDate")),
+                              close_date=parse_date(_get(r, "ResponseDeadLine"))),
+        naics=[_get(r, "NaicsCode")] if _get(r, "NaicsCode") else [],
+        custom_fields={
+            "solicitation_number": _get(r, "Sol#") or None,
+            "notice_type": _get(r, "Type") or None,
+            "set_aside": _get(r, "SetASideCode") or None,
+        },
+    )
+
+
+class SamBulkAdapter:
+    name = "sam_gov"
+
+    def __init__(self, client: httpx.Client, *, cache_path: Path, url: str = SAM_BULK_URL,
+                 max_age_hours: float = 20, naics: tuple[str, ...] = R_AND_D_NAICS) -> None:
+        self.client, self.cache_path, self.url = client, cache_path, url
+        self.max_age_s, self.naics = max_age_hours * 3600, frozenset(naics)
+
+    def _ensure_file(self) -> Path:
+        path = self.cache_path
+        if path.exists() and time.time() - path.stat().st_mtime < self.max_age_s:
+            return path
+        path.parent.mkdir(parents=True, exist_ok=True)
+        tmp = path.with_suffix(".part")
+        with self.client.stream("GET", self.url, timeout=600) as resp, tmp.open("wb") as fh:
+            resp.raise_for_status()
+            for chunk in resp.iter_bytes():
+                fh.write(chunk)
+        tmp.replace(path)
+        return path
+
+    def iter_opportunities(self, limit: int | None = None) -> Iterator[Opportunity]:
+        yielded = 0
+        # The extract is not strictly UTF-8; decode leniently so one bad byte can't stop the run.
+        with self._ensure_file().open(encoding="utf-8", errors="replace", newline="") as fh:
+            for row in csv.DictReader(fh):
+                if _get(row, "NaicsCode") not in self.naics or _get(row, "BaseType") not in BASE_TYPES:
+                    continue
+                yield map_sam_csv_row(row)
+                yielded += 1
+                if limit is not None and yielded >= limit:
+                    return
+```
+
+- [ ] **Step 5: Run tests**
+
+Run: `uv run pytest tests/unit/test_sam_gov_bulk.py -v`
+Expected: 3 PASS.
+
+- [ ] **Step 6: Live check (no key; about 210 MB download, cached for 20 h)**
+
+Add `data/cache/` to `.gitignore`, then:
+
+```bash
+uv run python -c "
+from pathlib import Path; from ingest.http import build_client
+from ingest.sources.sam_gov_bulk import SamBulkAdapter
+with build_client() as c:
+    opps=list(SamBulkAdapter(c, cache_path=Path('data/cache/sam_full.csv')).iter_opportunities())
+print(len(opps), sum(o.kind=='sbir' for o in opps), opps[0].title[:60])"
+```
+Expected: hundreds of R&D notices, some marked `sbir`.
+
+- [ ] **Step 7: Commit**
+
+```bash
+git add ingest/sources/sam_gov_bulk.py tests/fixtures/sam_gov/bulk_sample.csv tests/unit/test_sam_gov_bulk.py .gitignore
+git commit -m "feat(m0): SAM.gov daily bulk extract adapter (no quota, full descriptions)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+```
+
+
+---
+
 ### Task 8: Ingestion pipeline, company seed and CLI
 
 **Files:**
@@ -1897,7 +2158,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
   - `ingest.pipeline.IngestStats` (dataclass: `seen`, `new`, `updated`, `unchanged`, `failed`, `attachments_stored`, `attachments_skipped`, `attachments_duplicate`, `errors: list[str]`)
   - `ingest.pipeline.run_ingest(adapter, session: Session, store: BlobStore, fetch: Callable[[str], bytes | None], *, limit: int | None = None, download_attachments: bool = True) -> IngestStats`
   - `ingest.company.seed_company(session: Session, profile_path: Path) -> uuid.UUID`
-  - CLI: `python -m ingest run --source {grants_gov|sam_gov} [--limit N] [--no-attachments]`, `python -m ingest seed-company`, `python -m ingest stats`
+  - CLI: `python -m ingest run --source {grants_gov|sam_gov|sam_gov_api} [--limit N] [--no-attachments]`, `python -m ingest seed-company`, `python -m ingest stats`
 
 - [ ] **Step 1: Write the company profile** (the facts the M1 eligibility rules check)
 
@@ -2057,6 +2318,7 @@ Expected: FAIL with `ModuleNotFoundError: No module named 'ingest.pipeline'`.
 
 import hashlib
 import logging
+import uuid
 from collections.abc import Callable
 from dataclasses import asdict, dataclass, field
 from datetime import UTC, datetime
@@ -2093,7 +2355,10 @@ def _apply(row: OpportunityRow, o: Opportunity, content_hash: str) -> None:
     row.award_ceiling = o.funding.max_award_amount.amount if o.funding.max_award_amount else None
     row.naics, row.assistance_listings = list(o.naics), list(o.assistance_listings)
     row.eligibility_codes = list(o.accepted_applicant_types)
-    row.raw, row.content_hash = o.to_commongrants(), content_hash
+    now = datetime.now(UTC)
+    cg = o.to_commongrants(record_id=row.id, created_at=row.ingested_at or now, last_modified_at=now)
+    row.raw = cg.model_dump(mode="json", by_alias=True, exclude_none=True)
+    row.content_hash = content_hash
 
 
 def _store_attachments(session: Session, row: OpportunityRow, o: Opportunity, store: BlobStore,
@@ -2138,7 +2403,7 @@ def run_ingest(adapter: SourceAdapter, session: Session, store: BlobStore,
                 stats.unchanged += 1
                 continue
             if row is None:
-                row = OpportunityRow(source=o.source, source_id=o.source_id)
+                row = OpportunityRow(id=uuid.uuid4(), source=o.source, source_id=o.source_id)
                 session.add(row)
                 stats.new += 1
             else:
@@ -2204,6 +2469,7 @@ from ingest.http import build_client, download
 from ingest.pipeline import run_ingest
 from ingest.sources.grants_gov import GrantsGovAdapter
 from ingest.sources.sam_gov import SamGovAdapter
+from ingest.sources.sam_gov_bulk import SamBulkAdapter
 from ingest.storage import blob_store_from_root
 
 cli = typer.Typer(no_args_is_help=True)
@@ -2214,7 +2480,7 @@ def _session():
 
 
 @cli.command()
-def run(source: str = typer.Option(..., help="grants_gov or sam_gov"),
+def run(source: str = typer.Option(..., help="grants_gov, sam_gov (daily bulk extract) or sam_gov_api"),
         limit: int | None = typer.Option(None), attachments: bool = typer.Option(True)) -> None:
     logging.basicConfig(level=logging.INFO)
     s = get_settings()
@@ -2224,6 +2490,8 @@ def run(source: str = typer.Option(..., help="grants_gov or sam_gov"),
                 raise typer.BadParameter("SIMPLER_GRANTS_API_KEY is not set")
             adapter = GrantsGovAdapter(client, s.simpler_grants_api_key.get_secret_value())
         elif source == "sam_gov":
+            adapter = SamBulkAdapter(client, cache_path=Path("data/cache/sam_full.csv"))
+        elif source == "sam_gov_api":
             if s.sam_api_key is None:
                 raise typer.BadParameter("SAM_API_KEY is not set")
             adapter = SamGovAdapter(client, s.sam_api_key.get_secret_value(),
@@ -2234,7 +2502,7 @@ def run(source: str = typer.Option(..., help="grants_gov or sam_gov"),
         def fetch(url: str) -> bytes | None:
             return download(client, url, max_bytes=s.max_attachment_bytes)
 
-        if source == "sam_gov" and attachments:
+        if source == "sam_gov_api" and attachments:
             # SAM attachment downloads may count against the ~10 requests/day key quota.
             # Links are kept in raw/customFields; M1's Analyze agent fetches them on demand.
             typer.echo("sam_gov: attachment download deferred to on-demand (quota)", err=True)
@@ -2673,7 +2941,7 @@ What becomes easier, what becomes harder, and what we will watch.
 | 0012 | Runtime choice | Agents need managed sessions; API/UI/ingestion are plain containers | Agent Runtime for agents; Cloud Run for API, UI and ingestion job | Cloud Run for everything (lose managed sessions/memory); GKE (operational overhead) | Two deployment paths to maintain |
 | 0013 | Analyze as an A2A service (Proposed; decided in M2) | Analyze is reused by Discover, Draft and external callers | Deploy Analyze separately and call it over A2A | Single deployment (simpler, but couples scaling and releases) | Network hop and auth between agents; independent versioning |
 | 0014 | Per-agent identity (Proposed; decided in M4) | Least privilege; one leaked agent shouldn't reach everything | Agent Identity per agent with principal access boundary policies | One shared service account | More IAM to manage; clearer audit trail |
-| 0015 | Sources and normalized format | SBIR.gov API returns 403 and DSIP blocks access (tested 2026-10-07); Simpler Grants serves CommonGrants natively | Index Grants.gov + SAM.gov; USAspending, NIH RePORTER, NSF Awards as live context tools; normalize to CommonGrants-compatible `Opportunity` | Scraping SBIR.gov/DSIP (fragile, against terms); a source-specific schema (no path to other portals) | SAM.gov quota (~10 requests/day) limits refresh, so the adapter has a hard budget |
+| 0015 | Sources and normalized format | SBIR.gov search API returns 403 and DSIP blocks access (tested 2026-10-07); SAM.gov API allows ~10 requests/day but SAM publishes a free daily CSV with descriptions; Simpler Grants serves CommonGrants natively | Index Grants.gov (API) + SAM.gov (daily CSV); SAM API only for on-demand attachments; USAspending, NIH RePORTER, NSF live and SBIR award CSV as context; export validated against the CommonGrants SDK | SAM API for bulk (quota); scraping SBIR.gov/DSIP (fragile, against terms); a source-specific schema | One 210 MB daily download; SAM attachments arrive later (on demand) than Grants.gov ones |
 
 - [ ] **Step 3: Index**
 
@@ -2788,7 +3056,7 @@ uv run python -m ingest run --source grants_gov --limit 1200   # ~25 min at 60 r
 uv run python -m ingest run --source sam_gov
 uv run python -m ingest stats
 ```
-Expected: `stats` shows at least 1,000 opportunities across both sources, at least 300 opportunities with documents (Grants.gov only; SAM attachments are fetched on demand from M1), and an error count below 5% of `seen`. Record the actual numbers in the PR description. (The SAM run uses up to 8 requests of the day's quota.)
+Expected: `stats` shows at least 1,000 opportunities across both sources (Grants.gov had 1,458 open/forecasted on 2026-10-07), at least 300 opportunities with documents (Grants.gov attachments; SAM attachments are fetched on demand from M1), and an error count below 5% of `seen`. Record the actual numbers in the PR description. (The SAM run reads the daily bulk file and uses none of the API quota.)
 
 - [ ] **Step 2: Re-run to prove idempotence on real data**
 
@@ -3361,7 +3629,7 @@ resource "google_cloud_run_v2_job" "ingest" {
       }
       containers {
         image = var.ingest_image
-        args  = ["run", "--source", "grants_gov", "--limit", "500"]
+        args  = ["run", "--source", "grants_gov", "--limit", "500"] # M2 adds a sam_gov job
         resources { limits = { cpu = "1", memory = "1Gi" } }
         env {
           name  = "GOOGLE_CLOUD_PROJECT"

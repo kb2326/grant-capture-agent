@@ -125,6 +125,7 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
     <li><a href="#process">How a team runs it</a></li>
     <li><a href="#data">The data</a></li>
     <li><a href="#m0">M0 at a glance</a></li>
+    <li><a href="#claude-code">Using Claude Code</a></li>
     <li><a href="#arch">Architecture</a></li>
     <li><a href="#agents">The agents</a></li>
     <li><a href="#rag">RAG from scratch</a></li>
@@ -158,7 +159,7 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
 
 <section id="next">
   <header><span class="eyebrow">Section 01b</span><h2>Your next steps</h2></header>
-  <p>Everything needed to start building is set up. The M0 plan now has 20 tasks, including a raw zone, provenance and quality checks. Here is what is done, what you do next, and what happens after that.</p>
+  <p>Everything needed to start building is set up. The M0 plan now has 21 tasks, including a raw zone, provenance and quality checks. Here is what is done, what you do next, and what happens after that.</p>
   <div class="grid2">
     <div class="panel"><span class="eyebrow">Done</span><h3>Ready to build</h3>
       <ul class="tight">
@@ -220,7 +221,7 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
     <div class="phase"><span class="n">02</span><div><h3>System design</h3><p>Architecture, data model, typed hand-offs, workflows, knockout rules, evals, security, deployment. <code>docs/design/system-design.md</code></p></div><span class="pill done">done</span></div>
     <div class="phase"><span class="n">03</span><div><h3>Decision records (ADRs)</h3><p>One short file per big choice, with the options we turned down and why. Listed in the design; written in M0 Task 11. <code>docs/adr/</code></p></div><span class="pill todo">in M0</span></div>
     <div class="phase"><span class="n">04</span><div><h3>Evals first</h3><p>Decide what "correct" means and label test data before writing features. The harness and labeling guide come in M0; labeled sets in M1–M3. <code>evals/</code></p></div><span class="pill todo">in M0</span></div>
-    <div class="phase"><span class="n">05</span><div><h3>Implementation plan</h3><p>Each milestone broken into small, testable tasks. M0 has 20 tasks. <code>docs/plans/2026-10-07-m0-foundation.md</code></p></div><span class="pill done">M0 done</span></div>
+    <div class="phase"><span class="n">05</span><div><h3>Implementation plan</h3><p>Each milestone broken into small, testable tasks. M0 has 21 tasks. <code>docs/plans/2026-10-07-m0-foundation.md</code></p></div><span class="pill done">M0 done</span></div>
     <div class="phase current"><span class="n">06</span><div><h3>Build</h3><p>Tests first, small pull requests, CI on every pull request. Starts with M0 Task 1 when you say go.</p></div><span class="pill now">next</span></div>
     <div class="phase"><span class="n">07</span><div><h3>Ship</h3><p>Deploy to Google Cloud with a demo UI, tracing, and an eval gate that blocks a bad release.</p></div><span class="pill todo">to do</span></div>
     <div class="phase"><span class="n">08</span><div><h3>Operate and report</h3><p>Eval report, cost report, and a write-up of what went wrong and what you'd change.</p></div><span class="pill todo">to do</span></div>
@@ -252,13 +253,14 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
 
 <section id="m0">
   <header><span class="eyebrow">Section 04c</span><h2>M0 at a glance</h2></header>
-  <p>The full plan is <code>docs/plans/2026-10-07-m0-foundation.md</code>: 20 tasks, each with its tests and code. This table is the short version. Every task is built test-first: write a test that fails, write the code, watch the test pass, then commit.</p>
+  <p>The full plan is <code>docs/plans/2026-10-07-m0-foundation.md</code>: 21 tasks, each with its tests and code. This table is the short version. Every task is built test-first: write a test that fails, write the code, watch the test pass, then commit.</p>
   <div class="tablewrap"><table>
     <thead><tr><th>Task</th><th>What it builds, in plain terms</th><th>Why it matters</th></tr></thead>
     <tbody>
       <tr><td colspan="3"><b>Part A: on your laptop</b></td></tr>
       <tr><td class="num">1</td><td>Generate the project skeleton with Google's agents-cli; replace the demo weather agent with our placeholder agent</td><td>Standard layout, eval folders and deployment templates from day one</td></tr>
       <tr><td class="num">2</td><td>One settings file (models, database, keys), extra libraries, automatic code checks before each commit, and rules for coding assistants (<code>CLAUDE.md</code>)</td><td>Model names and keys live in one place; code style is enforced automatically</td></tr>
+      <tr><td class="num">2b</td><td>Set up Claude Code for this repo: auto-formatting after edits, two project skills ("ingest-status", "eval-report"), and a data-quality reviewer subagent</td><td>Every coding session follows the same rules and has specialist helpers</td></tr>
       <tr><td class="num">3</td><td>The database tables, with vector search turned on, created through versioned migrations</td><td>Every later feature stores and reads data here</td></tr>
       <tr><td class="num">4</td><td>One standard "opportunity" record that every source is converted into, checked against the official CommonGrants model</td><td>Grants.gov and SAM.gov look different; the rest of the system sees one format</td></tr>
       <tr><td class="num">5</td><td>Safe downloading: retries when a site hiccups, size limits on files, and safe file names</td><td>Protects against flaky APIs, huge files and malicious file names</td></tr>
@@ -281,6 +283,24 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
     </tbody>
   </table></div>
   <p class="small">How to review: read this table, then open the plan and skim only the "Files", "Interfaces" and "Expected" lines of each task. The code blocks are the exact code to be written; you don't need to read them in advance.</p>
+</section>
+
+<section id="claude-code">
+  <header><span class="eyebrow">Section 05b</span><h2>How we use Claude Code</h2></header>
+  <p>Claude Code is the coding agent building this project. It's used the way a team would use one: as a configured, reviewable part of the workflow.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Practice</th><th>How</th></tr></thead>
+    <tbody>
+      <tr><td>Spec → plan → build</td><td>Every milestone goes through brainstorming, a written spec and a task-by-task plan before any code (the files in <code>docs/</code>)</td></tr>
+      <tr><td>Test-first building</td><td>Each task: write a failing test, write the code, see it pass, commit</td></tr>
+      <tr><td>Repo configuration</td><td><code>CLAUDE.md</code> rules, an auto-format hook, project skills and a reviewer subagent (Task 2b)</td></tr>
+      <tr><td>Google's agent skills</td><td>The agents-cli skill pack (scaffold, ADK code, eval, deploy, observability) is loaded for the matching steps</td></tr>
+      <tr><td>Parallel work</td><td>Independent tasks (the company documents, the ADRs) can run as parallel subagents while the core code is built in the main session</td></tr>
+      <tr><td>Reviews</td><td>A code review on every milestone pull request; a security review before cloud and infrastructure changes merge; the data-quality reviewer after ingestion changes</td></tr>
+      <tr><td>CI follow-through</td><td>Pull requests are watched until CI is green, and failures are fixed rather than skipped</td></tr>
+      <tr><td>Library docs on demand</td><td>Current documentation for ADK, Ragas and similar libraries is looked up when coding, not recalled from memory</td></tr>
+    </tbody>
+  </table></div>
 </section>
 
 <section id="arch">
@@ -314,11 +334,15 @@ flowchart LR
 </section>
 
 <section id="agents">
-  <header><span class="eyebrow">Section 06</span><h2>The agents</h2></header>
+  <header><span class="eyebrow">Section 06</span><h2>The agents, and how their design gets chosen</h2></header>
+  <div class="clause">
+    <span class="eyebrow">Rule: simplest first, then prove the extra complexity</span>
+    <p>Current agent-engineering guidance is to start with simple, predictable workflows and add agent loops only when they <i>measurably</i> improve results. So each module is built twice: a simple <b>baseline</b> and a richer <b>variant</b>. Both run on the same test set, and the evals decide which ships. Nothing is kept just because v0 used it.</p>
+  </div>
   <div class="grid2">
-    <div class="panel"><span class="eyebrow">Discover</span><h3>Plan → Execute → Verify</h3><p>The planner turns a request into a structured search plan. You approve it. The executor runs hybrid searches against the index. The verifier checks the results with rules (still open? deadline far enough out? matches the company's field?) and sends the executor back with a sharper query if too few pass.</p></div>
-    <div class="panel"><span class="eyebrow">Analyze</span><h3>The Solicitation agent</h3><p>Reads every attached document for one opportunity and fills a <code>SolicitationBrief</code>: eligibility clauses, "shall" requirements, scoring criteria, page limits, required sections, deadlines. The knockout screen runs on the eligibility clauses. You can ask follow-up questions, and each answer cites the page it came from.</p></div>
-    <div class="panel"><span class="eyebrow">Draft</span><h3>Corrective RAG writer</h3><p>For each section the solicitation requires, it retrieves evidence from the company's documents and grades every passage. If the evidence is weak it rewrites the query and tries again. If evidence is still missing it writes "needs input from the team" rather than making something up. A final check confirms every sentence is supported.</p></div>
+    <div class="panel"><span class="eyebrow">Discover</span><h3>Single pass vs. Plan → Execute → Verify</h3><p><b>Baseline:</b> turn the request into a search plan, search once, filter with rules, return the best results. <b>Variant (PEV):</b> the same, plus a loop. If too few results pass the checks, the planner sharpens the plan and searches again (up to 3 rounds). PEV should help most on vague requests ("anything for our battery work?"), so the test set has a separate set of vague queries. If the single pass is as good and faster, it ships, and that measured finding is itself a strong interview story.</p></div>
+    <div class="panel"><span class="eyebrow">Analyze</span><h3>Read the whole document vs. read it in pieces</h3><p>A solicitation is usually 30–150 pages, which fits in Gemini's long context. <b>Baseline:</b> the model reads each document whole, with page markers so every quote keeps its page number. That avoids cutting a clause away from the heading that explains it. <b>Variant:</b> split into sections and merge the results, used automatically only for packages too large for the context budget. Follow-up questions reuse the loaded document through context caching, so they're fast and cheap.</p></div>
+    <div class="panel"><span class="eyebrow">Draft</span><h3>Whole corpus in context vs. corrective RAG</h3><p>With 13 company documents, putting everything in the prompt may work as well as retrieval. Real companies have hundreds. So M3 grows the fake company to about 80 documents, including outdated and off-topic ones as distractors, then compares: <b>baseline</b>, everything in context; <b>variant</b>, corrective RAG (retrieve, grade, search again when evidence is weak, flag gaps). Both must cite every claim and pass the faithfulness check.</p></div>
   </div>
 </section>
 
@@ -557,6 +581,7 @@ flowchart LR
       <tr><td class="num">2026-10-06</td><td>Added the Solicitation agent (Analyze) and a hand-built RAG library shared by all agents.</td></tr>
       <tr><td class="num">2026-10-06</td><td>Fictional test company "Lumen Grid Labs" replaces BESI's real capability document.</td></tr>
       <tr><td class="num">2026-10-06</td><td>Stack: ADK 2.x, Gemini 3.x, Cloud SQL Postgres + pgvector, Docling, Agent Runtime (pending your review).</td></tr>
+      <tr><td class="num">2026-10-07</td><td>Architecture choices inherited from v0 re-examined against current guidance. Discover: single pass vs. Plan-Execute-Verify, decided by ablation (ADR-0017). Analyze: whole-document long-context reading by default, chunking only for oversized packages (ADR-0016). Draft: long context vs. corrective RAG on an expanded ~80-document corpus (ADR-0018). Claude Code workspace added to M0 (Task 2b).</td></tr>
       <tr><td class="num">2026-10-07</td><td>Evaluation and observability stack confirmed against 2026 practice: Ragas added for standard RAG metrics, Arize Phoenix for local trace inspection, alongside our own metrics, ADK evalsets, the Gen AI evaluation service, Cloud Trace and BigQuery Agent Analytics.</td></tr>
       <tr><td class="num">2026-10-07</td><td>M0 plan written: 20 tasks in two parts, local foundation and cloud foundation. Added after review: a raw zone with replay, provenance on every record, and automatic data-quality checks.</td></tr>
       <tr><td class="num">2026-10-07</td><td>Data sources finalized after live tests: Grants.gov API and the SAM.gov daily CSV for the index; the SAM.gov API only on demand; SBIR award file, USAspending, NIH and NSF for competition context. SBIR.gov search API and the DoD portal dropped (blocked). Records are validated against the official CommonGrants SDK.</td></tr>

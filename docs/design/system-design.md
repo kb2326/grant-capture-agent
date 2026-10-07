@@ -239,7 +239,23 @@ All three workflows are ADK 2 workflow graphs. State lives in the ADK session, a
 
 Exact IDs are pinned in M0 by listing the available models with `google-genai`.
 
-### 8.1 Discover: Plan → Execute → Verify
+### 8.0 Design method: simplest baseline first, complexity only when the evals show a gain
+
+Every workflow ships with a **simple baseline** and a **richer variant**. Both run on the same golden set, and the variant is kept only if it wins on quality without an unacceptable cost or latency penalty. This follows current agent-engineering guidance (add multi-step or agentic behaviour only when it demonstrably improves outcomes), and it turns each architecture choice into a measured result rather than an assumption carried over from v0.
+
+| Workflow | Baseline (B0) | Variant (B1) | Pattern names | Decided in |
+|---|---|---|---|---|
+| Discover | Single pass: query understanding → hybrid search → rerank → rule filters | Plan → Execute → Verify loop with plan refinement (≤ 3 iterations) | Prompt chaining vs. plan-and-execute + evaluator-optimizer | M2 (ADR-0017) |
+| Analyze | Long-context extraction over each whole solicitation document | Chunk-and-merge extraction (kept as the fallback for packages too large for the context budget) | Long context vs. retrieval | M1 (ADR-0016) |
+| Draft | Long-context drafting: the whole company corpus in context | Corrective RAG: retrieve → grade → re-query → gap | Long context vs. corrective RAG | M3 (ADR-0018) |
+
+Each ablation reports quality (the module's metrics), p50/p95 latency and cost per run, overall and on the hard slices (vague queries, very long solicitations, a large company corpus).
+
+### 8.1 Discover: Plan → Execute → Verify (B1) vs. single pass (B0)
+
+**B0 (single pass).** The LLM turns the request into a `SearchPlan` (the same contract, so the approval step is identical), the executor runs it once, the verifier rules filter, and the top results are returned. No refinement loop.
+
+**B1 (Plan → Execute → Verify).** As below. The loop adds value when the first plan misses, typically on vague or broad requests, so the golden query set includes a labeled "vague" slice to measure exactly that.
 
 ```
 plan (LLM → SearchPlan)
@@ -262,13 +278,18 @@ plan (LLM → SearchPlan)
 
 ### 8.2 Analyze: the Solicitation agent
 
+A solicitation package is typically 30–150 pages (roughly 25k–120k tokens), well inside Gemini's long-context window. Reading the **whole document at once** avoids the classic chunking failure where a clause is split from the heading that gives it meaning. Retrieval is used only when a package exceeds the context budget.
+
 ```
 load (opportunity + documents; on-demand ingest if attachments missing)
-  → extract (LLM, per document, over section chunks → partial briefs)  → merge (code: dedupe by quote)
-  → validate (code: every quote is a substring of its chunk text after whitespace normalization; failures dropped + logged)
+  → route by size: total tokens ≤ ANALYZE_CONTEXT_BUDGET (default 300k)?
+      ├─ yes → extract (LLM over each whole document; text is page-tagged "[p.12]" so quotes keep their page)   [B0]
+      └─ no  → extract per section chunk → merge (dedupe by quote)                                              [B1 / fallback]
+  → validate (code: every quote is a substring of the page text after whitespace normalization; failures dropped + logged)
   → knockout (rules → EligibilityVerdict)
   → persist brief + verdict
-Q&A tool: rag.answer(question, scope=this opportunity's chunks) with citations
+Q&A tool: answer(question) over the same documents using Gemini context caching, so follow-up questions
+don't resend the whole package; answers cite page numbers. Falls back to rag.answer over chunks above the budget.
 ```
 
 ### 8.3 Knockout rules (`app/rules/eligibility.py`)
@@ -292,7 +313,13 @@ Q&A tool: rag.answer(question, scope=this opportunity's chunks) with citations
 
 Clauses are extracted by the LLM, which also proposes `constraint`. The constraint is validated against a JSON schema for its category, and an invalid constraint becomes `None`, which leads to E0.
 
-### 8.4 Draft: corrective RAG
+### 8.4 Draft: corrective RAG (B1) vs. long-context drafting (B0)
+
+**Why both.** The original corrective-RAG idea (grade retrieved passages, re-query or fall back when they're weak) matters when the evidence base is large: a real company accumulates hundreds of past proposals, reports and CVs, far more than fits usefully in one prompt. With a small corpus, putting everything in context is simpler and often as good. So M3 expands the synthetic Lumen Grid Labs corpus to a realistic size (about 80 documents, including off-topic and outdated material as distractors) and measures both approaches on faithfulness, context relevance, gap detection and cost.
+
+**B0 (long context).** The whole company corpus (page-tagged) plus the section's requirements in one call; the same citation rules and faithfulness check apply.
+
+**B1 (corrective RAG):**
 
 ```
 select sections (from SolicitationBrief.required_sections; user picks)
@@ -351,6 +378,7 @@ evals/
   - *Offline metrics:* our own `evals/metrics.py` for task metrics (knockout precision/recall, P@10, nDCG, κ), **Ragas 0.4** for the standard RAG metrics (context precision, context recall, faithfulness, response relevancy) with Gemini as the judge model, and **ADK evalsets** (`agents-cli eval run`) for tool trajectories and agent responses. Ragas' judge is calibrated against the hand labels (Cohen's κ) before its scores are trusted, the same rule as our own grader.
   - *Managed and continuous:* the **Gen AI evaluation service** with custom autoraters, run on a sample of production traces (M4).
   - Considered and not used: DeepEval (overlaps Ragas + pytest), promptfoo (its red-team plugins are a candidate for M4's injection tests; our own red-team set comes first), LangSmith (tied to LangChain).
+- **Ablations.** Each workflow's baseline and variant (§8.0) run on the same golden sets; the report shows quality, p50/p95 latency and cost side by side, overall and per hard slice. Whichever variant wins is the one shipped, and the result is what goes in the README and résumé.
 - **Labeling.** Karthick labels the golden sets by hand, following `evals/LABELING.md`, which defines each verdict, what counts as a knockout, and edge cases. Opportunities are sampled with stratification by source and agency, and include at least 10 known knockouts.
 - **Timing benchmark protocol.**
   - 10 search tasks and 3 drafting tasks.
@@ -431,9 +459,9 @@ These capabilities make the system behave like a governed enterprise deployment 
 | Milestone | Done when |
 |---|---|
 | **M0 Foundation** | Scaffold in place; Lumen Grid Labs data written; Postgres schema migrated; ingestion loads ≥ 1,000 opportunities with attachments locally; CI runs lint, types and tests; eval harness runs an empty report; ADRs 0001–0009 written; `CLAUDE.md`/`AGENTS.md`, project skills and pre-commit hooks in place |
-| **M1 Analyze** | Golden knockout and requirements sets labeled; Solicitation agent produces validated briefs; knockout recall and precision plus requirement recall reported |
-| **M2 Discover** | Hybrid search + rerank with retrieval metrics reported; PEV workflow with an approval step; Analyze served over A2A; Memory Bank stores and applies preferences; P@10 reported; timing benchmark run and reported |
-| **M3 Draft** | Grader calibrated (κ reported); CRAG drafting with gaps; relevance and faithfulness reported; drafting timing reported; MCP server working from an MCP client; Sensitive Data Protection redaction on company documents; Gen AI evaluation service autoraters wired in |
+| **M1 Analyze** | Golden knockout and requirements sets labeled; Solicitation agent produces validated briefs; knockout recall and precision plus requirement recall reported; long-context vs. chunked extraction ablation reported (ADR-0016) |
+| **M2 Discover** | Hybrid search + rerank with retrieval metrics reported; single-pass (B0) and PEV (B1) workflows with an approval step, ablation reported overall and on the vague-query slice (ADR-0017); Analyze served over A2A; Memory Bank stores and applies preferences; P@10 reported; timing benchmark run and reported |
+| **M3 Draft** | Company corpus expanded to about 80 documents with distractors; grader calibrated (κ reported); long-context (B0) vs. corrective RAG (B1) ablation reported (ADR-0018); drafting with gaps; relevance and faithfulness reported; drafting timing reported; MCP server working from an MCP client; Sensitive Data Protection redaction on company documents; Gen AI evaluation service autoraters wired in |
 | **M4 Ship** | Terraform-provisioned prod; agents on Agent Runtime; UI live on Cloud Run; tracing, BigQuery Agent Analytics and cost dashboards; Agent Identity + PAB, Agent Registry, Agent Gateway + Model Armor configured; OAuth export to Google Docs; continuous evaluation on sampled traces; CI eval gate enforced; red-team results; final eval report and README with measured numbers |
 | **M5 Specialize** | (a) **Fine-tuning:** supervised fine-tune of Gemini Flash-Lite on the labeled dev grading data (Vertex AI supervised tuning), compared with the prompted grader on κ, latency and cost, and the winner shipped. (b) **Multimodal parsing:** Gemini reads scanned and table-heavy PDF pages natively as images, compared with Docling on clause-extraction recall; used as the fallback for pages Docling can't parse. (c) **Managed retrieval comparison:** the same corpus indexed in Vector Search and RAG Engine, compared with pgvector hybrid search on recall@k, nDCG, latency and cost. Results go in the eval report. |
 
@@ -455,6 +483,9 @@ These capabilities make the system behave like a governed enterprise deployment 
 | 0012 | Agent Runtime for agents; Cloud Run for API, UI and ingestion | Cloud Run for everything; GKE |
 | 0013 | Analyze as a separate A2A service | All agents in one deployment |
 | 0014 | Per-agent Agent Identity with PAB policies | One shared service account |
+| 0016 | Analyze reads whole documents in long context; chunked extraction only above the context budget | Always chunk (splits clauses from their headings); always long context (fails on very large packages) |
+| 0017 | Discover architecture chosen by ablation: single pass vs. Plan-Execute-Verify | Assuming PEV is better because v0 used it |
+| 0018 | Draft architecture chosen by ablation: long context vs. corrective RAG, on a realistically sized corpus | Assuming CRAG is needed on a 13-document corpus |
 | 0015 | Grants.gov API + SAM.gov daily bulk extract indexed; SAM API only on demand; USAspending/NIH/NSF live and SBIR award bulk file as context; records validated against the CommonGrants SDK | SAM API for bulk loading (10 requests/day); source-specific schemas |
 
 M5 runs after M4 so the shipped product never depends on it. Its results update the live system through the normal eval gate.

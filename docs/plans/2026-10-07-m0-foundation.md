@@ -45,6 +45,7 @@
 .github/workflows/{pr_checks,staging,deploy-to-prod}.yaml   SCAFFOLD, set to manual-only until M4
 .pre-commit-config.yaml                  NEW  ruff, ruff-format, codespell, unit tests on pre-push
 CLAUDE.md / AGENTS.md                    SCAFFOLD + NEW  conventions for coding agents
+.claude/settings.json, .claude/skills/*, .claude/agents/*   NEW  format hook, project skills, review subagent
 docker-compose.yml                       NEW  local Postgres 16 + pgvector on port 5433
 db/init/01-test-db.sql                   NEW  creates grant_capture_test
 alembic.ini, db/migrations/              NEW  Alembic environment + initial revision
@@ -370,6 +371,112 @@ Coding-agent guidance for this repository lives in [CLAUDE.md](CLAUDE.md), the s
 git add pyproject.toml uv.lock app/config.py tests/unit/test_config.py .env.example \
   .pre-commit-config.yaml CLAUDE.md AGENTS.md
 git commit -m "feat(m0): settings, dependencies, pre-commit and coding-agent conventions
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+```
+
+---
+
+### Task 2b: Coding-agent workspace (project skills, subagent, hooks)
+
+**Files:**
+- Create: `.claude/settings.json`, `.claude/skills/ingest-status/SKILL.md`, `.claude/skills/eval-report/SKILL.md`, `.claude/agents/data-quality-reviewer.md`
+- Modify: `CLAUDE.md` (point to them)
+
+**Interfaces:**
+- Produces: repo-level conventions that any Claude Code session in this repo picks up automatically: a formatting hook after file edits, two project skills, and one review subagent.
+
+Why: teams configure their coding agent per repository (rules, reusable skills, specialist reviewers, automatic hooks) so every session works the same way. These files are versioned with the code.
+
+- [ ] **Step 1: Hook: format Python after every edit**
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uv run --quiet ruff format --quiet app ingest db evals tests >/dev/null 2>&1 || true"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+Save as `.claude/settings.json`.
+
+- [ ] **Step 2: Project skill `ingest-status`**
+
+```markdown
+---
+name: ingest-status
+description: Report the state of grant-capture-agent ingestion - row counts by source and status, documents stored, the last runs and their data-quality issues. Use when asked "how is the data", "did ingestion work", or before starting work that depends on fresh data.
+---
+
+1. Make sure the local DB is up: `docker compose ps db` (start with `docker compose up -d db` if needed).
+2. Run `uv run python -m ingest stats`.
+3. Show the last 5 runs with their quality issues:
+   `uv run python -c "from sqlalchemy import select; from app.config import get_settings; from db.models import IngestRunRow; from db.session import make_engine, make_session_factory; s=make_session_factory(make_engine(get_settings().database_url))(); [print(r.started_at, r.stats.get('source'), r.stats.get('seen'), r.stats.get('quality_issues')) for r in s.scalars(select(IngestRunRow).order_by(IngestRunRow.started_at.desc()).limit(5))]"`
+4. Summarize in plain English: totals per source, anything that failed, any quality error or warning, and whether a re-run or replay is needed.
+```
+
+- [ ] **Step 3: Project skill `eval-report`**
+
+```markdown
+---
+name: eval-report
+description: Run the grant-capture-agent evaluation suites and explain the results - which metrics passed, which failed, and how they compare with the previous report. Use when asked to "run evals", "how good is it", or before merging a change that affects agent behaviour.
+---
+
+1. Run `uv run python -m evals.run --suite full --out reports/local` (use `--suite smoke` for a quick check).
+2. Open the newest `reports/local/eval-*.md` and the previous one, if any.
+3. Report per suite: metric, value, target, pass/fail, and the change since the previous report.
+4. For any failure, open the per-case output in the JSON report and name the three worst cases with a one-line hypothesis each.
+5. Never edit golden data in `evals/data/golden/` to make a metric pass.
+```
+
+- [ ] **Step 4: Review subagent `data-quality-reviewer`**
+
+```markdown
+---
+name: data-quality-reviewer
+description: Reviews changes to ingest/ and db/ for data-engineering problems - non-idempotent writes, lost provenance, unbounded downloads, quota misuse, schema drift without a migration, and missing tests for messy source data. Use after modifying ingestion or schema code, before opening a PR.
+tools: Read, Grep, Glob, Bash
+---
+
+You review data-ingestion code for grant-capture-agent. Read the diff (`git diff main...HEAD -- ingest db tests`) and the relevant parts of `docs/design/system-design.md` §4–§5.
+
+Check, and report only concrete findings with file:line:
+1. Idempotence: re-running the same input must not duplicate rows or re-download unchanged attachments.
+2. Provenance: every written opportunity sets `fetched_at`, `raw_uri`, `adapter_version`; raw responses are archived before transformation.
+3. Limits: Simpler Grants ≤ 60 requests/min; SAM.gov API never exceeds `SAM_DAILY_REQUEST_BUDGET`; attachments capped by size and type.
+4. Schema: any model change has an Alembic migration; no destructive migration without a downgrade.
+5. Tests: messy inputs (nulls, odd dates, hostile file names) are covered for any new mapping.
+Output a short list ordered by severity, or "No findings" if there are none.
+```
+
+- [ ] **Step 5: Point `CLAUDE.md` at them** (append)
+
+```markdown
+## Coding-agent workspace
+- Hook: Python is auto-formatted after edits (`.claude/settings.json`).
+- Skills: `ingest-status` (data health), `eval-report` (run and explain evals).
+- Subagent: `data-quality-reviewer`. Run it after changing `ingest/` or `db/`, before opening a PR.
+- Each milestone PR also gets a code review and, before cloud/infra changes merge, a security review.
+```
+
+- [ ] **Step 6: Verify and commit**
+
+Run: `python -c "import json; json.load(open('.claude/settings.json'))"`
+Expected: no error. In a new Claude Code session in the repo, the two skills appear in the skill list and the subagent is listed.
+
+```bash
+git add .claude CLAUDE.md
+git commit -m "chore(m0): coding-agent workspace - format hook, project skills, data-quality reviewer
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 ```

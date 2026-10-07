@@ -55,6 +55,8 @@ Targets are hypotheses. The measured values go into the eval report and the rés
 | System | Cost per full Discover → Analyze → Draft run | < $0.25 |
 | System | p95 latency of a Discover run, excluding human approval time | < 90 s |
 
+**How architecture is chosen.** Each module is built twice, as a simple baseline and as a richer variant (for example single-pass search vs. a Plan-Execute-Verify loop), and the evals decide which ships. See system design §8.0.
+
 ## 5. Guardrails
 
 - A person approves the search plan and every draft. The system never submits anything anywhere.

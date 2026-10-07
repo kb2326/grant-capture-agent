@@ -568,6 +568,22 @@ flowchart LR
     <div><b>ADR</b><p>Architecture Decision Record: a one-page note of a decision, the options, and why.</p></div>
     <div><b>Eval gate</b><p>A CI step that blocks a release when evaluation scores drop below a threshold.</p></div>
     <div><b>Prompt injection</b><p>Hidden instructions inside a document that try to make the agent misbehave.</p></div>
+    <div><b>Baseline vs. variant (ablation)</b><p>Build the simple version and the richer version, test both on the same data, and keep whichever measurably wins.</p></div>
+    <div><b>Long context</b><p>Giving the model a whole document (hundreds of pages) at once instead of searching it in pieces.</p></div>
+    <div><b>Context caching</b><p>Keeping a loaded document on the model side, so follow-up questions don't pay to send it again.</p></div>
+    <div><b>Raw zone (bronze)</b><p>An untouched copy of everything downloaded, kept so the clean tables can be rebuilt without calling the APIs again.</p></div>
+    <div><b>Provenance</b><p>For each record: when it was fetched, from which raw file, by which version of our code.</p></div>
+    <div><b>Idempotent</b><p>Running the same job twice gives the same result, with no duplicates.</p></div>
+    <div><b>Data-quality check</b><p>An automatic test on the data itself after each run (did anything arrive, did volume drop), not on the code.</p></div>
+    <div><b>CommonGrants</b><p>An open standard format for grant records. It is a format, not a source of grants.</p></div>
+    <div><b>Plan-Execute-Verify (PEV)</b><p>A loop: plan the search, run it, check the results, re-plan if they fall short.</p></div>
+    <div><b>Ragas</b><p>A widely used open-source framework for scoring RAG systems (relevance, faithfulness).</p></div>
+    <div><b>OpenTelemetry · trace</b><p>The open standard for recording each step a program takes; a trace is one run's full recording.</p></div>
+    <div><b>Arize Phoenix</b><p>An open-source tool for browsing agent traces on your laptop.</p></div>
+    <div><b>Terraform</b><p>Cloud setup written as code, so it can be reviewed, rebuilt or deleted with one command.</p></div>
+    <div><b>Service account · least privilege</b><p>A non-human login for a program, given only the permissions it needs.</p></div>
+    <div><b>Workload Identity Federation</b><p>Lets GitHub Actions sign in to Google Cloud without any stored password or key.</p></div>
+    <div><b>Cohen's κ (kappa)</b><p>How often two graders agree, beyond what chance would give. Used to decide whether an AI judge can be trusted.</p></div>
   </div>
 </section>
 

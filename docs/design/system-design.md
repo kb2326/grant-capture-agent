@@ -71,6 +71,8 @@ The project starts from `agents-cli scaffold create` with the `adk` template, de
 - **Context sources** (not part of the opportunity index): USAspending (past awards and incumbents), NIH RePORTER and NSF Awards (previously funded research on a topic, queried live), and the **SBIR.gov award data bulk file** (`award_data.csv`, every SBIR/STTR award with abstracts, refreshed monthly; its download still works while the SBIR.gov API is down). It is loaded into an `sbir_awards` table in M2 to show past winners and likely competitors.
 - **Dropped, as verified on 2026-10-07:** the SBIR.gov API (returns 403 "under maintenance") and the DoD SBIR/STTR Innovation Portal (blocks programmatic access). Their solicitations reach us through Grants.gov and SAM.gov.
 
+**Raw zone, provenance and quality.** Every response is saved unchanged before it's transformed: `raw/api/<source>/<date>/…` in Cloud Storage (the "bronze" layer; the `opportunities` table is "silver"). `python -m ingest replay` rebuilds records from those files without calling any API. Every opportunity row records `fetched_at`, `raw_uri` and `adapter_version`. After each full run, checks Q1–Q4 (empty run, volume drop of more than 30%, failure rate above 5%, open records missing close dates) are stored in `ingest_runs`; any error fails the run, so a scheduled job shows as failed.
+
 **Normalized format.** Every source maps to one internal `Opportunity` model, which exports to the official CommonGrants `OpportunityBase` (validated with `common-grants-sdk`) and is stored in `opportunities.raw`. State and local portals that speak CommonGrants can be added later as more adapters (ADR-0015).
 
 The expected size is about 5,000 opportunities and about 20,000 attachment pages.
@@ -98,7 +100,8 @@ opportunities(
   posted_at date, close_at date, status text,           -- 'open' | 'forecasted' | 'closed'
   award_floor numeric, award_ceiling numeric,
   naics text[], assistance_listings text[], eligibility_codes text[],
-  raw jsonb, content_hash text, ingested_at timestamptz)
+  raw jsonb, content_hash text, ingested_at timestamptz,
+  fetched_at timestamptz, raw_uri text, adapter_version text)   -- provenance
 
 documents(
   id uuid pk, opportunity_id uuid null fk, corpus text check (corpus in ('solicitation','company')),

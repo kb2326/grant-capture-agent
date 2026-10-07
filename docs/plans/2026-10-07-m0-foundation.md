@@ -4,7 +4,7 @@
 
 **Goal:** A scaffolded, tested and CI-checked repository that ingests real Grants.gov and SAM.gov opportunities (with attachments) into Postgres + pgvector locally and on Cloud SQL, with the eval harness, synthetic company data, ADRs and Terraform-managed Google Cloud foundation in place.
 
-**Architecture:** Part A builds everything locally. The agents-cli `adk` scaffold provides the agent app, deployment templates and the eval layout. A small `ingest/` package fetches from the source APIs, normalizes each record to a CommonGrants-compatible `Opportunity`, stores raw attachments in a blob store, and upserts rows through SQLAlchemy into a schema managed by Alembic. Part B provisions the cloud foundation with Terraform (GCS, Secret Manager, Artifact Registry, Cloud SQL with pgvector, service accounts, Workload Identity Federation), then runs the same ingestion as a Cloud Run Job against Cloud SQL and GCS.
+**Architecture:** Part A builds everything locally. The agents-cli `adk` scaffold provides the agent app, deployment templates and the eval layout. A small `ingest/` package fetches from the source APIs, archives every raw response unchanged in a raw zone, normalizes each record to a CommonGrants-compatible `Opportunity` with provenance, stores attachments in a blob store, runs data-quality checks after each run, and upserts rows through SQLAlchemy into a schema managed by Alembic. Part B provisions the cloud foundation with Terraform (GCS, Secret Manager, Artifact Registry, Cloud SQL with pgvector, service accounts, Workload Identity Federation), then runs the same ingestion as a Cloud Run Job against Cloud SQL and GCS.
 
 **Tech Stack:** Python 3.12 · uv · agents-cli 1.9 / google-adk 2.x · pydantic 2 + pydantic-settings · httpx + tenacity · SQLAlchemy 2 + psycopg 3 + Alembic + pgvector · typer · pytest + respx · Docker (pgvector/pgvector:pg16) · Terraform ≥ 1.9 (google provider 6.x) · GitHub Actions
 
@@ -32,7 +32,7 @@
 
 1. **SAM.gov's tiny daily quota.** A long run, a retry storm or a re-run on the same day must not burn the key's ~10 requests. Expected: the adapter counts requests and stops cleanly at the budget, without raising, and logs that it stopped. *(Test added in Task 7.)*
 2. **Hostile or odd attachment file names** (`../../etc/passwd`, `Résumé (final).PDF`, empty name). Expected: the stored key stays under `raw/<source>/<source_id>/` and is filesystem-safe. *(Test added in Task 5.)*
-3. **Re-running ingestion.** Expected: unchanged opportunities aren't updated and their attachments aren't re-downloaded; a changed opportunity is updated in place, not duplicated. *(Test added in Task 8.)*
+3. **Re-running or replaying ingestion.** Expected: unchanged opportunities aren't updated and their attachments aren't re-downloaded; a changed opportunity is updated in place, not duplicated; replaying the raw zone reproduces identical records. *(Tests added in Tasks 8 and 8b.)*
 4. **Oversized or non-document attachments** (a 200 MB zip, an `.xlsx`). Expected: they're skipped and counted in the stats, never downloaded in full. *(Test added in Task 5.)*
 5. **Missing or odd API fields** (`summary: null`, `close_date: null`, `award_ceiling: null`, SAM `responseDeadLine` with a timezone offset, `resourceLinks: null`). Expected: mapping still produces a valid `Opportunity`; nothing crashes the run. *(Tests added in Tasks 6 and 7.)*
 
@@ -60,7 +60,9 @@ ingest/sources/base.py                   NEW  SourceAdapter protocol
 ingest/sources/grants_gov.py             NEW  Simpler Grants adapter + mapper
 ingest/sources/sam_gov.py                NEW  SAM.gov API adapter + request budget (on-demand)
 ingest/sources/sam_gov_bulk.py           NEW  SAM.gov daily bulk CSV adapter (primary)
-ingest/pipeline.py                       NEW  upsert + attachment handling + run stats
+ingest/pipeline.py                       NEW  upsert + attachment handling + run stats + provenance
+ingest/raw.py                            NEW  raw zone (bronze) archive + replay
+ingest/quality.py                        NEW  post-run data-quality checks
 ingest/company.py                        NEW  seed the companies table from profile.json
 data/company/profile.json, data/company/docs/*.md   NEW  synthetic Lumen Grid Labs
 evals/metrics.py, evals/report.py, evals/run.py, evals/LABELING.md, evals/data/{golden,dev}/README.md   NEW
@@ -486,6 +488,10 @@ class OpportunityRow(Base):
     raw: Mapped[dict[str, Any]] = mapped_column(JSONB)
     content_hash: Mapped[str] = mapped_column(String(64))
     ingested_at: Mapped[datetime] = _now()
+    # provenance: when it was fetched, which raw file it came from, which adapter produced it
+    fetched_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    raw_uri: Mapped[str | None] = mapped_column(Text)
+    adapter_version: Mapped[str | None] = mapped_column(String(32))
 
 
 class DocumentRow(Base):
@@ -2556,6 +2562,490 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 
 ---
 
+### Task 8b: Raw zone, provenance and replay
+
+**Files:**
+- Create: `ingest/raw.py`
+- Modify: `ingest/storage.py` (add `get`, `list`), `ingest/sources/grants_gov.py`, `ingest/sources/sam_gov.py`, `ingest/sources/sam_gov_bulk.py`, `ingest/__main__.py`
+- Test: `tests/unit/test_raw_zone.py`
+
+**Interfaces:**
+- Consumes: `BlobStore`, the three adapters, `run_ingest`.
+- Produces:
+  - `BlobStore.get(key: str) -> bytes`, `BlobStore.list(prefix: str) -> list[str]` (store-relative keys, sorted), on both `LocalBlobStore` and `GCSBlobStore`
+  - `ingest.raw.RawArchive(store: BlobStore, source: str, run_date: date)` with `.prefix`, `.key(name) -> str`, `.put_json(name, payload) -> str` (returns the key), `.put_bytes(name, data) -> str`, `.iter_json(name_prefix="") -> Iterator[tuple[str, Any]]`
+  - Adapter attribute `version: str` (`"grants_gov/1"`, `"sam_gov/1"`, `"sam_gov_api/1"`) and constructor argument `archive: RawArchive | None = None`
+  - `ingest.raw.replay_grants_gov(archive) -> Iterator[Opportunity]`, `ingest.raw.replay_sam_bulk(archive) -> Iterator[Opportunity]`, `ingest.raw.ReplayAdapter(name, version, factory)`
+  - CLI: `python -m ingest replay --source {grants_gov|sam_gov} --date YYYY-MM-DD`
+
+**Why (the data-team pattern):** every response we download is saved unchanged before we transform it. This is the "bronze" layer of the medallion pattern; the `opportunities` table is "silver". If a mapping bug is found later, fix the mapper and **replay** the saved files: no API calls, no quota, and the result is reproducible. Every record also stores where it came from (`raw_uri`), when it was fetched (`fetched_at`), and which adapter version produced it (`adapter_version`).
+
+Layout: `raw/api/<source>/<YYYY-MM-DD>/<name>`, with keys sanitized. Attachments keep their existing `raw/<source>/<source_id>/<file>` layout.
+
+- [ ] **Step 1: Write the failing tests**
+
+```python
+# tests/unit/test_raw_zone.py
+import json
+from datetime import date
+from pathlib import Path
+
+import httpx
+import respx
+
+from ingest.http import build_client
+from ingest.raw import RawArchive, replay_grants_gov, replay_sam_bulk
+from ingest.sources.grants_gov import GRANTS_BASE, GrantsGovAdapter
+from ingest.sources.sam_gov_bulk import SAM_BULK_URL, SamBulkAdapter
+from ingest.storage import LocalBlobStore
+
+FIX = Path("tests/fixtures/grants_gov")
+DAY = date(2026, 10, 7)
+
+
+def load(name: str) -> dict:
+    return json.loads((FIX / name).read_text(encoding="utf-8"))
+
+
+def test_archive_round_trip_and_listing(tmp_path: Path):
+    archive = RawArchive(LocalBlobStore(tmp_path), "grants_gov", DAY)
+    key = archive.put_json("detail-../../evil", {"a": 1})
+    assert key == "raw/api/grants_gov/2026-10-07/detail-_evil.json"
+    archive.put_json("search-page-0001", {"b": 2})
+    assert [k for k, _ in archive.iter_json("detail-")] == [key]
+    assert len(list(archive.iter_json())) == 2
+
+
+@respx.mock
+def test_grants_adapter_archives_raw_and_sets_provenance(tmp_path: Path):
+    respx.post(f"{GRANTS_BASE}/v1/opportunities/search").mock(
+        return_value=httpx.Response(200, json=load("search_page1.json")))
+    respx.get(f"{GRANTS_BASE}/v1/opportunities/11111111-1111-1111-1111-111111111111").mock(
+        return_value=httpx.Response(200, json=load("detail_full.json")))
+    respx.get(f"{GRANTS_BASE}/v1/opportunities/22222222-2222-2222-2222-222222222222").mock(
+        return_value=httpx.Response(200, json=load("detail_sparse.json")))
+    archive = RawArchive(LocalBlobStore(tmp_path), "grants_gov", DAY)
+    with build_client() as c:
+        live = list(GrantsGovAdapter(c, "k", page_size=2, min_interval_s=0, archive=archive).iter_opportunities())
+    assert live[0].raw_uri == "raw/api/grants_gov/2026-10-07/detail-11111111-1111-1111-1111-111111111111.json"
+    assert (tmp_path / "raw/api/grants_gov/2026-10-07/search-page-0001.json").exists()
+    replayed = list(replay_grants_gov(archive))
+    assert sorted(o.content_hash() for o in replayed) == sorted(o.content_hash() for o in live)
+
+
+@respx.mock
+def test_sam_bulk_archives_csv_and_replays(tmp_path: Path):
+    respx.get(SAM_BULK_URL).mock(return_value=httpx.Response(
+        200, content=Path("tests/fixtures/sam_gov/bulk_sample.csv").read_bytes()))
+    store = LocalBlobStore(tmp_path / "blobs")
+    archive = RawArchive(store, "sam_gov", DAY)
+    with build_client() as c:
+        live = list(SamBulkAdapter(c, cache_path=tmp_path / "sam.csv", archive=archive).iter_opportunities())
+    assert live[0].raw_uri == "raw/api/sam_gov/2026-10-07/ContractOpportunitiesFullCSV.csv#n-101"
+    assert [o.source_id for o in replay_sam_bulk(archive)] == [o.source_id for o in live]
+```
+
+Also add to `tests/unit/test_ingest_models.py`:
+
+```python
+def test_raw_uri_is_provenance_not_content():
+    assert _opp().content_hash() == _opp(raw_uri="raw/api/x/2026-10-07/a.json").content_hash()
+```
+
+- [ ] **Step 2: Run to see them fail**
+
+Run: `uv run pytest tests/unit/test_raw_zone.py tests/unit/test_ingest_models.py -v`
+Expected: FAIL (`ingest.raw` missing; `Opportunity` has no `raw_uri`).
+
+- [ ] **Step 3: `Opportunity.raw_uri` (provenance, excluded from the content hash)**
+
+In `ingest/models.py`, add to `Opportunity`:
+
+```python
+    raw_uri: str | None = Field(default=None, exclude=True)  # provenance; not part of content
+```
+`exclude=True` keeps it out of `model_dump()`, so `content_hash()` ignores it.
+
+- [ ] **Step 4: `get` and `list` on both blob stores** (`ingest/storage.py`)
+
+```python
+class BlobStore(Protocol):
+    def put(self, key: str, data: bytes) -> str: ...
+    def exists(self, key: str) -> bool: ...
+    def get(self, key: str) -> bytes: ...
+    def list(self, prefix: str) -> list[str]: ...
+```
+`LocalBlobStore`:
+
+```python
+    def get(self, key: str) -> bytes:
+        return self._path(key).read_bytes()
+
+    def list(self, prefix: str) -> list[str]:
+        base = self._path(prefix.rsplit("/", 1)[0]) if "/" in prefix else self.root
+        if not base.exists():
+            return []
+        keys = (f.relative_to(self.root).as_posix() for f in base.rglob("*") if f.is_file())
+        return sorted(k for k in keys if k.startswith(prefix))
+```
+`GCSBlobStore`:
+
+```python
+    def get(self, key: str) -> bytes:
+        return self._bucket.blob(key).download_as_bytes()
+
+    def list(self, prefix: str) -> list[str]:
+        return sorted(b.name for b in self._client.list_blobs(self.bucket_name, prefix=prefix))
+```
+
+- [ ] **Step 5: `ingest/raw.py`**
+
+```python
+"""Raw zone (bronze): source responses archived unchanged, partitioned by source and date."""
+
+import csv
+import io
+import json
+import re
+from collections.abc import Callable, Iterator
+from datetime import date
+from typing import Any
+
+from ingest.models import Opportunity
+from ingest.storage import BlobStore
+
+_UNSAFE = re.compile(r"[^A-Za-z0-9._-]+")
+SAM_CSV_NAME = "ContractOpportunitiesFullCSV.csv"
+
+
+class RawArchive:
+    def __init__(self, store: BlobStore, source: str, run_date: date) -> None:
+        self.store = store
+        self.prefix = f"raw/api/{source}/{run_date:%Y-%m-%d}/"
+
+    def key(self, name: str) -> str:
+        segments = [s for s in name.replace("\\", "/").split("/") if s not in ("", ".", "..")]
+        cleaned = _UNSAFE.sub("_", "_".join(segments)).strip("._")
+        return self.prefix + (cleaned or "unnamed")
+
+    def put_json(self, name: str, payload: Any) -> str:
+        key = self.key(name if name.endswith(".json") else f"{name}.json")
+        self.store.put(key, json.dumps(payload, sort_keys=True).encode("utf-8"))
+        return key
+
+    def put_bytes(self, name: str, data: bytes) -> str:
+        key = self.key(name)
+        self.store.put(key, data)
+        return key
+
+    def iter_json(self, name_prefix: str = "") -> Iterator[tuple[str, Any]]:
+        for key in self.store.list(self.prefix + name_prefix):
+            if key.endswith(".json"):
+                yield key, json.loads(self.store.get(key))
+
+
+def replay_grants_gov(archive: RawArchive) -> Iterator[Opportunity]:
+    from ingest.sources.grants_gov import map_grants_gov
+
+    for key, payload in archive.iter_json("detail-"):
+        yield map_grants_gov(payload["data"]).model_copy(update={"raw_uri": key})
+
+
+def replay_sam_bulk(archive: RawArchive, naics: frozenset[str] | None = None) -> Iterator[Opportunity]:
+    from ingest.sources.sam_gov import R_AND_D_NAICS
+    from ingest.sources.sam_gov_bulk import BASE_TYPES, map_sam_csv_row
+
+    allowed = naics or frozenset(R_AND_D_NAICS)
+    key = archive.key(SAM_CSV_NAME)
+    text = archive.store.get(key).decode("utf-8", errors="replace")
+    for row in csv.DictReader(io.StringIO(text, newline="")):
+        if (row.get("NaicsCode") or "").strip() in allowed and (row.get("BaseType") or "").strip() in BASE_TYPES:
+            o = map_sam_csv_row(row)
+            yield o.model_copy(update={"raw_uri": f"{key}#{o.source_id}"})
+
+
+class ReplayAdapter:
+    def __init__(self, name: str, version: str, factory: Callable[[], Iterator[Opportunity]]) -> None:
+        self.name, self.version, self._factory = name, f"{version}+replay", factory
+
+    def iter_opportunities(self, limit: int | None = None) -> Iterator[Opportunity]:
+        for i, o in enumerate(self._factory()):
+            if limit is not None and i >= limit:
+                return
+            yield o
+```
+
+- [ ] **Step 6: Adapters archive what they download and record provenance**
+
+`ingest/sources/grants_gov.py`: add `version = "grants_gov/1"` under `name`, add the constructor argument `archive: "RawArchive | None" = None` (store it as `self.archive`), and in `iter_opportunities`:
+
+```python
+            payload = self._call("POST", f"{GRANTS_BASE}/v1/opportunities/search", json=body)
+            if self.archive:
+                self.archive.put_json(f"search-page-{page:04d}", payload)
+            for item in payload.get("data") or []:
+                detail = self._call("GET", f"{GRANTS_BASE}/v1/opportunities/{item['opportunity_id']}")
+                raw_key = self.archive.put_json(f"detail-{item['opportunity_id']}", detail) if self.archive else None
+                yield map_grants_gov(detail["data"]).model_copy(update={"raw_uri": raw_key})
+```
+Import `RawArchive` under `if TYPE_CHECKING:` to avoid a runtime import cycle.
+
+`ingest/sources/sam_gov_bulk.py`: add `version = "sam_gov/1"`, the `archive` argument, and archive the CSV only when it was freshly downloaded. Change `_ensure_file` to return `(path, downloaded: bool)`. In `iter_opportunities`:
+
+```python
+        path, downloaded = self._ensure_file()
+        csv_key = None
+        if self.archive:
+            csv_key = self.archive.key(SAM_CSV_NAME)
+            if downloaded or not self.archive.store.exists(csv_key):
+                self.archive.put_bytes(SAM_CSV_NAME, path.read_bytes())
+        ...
+                o = map_sam_csv_row(row)
+                yield o.model_copy(update={"raw_uri": f"{csv_key}#{o.source_id}"}) if csv_key else o
+```
+(Import `SAM_CSV_NAME` from `ingest.raw`.) Update Task 7b's `test_fresh_cache_skips_download_and_stale_cache_refreshes` only if the changed return type affects it; it doesn't, because it calls `iter_opportunities`.
+
+`ingest/sources/sam_gov.py` (API): add `version = "sam_gov_api/1"` and the `archive` argument, and archive each search response with `self.archive.put_json(f"search-{ptype}-{naics}-{offset}", payload)`.
+
+- [ ] **Step 7: CLI wiring**
+
+In `ingest/__main__.py` `run`: build `archive = RawArchive(store, adapter.name, date.today())` (create the store once as `store = blob_store_from_root(s.blob_root)`, then pass `archive=archive` to whichever adapter is constructed). Add:
+
+```python
+@cli.command()
+def replay(source: str = typer.Option(..., help="grants_gov or sam_gov"),
+           day: str = typer.Option(..., "--date", help="YYYY-MM-DD of the archived run")) -> None:
+    """Rebuild opportunities from the raw zone without calling any API."""
+    s = get_settings()
+    store = blob_store_from_root(s.blob_root)
+    archive = RawArchive(store, source, date.fromisoformat(day))
+    factories = {"grants_gov": ("grants_gov/1", lambda: replay_grants_gov(archive)),
+                 "sam_gov": ("sam_gov/1", lambda: replay_sam_bulk(archive))}
+    if source not in factories:
+        raise typer.BadParameter(f"unknown source {source!r}")
+    version, factory = factories[source]
+    with _session() as session:
+        stats = run_ingest(ReplayAdapter(source, version, factory), session, store,
+                           fetch=lambda url: None, download_attachments=False)
+    typer.echo(json.dumps({k: v for k, v in stats.__dict__.items() if k != "errors"}, indent=2))
+```
+
+- [ ] **Step 8: Provenance columns are written by the pipeline**
+
+In `ingest/pipeline.py`, change `_apply(row, o, content_hash)` to `_apply(row, o, content_hash, adapter_version)` and add at its end:
+
+```python
+    row.fetched_at = now
+    row.raw_uri = o.raw_uri
+    row.adapter_version = adapter_version
+```
+Call it as `_apply(row, o, content_hash, getattr(adapter, "version", "unknown"))`. In `tests/db/test_pipeline.py`, give `FakeAdapter` a `version = "fake/1"` and append to `test_first_run_inserts_and_stores`:
+
+```python
+    row = db_session.scalars(select(OpportunityRow)).one()
+    assert row.adapter_version == "fake/1" and row.fetched_at is not None
+```
+
+- [ ] **Step 9: Run tests**
+
+Run: `uv run pytest tests/unit tests/db -v`
+Expected: all PASS (3 new raw-zone tests, the provenance model test and the extended pipeline test included).
+
+- [ ] **Step 10: Commit**
+
+```bash
+git add ingest tests
+git commit -m "feat(m0): raw zone archiving, provenance columns and replay command
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+```
+
+---
+
+### Task 8c: Automatic data-quality checks
+
+**Files:**
+- Create: `ingest/quality.py`
+- Modify: `ingest/pipeline.py`, `ingest/__main__.py`
+- Test: `tests/db/test_quality.py`
+
+**Interfaces:**
+- Consumes: `OpportunityRow`, `IngestRunRow`, `run_ingest`.
+- Produces:
+  - `ingest.quality.QualityIssue` (frozen dataclass: `check: str`, `severity: Literal["error", "warning"]`, `message: str`)
+  - `ingest.quality.THRESHOLDS` (dict)
+  - `ingest.quality.previous_full_run_seen(session, source: str) -> int | None`
+  - `ingest.quality.check_run(session, source: str, *, seen: int, failed: int, previous_seen: int | None) -> list[QualityIssue]`
+  - `IngestStats.quality_issues: list[dict]`; the CLI exits with code 1 when any issue has severity `error`, so a scheduled Cloud Run Job shows as **failed**
+
+**Checks** (run after every full run, i.e. with no `--limit`):
+
+| ID | Check | Severity |
+|---|---|---|
+| Q1 | The run saw zero records | error |
+| Q2 | Records seen fell below 70% of the previous full run (the source changed or broke) | error |
+| Q3 | More than 5% of records failed to ingest | error |
+| Q4 | More than 10% of open opportunities have no close date (a mapping regression) | warning |
+
+- [ ] **Step 1: Write the failing tests**
+
+```python
+# tests/db/test_quality.py
+import uuid
+from datetime import date
+
+import pytest
+
+from db.models import IngestRunRow, OpportunityRow
+from ingest.quality import check_run, previous_full_run_seen
+
+pytestmark = pytest.mark.db
+
+
+def _ids(issues):
+    return {i.check for i in issues}
+
+
+def _opp(source_id: str, close: date | None) -> OpportunityRow:
+    return OpportunityRow(id=uuid.uuid4(), source="grants_gov", source_id=source_id, kind="grant",
+                          title="t", agency="a", summary="", url="u", status="open", close_at=close,
+                          naics=[], assistance_listings=[], eligibility_codes=[], raw={}, content_hash="h")
+
+
+def test_empty_run_is_an_error(db_session):
+    assert "Q1_empty" in _ids(check_run(db_session, "grants_gov", seen=0, failed=0, previous_seen=None))
+
+
+def test_volume_drop_against_previous_full_run(db_session):
+    db_session.add(IngestRunRow(stats={"source": "grants_gov", "limit": None, "seen": 100}))
+    db_session.add(IngestRunRow(stats={"source": "grants_gov", "limit": 10, "seen": 10}))  # ignored: partial
+    db_session.commit()
+    prev = previous_full_run_seen(db_session, "grants_gov")
+    assert prev == 100
+    assert "Q2_volume_drop" in _ids(check_run(db_session, "grants_gov", seen=50, failed=0, previous_seen=prev))
+    assert "Q2_volume_drop" not in _ids(check_run(db_session, "grants_gov", seen=80, failed=0, previous_seen=prev))
+
+
+def test_error_rate(db_session):
+    assert "Q3_error_rate" in _ids(check_run(db_session, "grants_gov", seen=100, failed=10, previous_seen=None))
+    assert "Q3_error_rate" not in _ids(check_run(db_session, "grants_gov", seen=100, failed=5, previous_seen=None))
+
+
+def test_missing_close_dates_warning(db_session):
+    db_session.add_all([_opp(str(i), date(2026, 12, 1)) for i in range(8)] + [_opp("x", None), _opp("y", None)])
+    db_session.commit()
+    issues = check_run(db_session, "grants_gov", seen=10, failed=0, previous_seen=None)
+    q4 = [i for i in issues if i.check == "Q4_missing_close_dates"]
+    assert q4 and q4[0].severity == "warning"
+```
+
+And extend `tests/db/test_pipeline.py`:
+
+```python
+def test_full_run_records_quality_issues(db_session, tmp_path: Path):
+    stats = run_ingest(FakeAdapter([]), db_session, LocalBlobStore(tmp_path), FakeFetch({}))
+    assert any(i["check"] == "Q1_empty" and i["severity"] == "error" for i in stats.quality_issues)
+    run = db_session.scalars(select(IngestRunRow)).one()
+    assert run.stats["quality_issues"][0]["check"] == "Q1_empty" and run.stats["limit"] is None
+```
+
+- [ ] **Step 2: Run to see them fail**
+
+Run: `uv run pytest tests/db/test_quality.py tests/db/test_pipeline.py -v`
+Expected: FAIL (`ingest.quality` missing).
+
+- [ ] **Step 3: Implement `ingest/quality.py`**
+
+```python
+"""Post-run data-quality checks. Errors fail the run; warnings are recorded."""
+
+from dataclasses import dataclass
+from typing import Literal
+
+from sqlalchemy import func, select
+from sqlalchemy.orm import Session
+
+from db.models import IngestRunRow, OpportunityRow
+
+THRESHOLDS = {"min_seen_ratio": 0.70, "max_failed_ratio": 0.05, "max_open_missing_close": 0.10}
+
+
+@dataclass(frozen=True)
+class QualityIssue:
+    check: str
+    severity: Literal["error", "warning"]
+    message: str
+
+
+def previous_full_run_seen(session: Session, source: str) -> int | None:
+    stats = session.scalar(
+        select(IngestRunRow.stats)
+        .where(IngestRunRow.stats["source"].astext == source)
+        .where(IngestRunRow.stats["limit"].astext.is_(None))
+        .order_by(IngestRunRow.started_at.desc(), IngestRunRow.id.desc())
+        .limit(1))
+    return int(stats["seen"]) if stats and "seen" in stats else None
+
+
+def check_run(session: Session, source: str, *, seen: int, failed: int,
+              previous_seen: int | None) -> list[QualityIssue]:
+    issues: list[QualityIssue] = []
+    if seen == 0:
+        issues.append(QualityIssue("Q1_empty", "error", f"{source}: no records seen"))
+    if previous_seen and seen < THRESHOLDS["min_seen_ratio"] * previous_seen:
+        issues.append(QualityIssue("Q2_volume_drop", "error",
+                                   f"{source}: {seen} records vs {previous_seen} last full run"))
+    if seen and failed / seen > THRESHOLDS["max_failed_ratio"]:
+        issues.append(QualityIssue("Q3_error_rate", "error", f"{source}: {failed}/{seen} records failed"))
+    open_q = select(func.count()).select_from(OpportunityRow).where(
+        OpportunityRow.source == source, OpportunityRow.status == "open")
+    open_total = session.scalar(open_q) or 0
+    missing = session.scalar(open_q.where(OpportunityRow.close_at.is_(None))) or 0
+    if open_total and missing / open_total > THRESHOLDS["max_open_missing_close"]:
+        issues.append(QualityIssue("Q4_missing_close_dates", "warning",
+                                   f"{source}: {missing}/{open_total} open opportunities lack a close date"))
+    return issues
+```
+`stats["limit"].astext.is_(None)` matches both a JSON `null` and a missing key, because `->>` returns SQL NULL for both. The second `IngestRunRow` in `test_volume_drop_against_previous_full_run` is inserted after the first in the same transaction, so `started_at` ties. The `id.desc()` tiebreak doesn't guarantee insertion order with random UUIDs, but the partial run is filtered out by the `limit` condition, so the test is deterministic.
+
+- [ ] **Step 4: Wire into the pipeline and CLI**
+
+`ingest/pipeline.py`: add `quality_issues: list[dict] = field(default_factory=list)` to `IngestStats`. In `run_ingest`, compute `prev = previous_full_run_seen(session, adapter.name)` before the loop, and after it:
+
+```python
+    if limit is None:
+        stats.quality_issues = [asdict(i) for i in check_run(
+            session, adapter.name, seen=stats.seen, failed=stats.failed, previous_seen=prev)]
+    session.add(IngestRunRow(started_at=started, ended_at=datetime.now(UTC),
+                             stats={"source": adapter.name, "limit": limit, **asdict(stats)}))
+```
+(This replaces the existing `IngestRunRow` line.)
+
+`ingest/__main__.py` `run` (and `replay`): after printing the stats, add:
+
+```python
+    for issue in stats.quality_issues:
+        typer.echo(f"quality {issue['severity']}: {issue['check']} - {issue['message']}", err=True)
+    if any(i["severity"] == "error" for i in stats.quality_issues):
+        raise typer.Exit(code=1)
+```
+
+- [ ] **Step 5: Run tests**
+
+Run: `uv run pytest tests/unit tests/db -v`
+Expected: all PASS.
+
+- [ ] **Step 6: Commit**
+
+```bash
+git add ingest tests
+git commit -m "feat(m0): post-run data-quality checks that fail the run on errors
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+```
+
+---
+
 ### Task 9: Synthetic company documents (Lumen Grid Labs)
 
 **Files:**
@@ -3058,6 +3548,20 @@ uv run python -m ingest stats
 ```
 Expected: `stats` shows at least 1,000 opportunities across both sources (Grants.gov had 1,458 open/forecasted on 2026-10-07), at least 300 opportunities with documents (Grants.gov attachments; SAM attachments are fetched on demand from M1), and an error count below 5% of `seen`. Record the actual numbers in the PR description. (The SAM run reads the daily bulk file and uses none of the API quota.)
 
+- [ ] **Step 1b: Check the raw zone, provenance and quality report**
+
+```bash
+ls data/blobs/raw/api/grants_gov/$(date +%F) | head      # search pages + detail JSONs
+uv run python -c "
+from sqlalchemy import select; from app.config import get_settings
+from db.models import IngestRunRow, OpportunityRow; from db.session import make_engine, make_session_factory
+with make_session_factory(make_engine(get_settings().database_url))() as s:
+    r=s.scalars(select(OpportunityRow).limit(1)).one(); print(r.adapter_version, r.fetched_at, r.raw_uri)
+    for run in s.scalars(select(IngestRunRow).order_by(IngestRunRow.started_at)): print(run.stats['source'], run.stats.get('quality_issues'))"
+uv run python -m ingest replay --source grants_gov --date $(date +%F)
+```
+Expected: the raw files exist, every row has provenance, the full runs show no `error` issues, and the replay reports `unchanged` equal to `seen` (the same files map to the same records).
+
 - [ ] **Step 2: Re-run to prove idempotence on real data**
 
 Run: `uv run python -m ingest run --source grants_gov --limit 200`
@@ -3203,6 +3707,13 @@ resource "google_storage_bucket" "raw" {
   uniform_bucket_level_access = true
   public_access_prevention    = "enforced"
   versioning { enabled = false }
+  lifecycle_rule {
+    condition {
+      age            = 30
+      matches_prefix = ["raw/api/sam_gov/"] # the 210 MB daily SAM extract; keep 30 days for replay
+    }
+    action { type = "Delete" }
+  }
   lifecycle_rule {
     condition { age = 365 }
     action {
@@ -3752,6 +4263,8 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 | Eval harness runs an empty report | `uv run python -m evals.run --suite smoke` |
 | ADRs written | `ls docs/adr` shows 0001–0009, 0012–0015 |
 | Coding-agent conventions | `CLAUDE.md`, `AGENTS.md`, `.pre-commit-config.yaml` present |
+| Raw zone, provenance, replay | Task 13 Step 1b output |
+| Data-quality checks | `ingest_runs.stats.quality_issues` present on full runs; no errors |
 | Cloud foundation | `terraform -chdir=deployment/terraform/foundation plan -var enable_cloudsql=false` shows no changes |
 | Cloud ingestion | the last `gcloud run jobs executions list --job grant-capture-ingest` shows success |
 

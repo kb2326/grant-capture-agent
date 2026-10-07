@@ -124,6 +124,7 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
     <li><a href="#product">What we're building</a></li>
     <li><a href="#process">How a team runs it</a></li>
     <li><a href="#data">The data</a></li>
+    <li><a href="#m0">M0 at a glance</a></li>
     <li><a href="#arch">Architecture</a></li>
     <li><a href="#agents">The agents</a></li>
     <li><a href="#rag">RAG from scratch</a></li>
@@ -157,7 +158,7 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
 
 <section id="next">
   <header><span class="eyebrow">Section 01b</span><h2>Your next steps</h2></header>
-  <p>Everything needed to start building is set up. Here is what is done, what you do next, and what happens after that.</p>
+  <p>Everything needed to start building is set up. The M0 plan now has 20 tasks, including a raw zone, provenance and quality checks. Here is what is done, what you do next, and what happens after that.</p>
   <div class="grid2">
     <div class="panel"><span class="eyebrow">Done</span><h3>Ready to build</h3>
       <ul class="tight">
@@ -219,7 +220,7 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
     <div class="phase"><span class="n">02</span><div><h3>System design</h3><p>Architecture, data model, typed hand-offs, workflows, knockout rules, evals, security, deployment. <code>docs/design/system-design.md</code></p></div><span class="pill done">done</span></div>
     <div class="phase"><span class="n">03</span><div><h3>Decision records (ADRs)</h3><p>One short file per big choice, with the options we turned down and why. Listed in the design; written in M0 Task 11. <code>docs/adr/</code></p></div><span class="pill todo">in M0</span></div>
     <div class="phase"><span class="n">04</span><div><h3>Evals first</h3><p>Decide what "correct" means and label test data before writing features. The harness and labeling guide come in M0; labeled sets in M1–M3. <code>evals/</code></p></div><span class="pill todo">in M0</span></div>
-    <div class="phase"><span class="n">05</span><div><h3>Implementation plan</h3><p>Each milestone broken into small, testable tasks. M0 has 18 tasks. <code>docs/plans/2026-10-07-m0-foundation.md</code></p></div><span class="pill done">M0 done</span></div>
+    <div class="phase"><span class="n">05</span><div><h3>Implementation plan</h3><p>Each milestone broken into small, testable tasks. M0 has 20 tasks. <code>docs/plans/2026-10-07-m0-foundation.md</code></p></div><span class="pill done">M0 done</span></div>
     <div class="phase current"><span class="n">06</span><div><h3>Build</h3><p>Tests first, small pull requests, CI on every pull request. Starts with M0 Task 1 when you say go.</p></div><span class="pill now">next</span></div>
     <div class="phase"><span class="n">07</span><div><h3>Ship</h3><p>Deploy to Google Cloud with a demo UI, tracing, and an eval gate that blocks a bad release.</p></div><span class="pill todo">to do</span></div>
     <div class="phase"><span class="n">08</span><div><h3>Operate and report</h3><p>Eval report, cost report, and a write-up of what went wrong and what you'd change.</p></div><span class="pill todo">to do</span></div>
@@ -245,7 +246,41 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
     <div class="panel"><h3>What CommonGrants is</h3><p>CommonGrants is an <b>open standard</b> from the Simpler Grants team at HHS. It defines what a grant opportunity record looks like: title, status, key dates, funding, eligible applicant types, source link and custom fields. It is a shared format, not a data source; it holds no grants itself. When different portals publish in the same format, one program can read all of them.</p></div>
     <div class="panel"><h3>What the CommonGrants SDK does for us</h3><p>The Python package <code>common-grants-sdk</code> has three parts. <b>Models</b>: the official definitions of the format, which we use to check that every record we store is valid CommonGrants. <b>Client</b>: code that can query any CommonGrants-compliant API, such as Simpler Grants or state portals in California, Pennsylvania and Washington. <b>Extensions</b>: a way to add our own fields, such as NAICS codes and SBIR phase, in a standard way.</p></div>
     <div class="panel"><h3>How we use it</h3><p>M0: every opportunity is converted to an official CommonGrants record and validated before it is saved. Optional, after M4: one extra adapter that uses the SDK client to pull from state portals, showing that the same pipeline accepts any portal that speaks the standard.</p></div>
+    <div class="panel"><h3>Handled the way a data team would</h3><p><b>Raw zone:</b> every response we download is saved unchanged, by source and date, before it is converted. If a conversion bug turns up, we fix the code and rebuild from the saved files without calling the APIs again (<code>python -m ingest replay</code>). <b>Provenance:</b> every record stores when it was fetched, which raw file it came from, and which version of our code produced it. <b>Quality checks:</b> after each run, four automatic checks (nothing arrived, volume dropped more than 30%, more than 5% of records failed, too many missing close dates). A failed check marks the run as failed, so a broken source can't slip through unnoticed.</p></div>
   </div>
+</section>
+
+<section id="m0">
+  <header><span class="eyebrow">Section 04c</span><h2>M0 at a glance</h2></header>
+  <p>The full plan is <code>docs/plans/2026-10-07-m0-foundation.md</code>: 20 tasks, each with its tests and code. This table is the short version. Every task is built test-first: write a test that fails, write the code, watch the test pass, then commit.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Task</th><th>What it builds, in plain terms</th><th>Why it matters</th></tr></thead>
+    <tbody>
+      <tr><td colspan="3"><b>Part A: on your laptop</b></td></tr>
+      <tr><td class="num">1</td><td>Generate the project skeleton with Google's agents-cli; replace the demo weather agent with our placeholder agent</td><td>Standard layout, eval folders and deployment templates from day one</td></tr>
+      <tr><td class="num">2</td><td>One settings file (models, database, keys), extra libraries, automatic code checks before each commit, and rules for coding assistants (<code>CLAUDE.md</code>)</td><td>Model names and keys live in one place; code style is enforced automatically</td></tr>
+      <tr><td class="num">3</td><td>The database tables, with vector search turned on, created through versioned migrations</td><td>Every later feature stores and reads data here</td></tr>
+      <tr><td class="num">4</td><td>One standard "opportunity" record that every source is converted into, checked against the official CommonGrants model</td><td>Grants.gov and SAM.gov look different; the rest of the system sees one format</td></tr>
+      <tr><td class="num">5</td><td>Safe downloading: retries when a site hiccups, size limits on files, and safe file names</td><td>Protects against flaky APIs, huge files and malicious file names</td></tr>
+      <tr><td class="num">6</td><td>The Grants.gov collector, paced to 60 requests a minute</td><td>Brings in all federal grants with their PDFs</td></tr>
+      <tr><td class="num">7</td><td>The SAM.gov API collector with a hard daily cap</td><td>Kept for fetching one notice's attachments when needed</td></tr>
+      <tr><td class="num">7b</td><td>The SAM.gov daily-file collector (no key, no limit)</td><td>Brings in all federal contract R&amp;D notices with full descriptions</td></tr>
+      <tr><td class="num">8</td><td>The pipeline that saves records without duplicates, stores PDFs, and logs each run; plus a command-line tool</td><td>Re-running is safe; one bad record never stops the run</td></tr>
+      <tr><td class="num">8b</td><td>Raw zone, provenance and replay</td><td>Fix a bug, rebuild from saved files; trace any record to its source</td></tr>
+      <tr><td class="num">8c</td><td>Automatic quality checks after each run</td><td>A broken source fails loudly instead of silently</td></tr>
+      <tr><td class="num">9</td><td>The fictional company's 13 documents (proposals, reports, bios), with deliberate gaps</td><td>The evidence the Draft agent will write from; the gaps test that it doesn't invent</td></tr>
+      <tr><td class="num">10</td><td>Scoring code (precision, recall, ranking quality, agreement between graders) and the labeling guide</td><td>Where every number on your résumé will come from</td></tr>
+      <tr><td class="num">11</td><td>13 decision records ("why we chose X over Y")</td><td>Your interview answers, written down</td></tr>
+      <tr><td class="num">12</td><td>GitHub CI: style checks, type checks, tests and an eval smoke run on every push</td><td>Nothing broken reaches <code>main</code></td></tr>
+      <tr><td class="num">13</td><td>The real run: 1,000+ opportunities, 300+ with documents, then a re-run and a replay to prove it's repeatable</td><td>M0's main acceptance test</td></tr>
+      <tr><td colspan="3"><b>Part B: on Google Cloud</b></td></tr>
+      <tr><td class="num">14</td><td>Terraform builds the cloud setup: storage, key vault, container registry, database, one service account per component, keyless GitHub sign-in</td><td>The whole cloud setup is code you can review, rebuild or delete</td></tr>
+      <tr><td class="num">15</td><td>Keys moved into Secret Manager, start/stop scripts for the database, tables created in the cloud</td><td>No keys in files; the database runs only when needed</td></tr>
+      <tr><td class="num">16</td><td>The collector packaged as a container and run as a Cloud Run Job against the cloud database; nightly schedule created but paused</td><td>The same code runs in the cloud with its own limited permissions</td></tr>
+      <tr><td class="num">17</td><td>Check every M0 criterion with evidence, delete the cloud database to save money, update the docs</td><td>A clean, verified finish</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">How to review: read this table, then open the plan and skim only the "Files", "Interfaces" and "Expected" lines of each task. The code blocks are the exact code to be written; you don't need to read them in advance.</p>
 </section>
 
 <section id="arch">
@@ -516,7 +551,7 @@ flowchart LR
       <tr><td class="num">2026-10-06</td><td>Added the Solicitation agent (Analyze) and a hand-built RAG library shared by all agents.</td></tr>
       <tr><td class="num">2026-10-06</td><td>Fictional test company "Lumen Grid Labs" replaces BESI's real capability document.</td></tr>
       <tr><td class="num">2026-10-06</td><td>Stack: ADK 2.x, Gemini 3.x, Cloud SQL Postgres + pgvector, Docling, Agent Runtime (pending your review).</td></tr>
-      <tr><td class="num">2026-10-07</td><td>M0 plan written: 18 tasks in two parts, local foundation and cloud foundation.</td></tr>
+      <tr><td class="num">2026-10-07</td><td>M0 plan written: 20 tasks in two parts, local foundation and cloud foundation. Added after review: a raw zone with replay, provenance on every record, and automatic data-quality checks.</td></tr>
       <tr><td class="num">2026-10-07</td><td>Data sources finalized after live tests: Grants.gov API and the SAM.gov daily CSV for the index; the SAM.gov API only on demand; SBIR award file, USAspending, NIH and NSF for competition context. SBIR.gov search API and the DoD portal dropped (blocked). Records are validated against the official CommonGrants SDK.</td></tr>
       <tr><td class="num">2026-10-07</td><td>Google Cloud project <code>grant-capture-agent</code> created on the personal account with a $10/month budget. All tools signed in, Terraform installed, models tested (embedding-2 not yet available, so embedding-001 is used).</td></tr>
       <tr><td class="num">2026-10-07</td><td>New Simpler Grants and SAM.gov accounts on the personal email replace the old BESI-email accounts.</td></tr>

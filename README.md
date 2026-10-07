@@ -25,7 +25,7 @@ An open, measured take on the grant-capture workflow that commercial GovCon plat
 
 A grants lead at a 30-person deep-tech company does three jobs alone:
 
-1. **Find:** search Grants.gov, SBIR.gov and SAM.gov, each with its own interface and vocabulary.
+1. **Find:** search Grants.gov and SAM.gov, each with its own interface and vocabulary.
 2. **Qualify:** read a 40-page solicitation, only to find a disqualifying clause on page 31.
 3. **Draft:** write the technical section from old proposals scattered across shared drives.
 
@@ -51,7 +51,7 @@ One sentence can decide whether a week of writing is worth starting:
 flowchart LR
     subgraph OFF["Offline: nightly ingestion"]
         direction TB
-        SRC["Grants.gov · SBIR.gov<br/>SAM.gov · USAspending"] --> ING["Ingestion job<br/>(Cloud Run Job + Scheduler)"]
+        SRC["Grants.gov · SAM.gov"] --> ING["Ingestion job<br/>(Cloud Run Job + Scheduler)"]
         CO["Company documents<br/>(profile, past proposals, CVs)"] --> ING
         ING -->|"parse → chunk → embed"| DB[("Cloud SQL Postgres<br/>pgvector + full-text")]
         ING --> GCS[("Cloud Storage<br/>raw files")]
@@ -150,7 +150,7 @@ flowchart LR
 ```mermaid
 flowchart LR
     P["Parse<br/>Docling: headings,<br/>tables, pages"] --> C["Chunk<br/>by section,<br/>≤ 800 tokens"]
-    C --> E["Embed<br/>gemini-embedding-2<br/>768-d"]
+    C --> E["Embed<br/>gemini-embedding-001<br/>768-d"]
     E --> S[("pgvector HNSW<br/>+ tsvector GIN")]
     S --> H["Hybrid query<br/>RRF k=60"]
     H --> RR["Rerank<br/>Ranking API"]
@@ -206,7 +206,7 @@ flowchart LR
 | Agents | **Google ADK 2.x** workflow graphs | Loops, branches and resumable human approval in one graph |
 | Lifecycle | **agents-cli** | Google's standard scaffold → eval → deploy → CI/CD toolchain |
 | Models | **Gemini 3.8 Flash · 3.5 Flash-Lite · 3.1 Pro** via `google-genai` | Model size matched to each job: extraction, grading, drafting |
-| Embeddings | **gemini-embedding-2** (768-d) | Strong retrieval with a small index |
+| Embeddings | **gemini-embedding-001** (768-d) | Strong retrieval with a small index |
 | Store | **Cloud SQL Postgres + pgvector** | Metadata, full-text and vectors in one database; hybrid search in one SQL query |
 | Parsing | **Docling**, with Gemini multimodal as the fallback | Keeps headings, tables and page numbers for citations |
 | Reranking | **Vertex AI Ranking API** | Precise top-k after a broad hybrid recall |
@@ -216,8 +216,10 @@ flowchart LR
 | Memory | **Agent Platform Sessions + Memory Bank** | Remembers a company's preferences (excluded agencies, award ranges) across sessions |
 | Governance | **Agent Identity · Agent Registry · Agent Gateway · Model Armor** | Each agent has its own identity and permissions; tool traffic is routed through a policy gateway; prompt-injection screening |
 | Data protection | **Sensitive Data Protection** · **OAuth 2.0** (Auth Manager) | PII is redacted from company documents before indexing; drafts are exported to Google Docs only with the user's consent |
-| Evaluation | **ADK evalsets · Gen AI evaluation service · custom autoraters** | Tool-path, response and retrieval quality, run continuously |
-| Ops | **Terraform · GitHub Actions (WIF) · Cloud Trace · Cloud Logging · BigQuery Agent Analytics · Secret Manager** | Reproducible infrastructure, keyless CI, traced and analyzable runs |
+| Evaluation | **Own metric harness · Ragas · ADK evalsets · Gen AI evaluation service** | Task metrics, standard RAG metrics, agent tool paths, continuous scoring of live traffic; LLM judges calibrated against hand labels |
+| Observability | **OpenTelemetry → Cloud Trace (prod) · Arize Phoenix (dev) · BigQuery Agent Analytics · Cloud Logging** | Every agent step, model call and tool call traced; cost and latency analyzable |
+| Ops | **Terraform · GitHub Actions (WIF) · Secret Manager · Cloud Run Jobs + Scheduler** | Reproducible infrastructure, keyless CI, scheduled ingestion |
+| Data engineering | **Raw zone (GCS) · provenance · post-run quality checks · Alembic** | Replayable ingestion; every record traceable to its source |
 | Specialization | **Vertex AI supervised tuning** | Tuned vs. prompted grader, decided by measurement |
 
 ---
@@ -265,7 +267,7 @@ Setup instructions arrive with milestone **M0**. They'll cover local Postgres in
 
 ## Acknowledgements
 
-Data: [Simpler Grants API](https://wiki.simpler.grants.gov/product/api), [SBIR.gov](https://www.sbir.gov/), [SAM.gov](https://sam.gov/), [USAspending](https://www.usaspending.gov/). The company used in examples and evals (*Lumen Grid Labs*) is fictional.
+Data: [Simpler Grants API](https://wiki.simpler.grants.gov/product/api), [SAM.gov](https://sam.gov/), [USAspending](https://www.usaspending.gov/), [NIH RePORTER](https://reporter.nih.gov/), [NSF Awards](https://www.research.gov/common/webapi/awardapisearch-v1.htm). Opportunity fields follow the [CommonGrants](https://wiki.simpler.grants.gov/product/deliverables/specifications/grants-protocol) protocol. The company used in examples and evals (*Lumen Grid Labs*) is fictional.
 
 ## Author
 

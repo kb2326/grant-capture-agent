@@ -347,6 +347,10 @@ evals/
   reports/             generated eval reports (Markdown + JSON), one per run
 ```
 
+- **Tooling (two layers, the common 2026 pattern: one framework as the offline CI gate, one platform tracing what runs).**
+  - *Offline metrics:* our own `evals/metrics.py` for task metrics (knockout precision/recall, P@10, nDCG, κ), **Ragas 0.4** for the standard RAG metrics (context precision, context recall, faithfulness, response relevancy) with Gemini as the judge model, and **ADK evalsets** (`agents-cli eval run`) for tool trajectories and agent responses. Ragas' judge is calibrated against the hand labels (Cohen's κ) before its scores are trusted, the same rule as our own grader.
+  - *Managed and continuous:* the **Gen AI evaluation service** with custom autoraters, run on a sample of production traces (M4).
+  - Considered and not used: DeepEval (overlaps Ragas + pytest), promptfoo (its red-team plugins are a candidate for M4's injection tests; our own red-team set comes first), LangSmith (tied to LangChain).
 - **Labeling.** Karthick labels the golden sets by hand, following `evals/LABELING.md`, which defines each verdict, what counts as a knockout, and edge cases. Opportunities are sampled with stratification by source and agency, and include at least 10 known knockouts.
 - **Timing benchmark protocol.**
   - 10 search tasks and 3 drafting tasks.
@@ -372,7 +376,8 @@ evals/
 
 ## 13. Observability and cost
 
-- ADK OpenTelemetry tracing is exported to Cloud Trace. Each run row links to its `trace_id`.
+- ADK emits OpenTelemetry spans for every agent run, model call and tool call (OpenTelemetry GenAI semantic conventions). In production they go to **Cloud Trace**, and each run row links to its `trace_id`. During development the same spans go to a local **Arize Phoenix** (open source, OTLP, official ADK integration) for step-by-step trace inspection and quick evals. Switching between them is configuration only, because both speak OpenTelemetry.
+- Prompt/response logging (GCS/BigQuery) and **BigQuery Agent Analytics** hold structured agent events for latency, cost, tool-error and loop analysis (scaffolded with `--bq-analytics`).
 - Structured JSON logs go to Cloud Logging.
 - Every model call records model, tokens in and out, latency and cost. `runs` aggregates them per workflow.
 - **Cost controls:**

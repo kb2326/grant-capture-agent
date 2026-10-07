@@ -413,7 +413,7 @@ flowchart LR
 
   <details class="stack"><summary><span><span class="layer">Quality</span><br><strong>Eval harness + ADK eval + calibrated LLM judge + red-team set</strong></span><span class="chev">›</span></summary><div class="body"><dl>
     <dt>In plain terms</dt><dd>Labeled test sets with automatic scoring. Where a model does the grading, we first measure how often it agrees with your own labels. Solicitation text is untrusted, so we also test for prompt injection hidden in documents, and Model Armor screens it in production.</dd>
-    <dt>Tools</dt><dd><code>agents-cli eval run</code> (ADK evalsets: tool path and response quality) for agent behaviour. Our own pytest-based harness for retrieval and extraction metrics. <code>agents-cli eval compare</code> to compare runs before and after a change.</dd>
+    <dt>Tools</dt><dd><b>Our own metric code</b> for task numbers (knockout precision and recall, search ranking quality). <b>Ragas</b>, the most widely used open-source RAG evaluation framework, for standard RAG scores (are the retrieved passages relevant, is the answer supported by them). <b>ADK evalsets</b> (<code>agents-cli eval run</code>) to check that agents call the right tools in the right order. <b>Gen AI evaluation service</b> to keep scoring live traffic in production. Any AI judge, Ragas included, is first compared with your own labels, and its scores are trusted only when it agrees with you often enough.</dd>
     <dt>Why here</dt><dd>Every résumé number comes from these evals. The CI eval gate blocks a release if scores drop.</dd>
     <dt>Skill it teaches</dt><dd>Evaluation design, judge calibration, and AI security, three of the most in-demand AI engineering skills.</dd></dl></div></details>
 
@@ -422,6 +422,12 @@ flowchart LR
     <dt>Why here</dt><dd>It's Google's managed home for ADK agents, and it fills the GCP gap on your résumé. Memory Bank can remember company preferences across sessions.</dd>
     <dt>Turned down</dt><dd>Running everything ourselves on Cloud Run (more control, but less to learn about managed agent hosting). We may compare the two in an ADR.</dd>
     <dt>Skill it teaches</dt><dd>Deploying agents to production, and session and memory management.</dd></dl></div></details>
+
+  <details class="stack"><summary><span><span class="layer">Observability</span><br><strong>OpenTelemetry · Cloud Trace · Arize Phoenix · BigQuery Agent Analytics</strong></span><span class="chev">›</span></summary><div class="body"><dl>
+    <dt>In plain terms</dt><dd>A step-by-step recording of everything an agent did: each model call, each tool call, how long it took and what it cost. OpenTelemetry is the open standard for these recordings, and ADK produces them automatically.</dd>
+    <dt>Why here</dt><dd>When an agent gives a wrong answer, the trace shows which step went wrong. In production the traces go to Cloud Trace; while developing they go to Arize Phoenix running on your laptop, which is easier to explore. Because both use the same standard, switching is a configuration change. BigQuery Agent Analytics stores agent events as a table, for questions like "which tool is slowest?" or "which runs cost the most?".</dd>
+    <dt>Turned down</dt><dd>Langfuse (equally good and open source; Phoenix has the official ADK integration). LangSmith (built around LangChain).</dd>
+    <dt>Skill it teaches</dt><dd>Debugging agents from traces, and cost and latency analysis.</dd></dl></div></details>
 
   <details class="stack"><summary><span><span class="layer">Ops</span><br><strong>Terraform · GitHub Actions · Cloud Trace · Secret Manager · Cloud Scheduler</strong></span><span class="chev">›</span></summary><div class="body"><dl>
     <dt>In plain terms</dt><dd>Infrastructure written as code, automatic tests and deploys on every change, a trace of every agent step, secrets kept out of the code, and a nightly timer for ingestion.</dd>
@@ -551,6 +557,7 @@ flowchart LR
       <tr><td class="num">2026-10-06</td><td>Added the Solicitation agent (Analyze) and a hand-built RAG library shared by all agents.</td></tr>
       <tr><td class="num">2026-10-06</td><td>Fictional test company "Lumen Grid Labs" replaces BESI's real capability document.</td></tr>
       <tr><td class="num">2026-10-06</td><td>Stack: ADK 2.x, Gemini 3.x, Cloud SQL Postgres + pgvector, Docling, Agent Runtime (pending your review).</td></tr>
+      <tr><td class="num">2026-10-07</td><td>Evaluation and observability stack confirmed against 2026 practice: Ragas added for standard RAG metrics, Arize Phoenix for local trace inspection, alongside our own metrics, ADK evalsets, the Gen AI evaluation service, Cloud Trace and BigQuery Agent Analytics.</td></tr>
       <tr><td class="num">2026-10-07</td><td>M0 plan written: 20 tasks in two parts, local foundation and cloud foundation. Added after review: a raw zone with replay, provenance on every record, and automatic data-quality checks.</td></tr>
       <tr><td class="num">2026-10-07</td><td>Data sources finalized after live tests: Grants.gov API and the SAM.gov daily CSV for the index; the SAM.gov API only on demand; SBIR award file, USAspending, NIH and NSF for competition context. SBIR.gov search API and the DoD portal dropped (blocked). Records are validated against the official CommonGrants SDK.</td></tr>
       <tr><td class="num">2026-10-07</td><td>Google Cloud project <code>grant-capture-agent</code> created on the personal account with a $10/month budget. All tools signed in, Terraform installed, models tested (embedding-2 not yet available, so embedding-001 is used).</td></tr>

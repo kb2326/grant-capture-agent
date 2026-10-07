@@ -17,6 +17,7 @@
 - Models (pinned, verified 2026-10-07): `gemini-3.8-flash`, `gemini-3.5-flash-lite`, `gemini-3.1-pro-preview` at location `global`; embeddings `gemini-embedding-001`, 768 dimensions, at `us-central1`.
 - Python `>=3.11,<3.14` (scaffold constraint); CI uses 3.12.
 - Indexed sources: Grants.gov (Simpler Grants API, header `X-API-Key`) and SAM.gov Opportunities API v2 (`api_key` query parameter). Never call the SBIR.gov API or the DoD DSIP portal.
+- Simpler Grants keys allow 60 requests/minute and 10,000/day, and are disabled after 30 days unused. The adapter waits at least `GRANTS_MIN_INTERVAL_S` (default 1.1 s) between requests.
 - SAM.gov public keys allow about 10 requests per day. The adapter must never exceed `SAM_DAILY_REQUEST_BUDGET` (default 8).
 - SAM.gov R&D NAICS codes: `541713`, `541714`, `541715`. Notice types: `o`, `p`, `k`.
 - Opportunity statuses stored: `forecasted`, `open`, `closed`, `custom`. Kinds: `grant`, `sbir`, `sttr`, `contract`.
@@ -1467,7 +1468,7 @@ def test_adapter_pages_and_fetches_details():
     respx.get(f"{GRANTS_BASE}/v1/opportunities/22222222-2222-2222-2222-222222222222").mock(
         return_value=httpx.Response(200, json=load("detail_sparse.json")))
     with build_client() as c:
-        opps = list(GrantsGovAdapter(c, api_key="k", page_size=2).iter_opportunities())
+        opps = list(GrantsGovAdapter(c, api_key="k", page_size=2, min_interval_s=0).iter_opportunities())
     assert [o.source_id[:4] for o in opps] == ["1111", "2222"]
     sent = json.loads(search.calls[0].request.content)
     assert sent["filters"]["opportunity_status"]["one_of"] == ["posted", "forecasted"]
@@ -1481,8 +1482,22 @@ def test_adapter_respects_limit():
     detail = respx.get(url__startswith=f"{GRANTS_BASE}/v1/opportunities/").mock(
         return_value=httpx.Response(200, json=load("detail_full.json")))
     with build_client() as c:
-        opps = list(GrantsGovAdapter(c, api_key="k").iter_opportunities(limit=1))
+        opps = list(GrantsGovAdapter(c, api_key="k", min_interval_s=0).iter_opportunities(limit=1))
     assert len(opps) == 1 and detail.call_count == 1
+
+
+@respx.mock
+def test_adapter_throttles_to_rate_limit():
+    respx.post(f"{GRANTS_BASE}/v1/opportunities/search").mock(
+        return_value=httpx.Response(200, json=load("search_page1.json")))
+    respx.get(url__startswith=f"{GRANTS_BASE}/v1/opportunities/").mock(
+        return_value=httpx.Response(200, json=load("detail_full.json")))
+    sleeps: list[float] = []
+    with build_client() as c:
+        adapter = GrantsGovAdapter(c, api_key="k", page_size=2, min_interval_s=1.1,
+                                   sleep=sleeps.append, clock=lambda: 0.0)
+        list(adapter.iter_opportunities())
+    assert sleeps == [1.1, 1.1]  # 3 requests (1 search + 2 details) → 2 waits
 ```
 
 - [ ] **Step 3: Run to see them fail**
@@ -1510,6 +1525,7 @@ class SourceAdapter(Protocol):
 # ingest/sources/grants_gov.py
 """Grants.gov via the Simpler Grants API (https://api.simpler.grants.gov)."""
 
+import time
 from collections.abc import Iterator
 from typing import Any
 
@@ -1570,9 +1586,21 @@ def map_grants_gov(d: dict[str, Any]) -> Opportunity:
 class GrantsGovAdapter:
     name = "grants_gov"
 
-    def __init__(self, client: httpx.Client, api_key: str, page_size: int = 100) -> None:
+    def __init__(self, client: httpx.Client, api_key: str, page_size: int = 100,
+                 min_interval_s: float = 1.1, sleep=time.sleep, clock=time.monotonic) -> None:
         self.client, self.page_size = client, page_size
         self.headers = {"X-API-Key": api_key, "Content-Type": "application/json"}
+        self.min_interval_s, self._sleep, self._clock = min_interval_s, sleep, clock
+        self._last: float | None = None
+
+    def _call(self, method: str, url: str, **kwargs):
+        # Simpler Grants allows 60 requests/minute per key; stay just under it.
+        if self._last is not None:
+            wait = self.min_interval_s - (self._clock() - self._last)
+            if wait > 0:
+                self._sleep(wait)
+        self._last = self._clock()
+        return request_json(self.client, method, url, headers=self.headers, **kwargs)
 
     def iter_opportunities(self, limit: int | None = None) -> Iterator[Opportunity]:
         page, yielded = 1, 0
@@ -1582,12 +1610,9 @@ class GrantsGovAdapter:
                 "pagination": {"page_offset": page, "page_size": self.page_size,
                                "sort_order": [{"order_by": "post_date", "sort_direction": "descending"}]},
             }
-            payload = request_json(self.client, "POST", f"{GRANTS_BASE}/v1/opportunities/search",
-                                   json=body, headers=self.headers)
+            payload = self._call("POST", f"{GRANTS_BASE}/v1/opportunities/search", json=body)
             for item in payload.get("data") or []:
-                detail = request_json(self.client, "GET",
-                                      f"{GRANTS_BASE}/v1/opportunities/{item['opportunity_id']}",
-                                      headers=self.headers)
+                detail = self._call("GET", f"{GRANTS_BASE}/v1/opportunities/{item['opportunity_id']}")
                 yield map_grants_gov(detail["data"])
                 yielded += 1
                 if limit is not None and yielded >= limit:
@@ -1602,7 +1627,7 @@ class GrantsGovAdapter:
 - [ ] **Step 5: Run tests**
 
 Run: `uv run pytest tests/unit/test_grants_gov.py -v`
-Expected: 4 PASS.
+Expected: 5 PASS.
 
 - [ ] **Step 6: Live check (needs `SIMPLER_GRANTS_API_KEY` in `.env`)**
 
@@ -2759,7 +2784,7 @@ Expected: the `CI / checks` job is green on the draft PR.
 docker compose up -d db
 uv run alembic upgrade head
 uv run python -m ingest seed-company
-uv run python -m ingest run --source grants_gov --limit 1200
+uv run python -m ingest run --source grants_gov --limit 1200   # ~25 min at 60 req/min
 uv run python -m ingest run --source sam_gov
 uv run python -m ingest stats
 ```

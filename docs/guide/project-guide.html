@@ -126,6 +126,7 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
     <li><a href="#agents">The agents</a></li>
     <li><a href="#rag">RAG from scratch</a></li>
     <li><a href="#stack">The stack, explained</a></li>
+    <li><a href="#platform">Enterprise deployment</a></li>
     <li><a href="#evals">How we measure</a></li>
     <li><a href="#milestones">Milestones</a></li>
     <li><a href="#resume">Résumé mapping</a></li>
@@ -341,6 +342,26 @@ flowchart LR
     <dt>Why here</dt><dd>The baseline any team expects in a Python repo. v0 already used uv.</dd></dl></div></details>
 </section>
 
+<section id="platform">
+  <header><span class="eyebrow">Section 08b</span><h2>Running it like an enterprise deployment</h2></header>
+  <p>A demo app runs as one process with one key. An enterprise agent system gives each agent its own identity, registers what's allowed to run, routes tool traffic through a policy gateway, and remembers users across sessions. These are the Google Cloud pieces that do each job, in plain terms.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Piece</th><th>In plain terms</th><th>What it does here</th><th>When</th></tr></thead>
+    <tbody>
+      <tr><td><b>A2A</b></td><td>A standard way for one agent to call another agent over the network</td><td>The Analyze agent runs as its own service; the other agents call it</td><td class="num">M2</td></tr>
+      <tr><td><b>Sessions + Memory Bank</b></td><td>Short-term memory for a conversation, plus long-term memory across conversations</td><td>Remembers "skip DoD" or "awards under $50k aren't worth it" from your past approvals</td><td class="num">M2</td></tr>
+      <tr><td><b>Sensitive Data Protection</b></td><td>Finds and masks personal data in documents</td><td>Redacts staff contact details from bios before they're indexed</td><td class="num">M3</td></tr>
+      <tr><td><b>Gen AI evaluation service</b></td><td>Google's managed scoring for model outputs, with custom graders</td><td>Runs next to our own eval harness, and keeps scoring a sample of live traffic</td><td class="num">M3–M4</td></tr>
+      <tr><td><b>Agent Identity</b></td><td>Each agent gets its own login, like an employee badge</td><td>The Draft agent can't read what only Discover needs; access boundaries are set per agent</td><td class="num">M4</td></tr>
+      <tr><td><b>Agent Registry</b></td><td>A catalogue of approved agents and tools</td><td>Only registered agents and MCP tools can be used in production</td><td class="num">M4</td></tr>
+      <tr><td><b>Agent Gateway</b></td><td>A checkpoint all agent and tool traffic passes through</td><td>Applies Model Armor screening and logs every tool call</td><td class="num">M4</td></tr>
+      <tr><td><b>OAuth 2.0</b></td><td>The "Sign in with Google and allow access" flow</td><td>Exports a draft to your own Google Docs, only with your consent</td><td class="num">M4</td></tr>
+      <tr><td><b>BigQuery Agent Analytics</b></td><td>Every agent event lands in a queryable table</td><td>Finds slow tools, loops and expensive runs</td><td class="num">M4</td></tr>
+      <tr><td><b>Coding-agent setup</b></td><td>Project rules, skills and hooks that coding assistants follow</td><td><code>CLAUDE.md</code>/<code>AGENTS.md</code>, the agents-cli skills, and pre-commit hooks</td><td class="num">M0</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
 <section id="evals">
   <header><span class="eyebrow">Section 09</span><h2>How we measure</h2></header>
   <p>These targets are hypotheses until the evals run. Whatever is measured goes on the résumé, even if it's lower.</p>
@@ -422,6 +443,7 @@ flowchart LR
       <tr><td class="num">2026-10-06</td><td>Added the Solicitation agent (Analyze) and a hand-built RAG library shared by all agents.</td></tr>
       <tr><td class="num">2026-10-06</td><td>Fictional test company "Lumen Grid Labs" replaces BESI's real capability document.</td></tr>
       <tr><td class="num">2026-10-06</td><td>Stack: ADK 2.x, Gemini 3.x, Cloud SQL Postgres + pgvector, Docling, Agent Runtime (pending your review).</td></tr>
+      <tr><td class="num">2026-10-07</td><td>Added A2A, Memory Bank, Agent Identity, Agent Registry, Agent Gateway, Sensitive Data Protection, OAuth export, the Gen AI evaluation service and BigQuery Agent Analytics to the spec (system design §16), plus a managed-retrieval comparison in M5. The README now describes the product only.</td></tr>
       <tr><td class="num">2026-10-06</td><td>Merged the rebuild branch into <code>main</code> (PR #5). Rewrote git history to remove BESI's capability document and a committed chat-session database from every branch and tag; the current code is unchanged.</td></tr>
       <tr><td class="num">2026-10-06</td><td>PRD and system design written. Key calls: knockout rules E0–E7 decide eligibility (anything unparsed becomes "needs review"); quotes are checked verbatim in code; golden sets are hand-labeled and frozen; the CI gate blocks if knockout recall drops below 0.95 or faithfulness below 0.90.</td></tr>
       <tr><td class="num">2026-10-06</td><td>Repo renamed to <b>grant-capture-agent</b>. The v0 code moved to <code>legacy/</code>, BESI's capability document was removed, and the rebuild happens on the <code>v1-rebuild</code> branch.</td></tr>

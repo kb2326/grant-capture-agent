@@ -358,7 +358,7 @@ evals/
   - Nodes that read untrusted text have no tools with side effects.
   - Model Armor screens retrieved text and model output in production.
   - The red-team set is part of the eval.
-- **Least privilege:**
+- **Least privilege** (see §16 for Agent Identity and PAB policies):
   - Separate service accounts for ingestion (write to the DB and bucket), agents (read the DB, write only to the drafts, briefs, verdicts, saved and runs tables) and the API.
   - GitHub Actions signs in through Workload Identity Federation, with no keys.
 - **Secrets:** API keys live in Secret Manager. `.env` is used only for local development and is never committed.
@@ -396,18 +396,37 @@ evals/
 | Module quality | Every metric in PRD §4 | `evals/` harness |
 | Smoke | Deployed endpoint answers a canned request | CI after deploy |
 
-## 16. Milestones and acceptance criteria
+## 16. Platform capabilities: protocols, memory, governance
+
+These capabilities make the system behave like a governed enterprise deployment rather than a single app.
+
+| Capability | How it's used | Milestone |
+|---|---|---|
+| **A2A** | The Analyze agent is deployed as its own A2A service on Agent Runtime, starting from the `adk_a2a` template. The root agent and Discover call it over A2A, so it can be scaled, versioned and reused independently. | M2 |
+| **Agent Platform Sessions + Memory Bank** | Sessions hold workflow state. Memory Bank stores company preferences learned from approvals and edits ("never show DoD", "awards under $50k aren't worth it") and feeds them into the planner. | M2 |
+| **Agent Identity** | Each deployed agent (root, Analyze, Discover, Draft) has its own identity, so permissions are granted per agent, not per project. A principal access boundary (PAB) policy limits each identity to the resources it needs. | M4 |
+| **Agent Registry** | Agents, the custom MCP server and the Toolbox tools are registered, so only approved assets are discoverable in production. | M4 |
+| **Agent Gateway** | Agent-to-tool and agent-to-agent traffic goes through the gateway, which applies Model Armor screening and logs every call. | M4 |
+| **Model Armor** | Screens retrieved solicitation text and model output for prompt injection and sensitive-data leaks, through the gateway and the ADK callbacks. | M4 |
+| **Sensitive Data Protection** | Company documents (staff bios, CVs) are scanned during ingestion and personal data is redacted before chunks are embedded. | M3 |
+| **OAuth 2.0 (Auth Manager)** | "Export to Google Docs" uses user-consented OAuth, so the agent writes only to the signed-in user's Drive. This follows the `adk-ae-oauth` pattern. | M4 |
+| **Gen AI evaluation service + custom autoraters** | Runs alongside the local harness: managed autoraters for response quality, custom autoraters for faithfulness, and continuous evaluation on a sample of production traces. | M3–M4 |
+| **BigQuery Agent Analytics** | Agent events are exported to BigQuery for latency, cost, tool-error and loop analysis. | M4 |
+| **Runtime choice** | Agent Runtime is used for the agents and Cloud Run for the API, UI and ingestion. The comparison with Cloud Run and GKE for agents is written up in ADR-0012. | M4 |
+| **Coding-agent workflow** | The repo includes a `CLAUDE.md`/`AGENTS.md`, project skills, hooks (lint and tests before commit) and the agents-cli skill pack, so coding agents follow the project's conventions. | M0 |
+
+## 17. Milestones and acceptance criteria
 
 | Milestone | Done when |
 |---|---|
-| **M0 Foundation** | Scaffold in place; Lumen Grid Labs data written; Postgres schema migrated; ingestion loads ≥ 1,000 opportunities with attachments locally; CI runs lint, types and tests; eval harness runs an empty report; ADRs 0001–0009 written |
+| **M0 Foundation** | Scaffold in place; Lumen Grid Labs data written; Postgres schema migrated; ingestion loads ≥ 1,000 opportunities with attachments locally; CI runs lint, types and tests; eval harness runs an empty report; ADRs 0001–0009 written; `CLAUDE.md`/`AGENTS.md`, project skills and pre-commit hooks in place |
 | **M1 Analyze** | Golden knockout and requirements sets labeled; Solicitation agent produces validated briefs; knockout recall and precision plus requirement recall reported |
-| **M2 Discover** | Hybrid search + rerank with retrieval metrics reported; PEV workflow with an approval step; P@10 reported; timing benchmark run and reported |
-| **M3 Draft** | Grader calibrated (κ reported); CRAG drafting with gaps; relevance and faithfulness reported; drafting timing reported; MCP server working from an MCP client |
-| **M4 Ship** | Terraform-provisioned prod; agents on Agent Runtime; UI live on Cloud Run; tracing and cost dashboards; CI eval gate enforced; red-team results; final eval report and README with measured numbers |
-| **M5 Specialize** | (a) **Fine-tuning:** supervised fine-tune of Gemini Flash-Lite on the labeled dev grading data (Vertex AI supervised tuning), compared with the prompted grader on κ, latency and cost, and the winner shipped. (b) **Multimodal parsing:** Gemini reads scanned and table-heavy PDF pages natively as images, compared with Docling on clause-extraction recall; used as the fallback for pages Docling can't parse. Results go in the eval report. |
+| **M2 Discover** | Hybrid search + rerank with retrieval metrics reported; PEV workflow with an approval step; Analyze served over A2A; Memory Bank stores and applies preferences; P@10 reported; timing benchmark run and reported |
+| **M3 Draft** | Grader calibrated (κ reported); CRAG drafting with gaps; relevance and faithfulness reported; drafting timing reported; MCP server working from an MCP client; Sensitive Data Protection redaction on company documents; Gen AI evaluation service autoraters wired in |
+| **M4 Ship** | Terraform-provisioned prod; agents on Agent Runtime; UI live on Cloud Run; tracing, BigQuery Agent Analytics and cost dashboards; Agent Identity + PAB, Agent Registry, Agent Gateway + Model Armor configured; OAuth export to Google Docs; continuous evaluation on sampled traces; CI eval gate enforced; red-team results; final eval report and README with measured numbers |
+| **M5 Specialize** | (a) **Fine-tuning:** supervised fine-tune of Gemini Flash-Lite on the labeled dev grading data (Vertex AI supervised tuning), compared with the prompted grader on κ, latency and cost, and the winner shipped. (b) **Multimodal parsing:** Gemini reads scanned and table-heavy PDF pages natively as images, compared with Docling on clause-extraction recall; used as the fallback for pages Docling can't parse. (c) **Managed retrieval comparison:** the same corpus indexed in Vector Search and RAG Engine, compared with pgvector hybrid search on recall@k, nDCG, latency and cost. Results go in the eval report. |
 
-## 17. Architecture decision records (written in M0)
+## 18. Architecture decision records (written in M0)
 
 | ADR | Decision | Main alternative rejected |
 |---|---|---|
@@ -422,10 +441,13 @@ evals/
 | 0009 | Single prod project with preview deploys | Separate staging project |
 | 0010 | Tuned vs. prompted grader: decided by measurement in M5 | Choosing without data |
 | 0011 | Docling first, Gemini multimodal as the fallback for hard pages | Gemini-only parsing (cost); Docling-only (fails on scans) |
+| 0012 | Agent Runtime for agents; Cloud Run for API, UI and ingestion | Cloud Run for everything; GKE |
+| 0013 | Analyze as a separate A2A service | All agents in one deployment |
+| 0014 | Per-agent Agent Identity with PAB policies | One shared service account |
 
 M5 runs after M4 so the shipped product never depends on it. Its results update the live system through the normal eval gate.
 
-## 18. Open items resolved by this spec
+## 19. Open items resolved by this spec
 
 - **Labeling approach:** hand-labeled golden sets plus a separate LLM-assisted dev set.
 - **Pipeline module:** reduced to a saved list.

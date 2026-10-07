@@ -211,26 +211,14 @@ flowchart LR
 | Parsing | **Docling**, with Gemini multimodal as the fallback | Keeps headings, tables and page numbers for citations |
 | Reranking | **Vertex AI Ranking API** | Precise top-k after a broad hybrid recall |
 | Tools | **MCP Toolbox for Databases** + a custom **MCP server** | Safe SQL tools; the same capabilities from any MCP client |
-| Serving | **Agent Runtime** (formerly Agent Engine) · **FastAPI + React** on **Cloud Run** | Managed agent hosting with sessions and memory |
-| Safety | **Model Armor**, deterministic rules, red-team evals | Solicitation text is untrusted input |
-| Ops | **Terraform · GitHub Actions (WIF) · Cloud Trace · Secret Manager** | Reproducible infrastructure, keyless CI, traced runs |
+| Agent protocols | **A2A** between the orchestrator and the Analyze agent · **MCP** for tools | Analyze runs as an independent service that other agents can call |
+| Serving | **Agent Runtime** (formerly Agent Engine) · **FastAPI + React** on **Cloud Run** | Managed agent hosting with sessions |
+| Memory | **Agent Platform Sessions + Memory Bank** | Remembers a company's preferences (excluded agencies, award ranges) across sessions |
+| Governance | **Agent Identity · Agent Registry · Agent Gateway · Model Armor** | Each agent has its own identity and permissions; tool traffic is routed through a policy gateway; prompt-injection screening |
+| Data protection | **Sensitive Data Protection** · **OAuth 2.0** (Auth Manager) | PII is redacted from company documents before indexing; drafts are exported to Google Docs only with the user's consent |
+| Evaluation | **ADK evalsets · Gen AI evaluation service · custom autoraters** | Tool-path, response and retrieval quality, run continuously |
+| Ops | **Terraform · GitHub Actions (WIF) · Cloud Trace · Cloud Logging · BigQuery Agent Analytics · Secret Manager** | Reproducible infrastructure, keyless CI, traced and analyzable runs |
 | Specialization | **Vertex AI supervised tuning** | Tuned vs. prompted grader, decided by measurement |
-
-### Skills this project demonstrates
-
-| Hiring signal (2026 postings) | Where it lives here |
-|---|---|
-| Agentic AI and multi-agent orchestration | `app/discover`, `app/analyze`, `app/draft` (ADK 2 workflows, approval steps) |
-| RAG engineering | `rag/` (parse, chunk, embed, hybrid search, rerank, corrective grading, citations) |
-| Evals and LLM-as-judge | `evals/` (golden sets, calibrated judge with Cohen's κ, CI gate) |
-| MCP and tool design | `mcp_server/`, `toolbox/` |
-| APIs and backend | `api/` (FastAPI), Postgres schema and migrations |
-| Observability and LLMOps | Cloud Trace, cost per run, eval-gated deploys |
-| AI security | Prompt-injection red team, Model Armor, least-privilege service accounts |
-| Data engineering | `ingest/` (four public APIs, incremental nightly pipeline) |
-| Fine-tuning | M5: supervised tuning of the grader, compared with prompting |
-| Multimodal | M5: Gemini reading scanned PDF pages, compared with Docling |
-| Cloud deployment | Terraform, Agent Runtime, Cloud Run, Cloud SQL on GCP |
 
 ---
 

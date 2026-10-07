@@ -109,8 +109,8 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
   <p class="lede">An AI system that finds federal funding a small R&amp;D company can actually win, rules out the ones it is not allowed to win, and drafts the proposal from the company's own evidence. It is an open, measured take on the workflow commercial GovCon platforms sell, built on Google ADK and Google Cloud, and run the way an AI product team would run it.</p>
   <div class="meta">
     <span>Owner: Karthick Balaje (kb2326)</span>
-    <span>Current phase: PRD and system design in review</span>
-    <span>Last updated: 6 Oct 2026</span>
+    <span>Current phase: M0 plan ready, waiting for go-ahead</span>
+    <span>Last updated: 7 Oct 2026</span>
   </div>
 </header>
 
@@ -119,14 +119,17 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
   <span class="eyebrow">Sections</span>
   <ol>
     <li><a href="#status">Where we are</a></li>
+    <li><a href="#next">Your next steps</a></li>
     <li><a href="#why">Why this exists</a></li>
     <li><a href="#product">What we're building</a></li>
     <li><a href="#process">How a team runs it</a></li>
+    <li><a href="#data">The data</a></li>
     <li><a href="#arch">Architecture</a></li>
     <li><a href="#agents">The agents</a></li>
     <li><a href="#rag">RAG from scratch</a></li>
     <li><a href="#stack">The stack, explained</a></li>
     <li><a href="#platform">Enterprise deployment</a></li>
+    <li><a href="#cloud">Cloud setup and cost</a></li>
     <li><a href="#evals">How we measure</a></li>
     <li><a href="#milestones">Milestones</a></li>
     <li><a href="#resume">Résumé mapping</a></li>
@@ -152,9 +155,39 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
   </table></div>
 </section>
 
+<section id="next">
+  <header><span class="eyebrow">Section 01b</span><h2>Your next steps</h2></header>
+  <p>Everything needed to start building is set up. Here is what is done, what you do next, and what happens after that.</p>
+  <div class="grid2">
+    <div class="panel"><span class="eyebrow">Done</span><h3>Ready to build</h3>
+      <ul class="tight">
+        <li>GitHub repo renamed and cleaned: <code>kb2326/grant-capture-agent</code></li>
+        <li>PRD, system design and the 18-task M0 plan written</li>
+        <li>Google Cloud project <code>grant-capture-agent</code> on your personal account, $10/month budget alert</li>
+        <li>gcloud, application credentials, agents-cli and GitHub all signed in; Terraform 1.16.5 installed</li>
+        <li>Grants.gov and SAM.gov keys in <code>.env</code> (never committed) and tested live</li>
+        <li>Gemini models tested and pinned</li>
+      </ul></div>
+    <div class="panel"><span class="eyebrow">You</span><h3>What to do now</h3>
+      <ol class="tight">
+        <li>Skim the M0 plan: <code>docs/plans/2026-10-07-m0-foundation.md</code>. The task titles and "Files" lists are enough.</li>
+        <li>Reply <b>"go, native"</b> to start. I build each task in the session and explain what it does and why.</li>
+        <li>After each task, read the short explanation. Ask about anything that isn't clear; that's the learning part.</li>
+        <li>Revoke the old Simpler Grants key in the BESI-email account if you haven't already.</li>
+      </ol></div>
+    <div class="panel"><span class="eyebrow">Then</span><h3>What happens after M0</h3>
+      <ul class="tight">
+        <li><b>M1 Analyze:</b> you hand-label at least 30 real solicitations (about 2–3 hours). Those labels produce the knockout-screen number for your résumé.</li>
+        <li><b>M2 Discover:</b> you time yourself searching manually vs. with the agent. That produces the "minutes saved" number.</li>
+        <li><b>M3 Draft:</b> you time drafting with and without the system.</li>
+        <li><b>M4 Ship:</b> live demo on Google Cloud, followed by the README results table, the LinkedIn post and the Medium article.</li>
+      </ul></div>
+  </div>
+</section>
+
 <section id="why">
   <header><span class="eyebrow">Section 02</span><h2>Why this exists</h2></header>
-  <p>A grants lead at a small deep-tech company spends hours searching Grants.gov, SBIR.gov and SAM.gov. They read a 40-page solicitation and find a disqualifying clause on page 31. Then they spend days writing a technical section from old proposals scattered across shared drives.</p>
+  <p>A grants lead at a small deep-tech company spends hours searching Grants.gov and SAM.gov. They read a 40-page solicitation and find a disqualifying clause on page 31. Then they spend days writing a technical section from old proposals scattered across shared drives.</p>
   <div class="clause">
     <span class="eyebrow">Example knockout clause</span>
     <p>"Only small business concerns (SBCs) are eligible to submit proposals. An SBC must have 500 or fewer employees, including affiliates, and be more than 50% owned and controlled by U.S. citizens or permanent resident aliens."</p>
@@ -182,14 +215,36 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
   <header><span class="eyebrow">Section 04</span><h2>How a product team runs it</h2></header>
   <p>Each phase produces a document. Those documents are what you'll talk through in interviews: what you decided, what you rejected, and how you knew it worked.</p>
   <div class="phases">
-    <div class="phase"><span class="n">01</span><div><h3>Product discovery</h3><p>PRD: problem, user, success metrics, non-goals. <code>docs/product/PRD.md</code></p></div><span class="pill now">written, in review</span></div>
-    <div class="phase current"><span class="n">02</span><div><h3>System design</h3><p>Architecture, data model, typed hand-offs, workflows, knockout rules, evals, security, deployment. <code>docs/design/system-design.md</code></p></div><span class="pill now">written, in review</span></div>
-    <div class="phase"><span class="n">03</span><div><h3>Decision records (ADRs)</h3><p>One short file per big choice, with the options we turned down and why. <code>docs/adr/</code></p></div><span class="pill todo">next</span></div>
-    <div class="phase"><span class="n">04</span><div><h3>Evals first</h3><p>Decide what "correct" means and label test data before writing features. <code>evals/</code></p></div><span class="pill todo">to do</span></div>
-    <div class="phase"><span class="n">05</span><div><h3>Implementation plan</h3><p>Each milestone broken into small, testable tasks. <code>docs/plans/</code></p></div><span class="pill todo">to do</span></div>
-    <div class="phase"><span class="n">06</span><div><h3>Build</h3><p>Tests first, small pull requests, CI on every pull request.</p></div><span class="pill todo">to do</span></div>
+    <div class="phase"><span class="n">01</span><div><h3>Product discovery</h3><p>PRD: problem, user, success metrics, non-goals. <code>docs/product/PRD.md</code></p></div><span class="pill done">done</span></div>
+    <div class="phase"><span class="n">02</span><div><h3>System design</h3><p>Architecture, data model, typed hand-offs, workflows, knockout rules, evals, security, deployment. <code>docs/design/system-design.md</code></p></div><span class="pill done">done</span></div>
+    <div class="phase"><span class="n">03</span><div><h3>Decision records (ADRs)</h3><p>One short file per big choice, with the options we turned down and why. Listed in the design; written in M0 Task 11. <code>docs/adr/</code></p></div><span class="pill todo">in M0</span></div>
+    <div class="phase"><span class="n">04</span><div><h3>Evals first</h3><p>Decide what "correct" means and label test data before writing features. The harness and labeling guide come in M0; labeled sets in M1–M3. <code>evals/</code></p></div><span class="pill todo">in M0</span></div>
+    <div class="phase"><span class="n">05</span><div><h3>Implementation plan</h3><p>Each milestone broken into small, testable tasks. M0 has 18 tasks. <code>docs/plans/2026-10-07-m0-foundation.md</code></p></div><span class="pill done">M0 done</span></div>
+    <div class="phase current"><span class="n">06</span><div><h3>Build</h3><p>Tests first, small pull requests, CI on every pull request. Starts with M0 Task 1 when you say go.</p></div><span class="pill now">next</span></div>
     <div class="phase"><span class="n">07</span><div><h3>Ship</h3><p>Deploy to Google Cloud with a demo UI, tracing, and an eval gate that blocks a bad release.</p></div><span class="pill todo">to do</span></div>
     <div class="phase"><span class="n">08</span><div><h3>Operate and report</h3><p>Eval report, cost report, and a write-up of what went wrong and what you'd change.</p></div><span class="pill todo">to do</span></div>
+  </div>
+</section>
+
+<section id="data">
+  <header><span class="eyebrow">Section 04b</span><h2>The data</h2></header>
+  <p>Every source was tested live on 7 Oct 2026. Together, Grants.gov and SAM.gov cover <b>every federal funding opportunity</b>: all federal grants and all federal contract notices. That is where nearly all SBIR-style R&amp;D funding lives.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Source</th><th>What it gives us</th><th>How we get it</th><th>Used for</th></tr></thead>
+    <tbody>
+      <tr><td><b>Grants.gov</b> (Simpler Grants API)</td><td>All federal grants and forecasts, including NSF, DOE and NIH SBIR calls, with their PDF attachments. 1,458 open or forecasted on 7 Oct.</td><td>API with your key: 60 requests/minute, 10,000/day</td><td>Main index (M0)</td></tr>
+      <tr><td><b>SAM.gov</b> daily file</td><td>Every federal contract notice, including DoD, NASA and DARPA SBIRs, with full description text</td><td>One free public CSV (about 210 MB) refreshed daily, no key</td><td>Main index (M0)</td></tr>
+      <tr><td><b>SAM.gov</b> API</td><td>Attachment links for a single notice</td><td>Your key, but only about 10 requests a day</td><td>On demand, when you open a shortlisted notice (M1)</td></tr>
+      <tr><td><b>SBIR.gov</b> award file</td><td>Every past SBIR/STTR award, with abstracts</td><td>Free bulk CSV, updated monthly. The SBIR.gov search API is down, but this file still works.</td><td>Past winners and likely competitors (M2)</td></tr>
+      <tr><td><b>USAspending</b></td><td>All federal award spending</td><td>Free API, no key</td><td>Incumbents on a topic (M2)</td></tr>
+      <tr><td><b>NIH RePORTER</b> · <b>NSF Awards</b></td><td>Research projects that were already funded</td><td>Free APIs, no key</td><td>Competition context (M2)</td></tr>
+      <tr><td>Not used</td><td>SBIR.gov search API (returns "forbidden"), DoD SBIR portal (blocks programs)</td><td colspan="2">Tested and dropped. Their solicitations also appear on Grants.gov or SAM.gov.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="grid2">
+    <div class="panel"><h3>What CommonGrants is</h3><p>CommonGrants is an <b>open standard</b> from the Simpler Grants team at HHS. It defines what a grant opportunity record looks like: title, status, key dates, funding, eligible applicant types, source link and custom fields. It is a shared format, not a data source; it holds no grants itself. When different portals publish in the same format, one program can read all of them.</p></div>
+    <div class="panel"><h3>What the CommonGrants SDK does for us</h3><p>The Python package <code>common-grants-sdk</code> has three parts. <b>Models</b>: the official definitions of the format, which we use to check that every record we store is valid CommonGrants. <b>Client</b>: code that can query any CommonGrants-compliant API, such as Simpler Grants or state portals in California, Pennsylvania and Washington. <b>Extensions</b>: a way to add our own fields, such as NAICS codes and SBIR phase, in a standard way.</p></div>
+    <div class="panel"><h3>How we use it</h3><p>M0: every opportunity is converted to an official CommonGrants record and validated before it is saved. Optional, after M4: one extra adapter that uses the SDK client to pull from state portals, showing that the same pipeline accepts any portal that speaks the standard.</p></div>
   </div>
 </section>
 
@@ -199,7 +254,7 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
 <pre class="mermaid">
 flowchart LR
   subgraph OFF["Offline · nightly"]
-    S[Grants.gov · SBIR.gov<br/>SAM.gov · USAspending] --> I[Ingestion job<br/>Cloud Run Job]
+    S[Grants.gov API<br/>SAM.gov daily CSV] --> I[Ingestion job<br/>Cloud Run Job]
     C[Company documents<br/>profile · past proposals · CVs] --> I
     I --> G[(Raw files<br/>Cloud Storage)]
     I --> P[(Postgres + pgvector<br/>Cloud SQL)]
@@ -284,9 +339,10 @@ flowchart LR
     <dt>Turned down</dt><dd>LangGraph (you already know it from ClaimLens; ADK broadens your range and is Google's own framework). ADK 1's <code>LoopAgent</code> (being phased out in favour of workflows).</dd>
     <dt>Skill it teaches</dt><dd>Multi-agent orchestration, human-in-the-loop workflows, resumable state.</dd></dl></div></details>
 
-  <details class="stack"><summary><span><span class="layer">Models</span><br><strong>Gemini 3.8 Flash · 3.5 Flash-Lite · 3.1 Pro · gemini-embedding-2</strong></span><span class="chev">›</span></summary><div class="body"><dl>
+  <details class="stack"><summary><span><span class="layer">Models</span><br><strong>gemini-3.8-flash · gemini-3.5-flash-lite · gemini-3.1-pro-preview · gemini-embedding-001</strong></span><span class="chev">›</span></summary><div class="body"><dl>
     <dt>In plain terms</dt><dd>Different models for different jobs. Flash handles planning and extraction. Flash-Lite, the cheapest, grades thousands of passages. Pro, the most capable, writes the drafts. The embedding model turns text into searchable vectors.</dd>
     <dt>Why here</dt><dd>Matching model size to the task is how real teams control cost. Every call is logged with its token count and cost.</dd>
+    <dt>Verified</dt><dd>All four were tested with live calls on 7 Oct 2026. <code>gemini-embedding-2</code> is listed for the project but returned "not found", so we use <code>gemini-embedding-001</code> (768 numbers per passage, us-central1) and retry embedding-2 in M2.</dd>
     <dt>Turned down</dt><dd>Using Pro for everything (several times the cost with no measured benefit for grading).</dd>
     <dt>Skill it teaches</dt><dd>Model routing, cost budgeting, structured output.</dd></dl></div></details>
 
@@ -362,6 +418,23 @@ flowchart LR
   </table></div>
 </section>
 
+<section id="cloud">
+  <header><span class="eyebrow">Section 08c</span><h2>Cloud setup and cost</h2></header>
+  <p>Google Cloud project <code>grant-capture-agent</code> (number 313052279552). It belongs to your personal account, sits in no organization, and is billed to "My Billing Account 1" with a <b>$10/month budget</b>. Email alerts go out at 50%, 90% and 100%, and when the forecast passes 100%. A budget only sends alerts; it never stops spending, so the plan keeps costly resources switched off when they aren't in use.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Cloud piece</th><th>In plain terms</th><th>Cost</th></tr></thead>
+    <tbody>
+      <tr><td>Gemini API calls</td><td>The AI models</td><td class="num">M0: under $0.10. M1–M3: about $3–8 in total</td></tr>
+      <tr><td>Embeddings</td><td>Turning about 20,000 pages into searchable vectors</td><td class="num">About $1.50, one time</td></tr>
+      <tr><td>Cloud SQL (Postgres)</td><td>The cloud database</td><td class="num">About $0.25 a day while it exists. It is deleted after each milestone's cloud test, because even a stopped database pays about $7/month for its IP address. Terraform recreates it in about 10 minutes.</td></tr>
+      <tr><td>Cloud Storage · Secret Manager · Artifact Registry · Cloud Build · Cloud Run Job</td><td>File storage, key storage, container storage, container builds, the ingestion job</td><td class="num">About $0 to a few cents (free tiers)</td></tr>
+      <tr><td>Agent Runtime + always-on database (M4 demo)</td><td>The live public demo</td><td class="num">About $10–20/month while it's live. To be decided at M4: keep it running, or switch it on only around interviews.</td></tr>
+      <tr><td colspan="2"><b>Expected total for M0</b></td><td class="num"><b>About $0.50–1</b></td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">Where the work happens: the database for tests runs in Docker on your laptop (free). Everything shared or deployed lives on Google Cloud and is written as Terraform code, so it can be rebuilt or torn down with one command.</p>
+</section>
+
 <section id="evals">
   <header><span class="eyebrow">Section 09</span><h2>How we measure</h2></header>
   <p>These targets are hypotheses until the evals run. Whatever is measured goes on the résumé, even if it's lower.</p>
@@ -385,7 +458,7 @@ flowchart LR
   <div class="tablewrap"><table>
     <thead><tr><th>Milestone</th><th>What gets built</th><th>What you learn</th><th>Status</th></tr></thead>
     <tbody>
-      <tr><td><b>M0 Foundation</b></td><td>New repo layout, Lumen Grid Labs profile, ingestion job, Postgres schema, CI, eval harness skeleton</td><td>Data pipelines, schema design, CI</td><td><span class="pill todo">to do</span></td></tr>
+      <tr><td><b>M0 Foundation</b></td><td>Part A (laptop): scaffold, settings, Postgres schema, Grants.gov + SAM.gov ingestion, fake company documents, eval harness, ADRs, CI. Part B (cloud): Terraform, Cloud Storage, Secret Manager, Cloud SQL, service accounts, keyless GitHub sign-in, ingestion as a Cloud Run Job.</td><td>Data pipelines, schema design, Terraform, IAM, CI</td><td><span class="pill now">plan ready</span></td></tr>
       <tr><td><b>M1 Analyze</b></td><td>Parsing and chunking, Solicitation agent, knockout rules, labeled set of 25+ solicitations</td><td>Document parsing, structured extraction, labeling, precision/recall</td><td><span class="pill todo">to do</span></td></tr>
       <tr><td><b>M2 Discover</b></td><td>Hybrid search, reranking, ADK 2 PEV workflow, approval step, timing benchmark</td><td>Retrieval engineering, agent graphs, human-in-the-loop</td><td><span class="pill todo">to do</span></td></tr>
       <tr><td><b>M3 Draft</b></td><td>Corrective RAG over company documents, faithfulness check, MCP server</td><td>CRAG, LLM judges, citation design, MCP</td><td><span class="pill todo">to do</span></td></tr>
@@ -443,6 +516,10 @@ flowchart LR
       <tr><td class="num">2026-10-06</td><td>Added the Solicitation agent (Analyze) and a hand-built RAG library shared by all agents.</td></tr>
       <tr><td class="num">2026-10-06</td><td>Fictional test company "Lumen Grid Labs" replaces BESI's real capability document.</td></tr>
       <tr><td class="num">2026-10-06</td><td>Stack: ADK 2.x, Gemini 3.x, Cloud SQL Postgres + pgvector, Docling, Agent Runtime (pending your review).</td></tr>
+      <tr><td class="num">2026-10-07</td><td>M0 plan written: 18 tasks in two parts, local foundation and cloud foundation.</td></tr>
+      <tr><td class="num">2026-10-07</td><td>Data sources finalized after live tests: Grants.gov API and the SAM.gov daily CSV for the index; the SAM.gov API only on demand; SBIR award file, USAspending, NIH and NSF for competition context. SBIR.gov search API and the DoD portal dropped (blocked). Records are validated against the official CommonGrants SDK.</td></tr>
+      <tr><td class="num">2026-10-07</td><td>Google Cloud project <code>grant-capture-agent</code> created on the personal account with a $10/month budget. All tools signed in, Terraform installed, models tested (embedding-2 not yet available, so embedding-001 is used).</td></tr>
+      <tr><td class="num">2026-10-07</td><td>New Simpler Grants and SAM.gov accounts on the personal email replace the old BESI-email accounts.</td></tr>
       <tr><td class="num">2026-10-07</td><td>Added A2A, Memory Bank, Agent Identity, Agent Registry, Agent Gateway, Sensitive Data Protection, OAuth export, the Gen AI evaluation service and BigQuery Agent Analytics to the spec (system design §16), plus a managed-retrieval comparison in M5. The README now describes the product only.</td></tr>
       <tr><td class="num">2026-10-06</td><td>Merged the rebuild branch into <code>main</code> (PR #5). Rewrote git history to remove BESI's capability document and a committed chat-session database from every branch and tag; the current code is unchanged.</td></tr>
       <tr><td class="num">2026-10-06</td><td>PRD and system design written. Key calls: knockout rules E0–E7 decide eligibility (anything unparsed becomes "needs review"); quotes are checked verbatim in code; golden sets are hand-labeled and frozen; the CI gate blocks if knockout recall drops below 0.95 or faithfulness below 0.90.</td></tr>

@@ -59,3 +59,16 @@ Ask the user: Option A (simple single-project) or Option B (full CI/CD pipeline 
 - **Run Python with `uv`**: `uv run python script.py`. Run `agents-cli install` first.
 - **Stop on repeated errors**: If the same error appears 3+ times, fix the root cause instead of retrying.
 - **Terraform conflicts** (Error 409): Use `terraform import` instead of retrying creation.
+
+## Project conventions (grant-capture-agent)
+
+- Read `docs/plans/STATUS.md` first, then `docs/design/system-design.md` before changing behaviour; plans live in `docs/plans/`.
+- Packages: `app/` (ADK agents), `ingest/` (data sources + pipeline), `rag/` (retrieval library, M1+), `db/` (models + migrations), `evals/` (metric harness).
+- Tests: `tests/unit` (no network, no DB), `tests/db` (needs `docker compose up -d db`), `tests/integration` + `tests/eval` (call Gemini; run manually).
+- Never assert on LLM output text in pytest; use `agents-cli eval run`.
+- Eligibility and verification decisions are plain Python in `app/rules/`, never model judgements.
+- Architecture is chosen by ablation (baseline vs. variant, decided by evals) — see system design §8.0.
+- Models and thresholds come from `app/config.py`; don't hard-code model IDs elsewhere.
+- GCP: project `grant-capture-agent`, personal account only. Stop or delete Cloud SQL after use.
+- Never commit `.env`; never mention commercial products used as inspiration anywhere in the repo.
+- Commits: conventional prefix (`feat`, `fix`, `docs`, `test`, `chore`, `infra`) and the Co-Authored-By trailer.

@@ -3,11 +3,14 @@ from my_agent.tools.capabilities import get_default_capabilities
 # Load capabilities once at module level
 DEFAULT_CAPABILITIES = get_default_capabilities()
 
-PLANNER_INSTRUCTION = """You are a Strategic Grant Proposal Planner for a specific company.
+PLANNER_INSTRUCTION = (
+    """You are a Strategic Grant Proposal Planner for a specific company.
 
 **Context:**
 - **Company Capabilities:**
-""" + DEFAULT_CAPABILITIES + """
+"""
+    + DEFAULT_CAPABILITIES
+    + """
   
   - ALWAYS use these provided capabilities to tailor your search.
   - You MUST align all search plans with these capabilities.
@@ -78,3 +81,4 @@ Instead, call the `exit_verification_loop` tool with your response.
 Example Tool Call:
 `exit_verification_loop(message="I am the Grant Discovery Agent. I help you find funding.")`
 """
+)

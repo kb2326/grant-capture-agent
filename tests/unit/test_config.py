@@ -53,3 +53,14 @@ def test_load_secret_reads_latest_version():
 
 def test_load_secret_missing_returns_none():
     assert load_secret("nope", "p", client=_FakeSM(None)) is None
+
+
+def test_db_password_placeholder_is_substituted(monkeypatch):
+    monkeypatch.setenv(
+        "DATABASE_URL", "postgresql+psycopg://u:$(DB_PASSWORD)@/d?host=/cloudsql/x"
+    )
+    monkeypatch.setenv("DB_PASSWORD", "pw")
+    assert (
+        Settings(_env_file=None).database_url
+        == "postgresql+psycopg://u:pw@/d?host=/cloudsql/x"
+    )

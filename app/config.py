@@ -48,6 +48,13 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def _secrets_from_secret_manager(self) -> "Settings":
+        password = os.environ.get("DB_PASSWORD")
+        if password and "$(DB_PASSWORD)" in self.database_url:
+            object.__setattr__(
+                self,
+                "database_url",
+                self.database_url.replace("$(DB_PASSWORD)", password),
+            )
         if os.environ.get("USE_SECRET_MANAGER") != "1":
             return self
         for field, secret_id in (

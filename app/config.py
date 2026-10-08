@@ -1,9 +1,25 @@
 """Runtime settings, loaded from the environment and an optional .env file."""
 
+import os
 from functools import lru_cache
 
-from pydantic import SecretStr
+from pydantic import SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+def load_secret(secret_id: str, project: str, client=None) -> str | None:
+    """Read the latest version of a Secret Manager secret; None if missing or unreadable."""
+    if client is None:
+        from google.cloud import secretmanager
+
+        client = secretmanager.SecretManagerServiceClient()
+    try:
+        response = client.access_secret_version(
+            name=f"projects/{project}/secrets/{secret_id}/versions/latest"
+        )
+    except Exception:
+        return None
+    return response.payload.data.decode("utf-8")
 
 
 class Settings(BaseSettings):
@@ -29,6 +45,20 @@ class Settings(BaseSettings):
     sam_daily_request_budget: int = 8
 
     max_attachment_bytes: int = 25 * 1024 * 1024
+
+    @model_validator(mode="after")
+    def _secrets_from_secret_manager(self) -> "Settings":
+        if os.environ.get("USE_SECRET_MANAGER") != "1":
+            return self
+        for field, secret_id in (
+            ("simpler_grants_api_key", "simpler-grants-api-key"),
+            ("sam_api_key", "sam-api-key"),
+        ):
+            if getattr(self, field) is None:
+                value = load_secret(secret_id, self.google_cloud_project)
+                if value:
+                    object.__setattr__(self, field, SecretStr(value))
+        return self
 
 
 @lru_cache

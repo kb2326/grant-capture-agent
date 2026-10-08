@@ -1,4 +1,4 @@
-from app.config import Settings
+from app.config import Settings, load_secret
 
 
 def test_defaults_match_pinned_models(monkeypatch):
@@ -23,3 +23,33 @@ def test_env_overrides_and_secret_masking(monkeypatch):
     assert s.sam_api_key is not None
     assert s.sam_api_key.get_secret_value() == "abc123"
     assert "abc123" not in repr(s)
+
+
+class _FakeSM:
+    def __init__(self, value):
+        self.value, self.calls = value, []
+
+    def access_secret_version(self, name):
+        self.calls.append(name)
+        if self.value is None:
+            raise KeyError(name)
+
+        class R:
+            pass
+
+        r = R()
+        r.payload = R()
+        r.payload.data = self.value.encode()
+        return r
+
+
+def test_load_secret_reads_latest_version():
+    sm = _FakeSM("s3cret")
+    assert load_secret("sam-api-key", "grant-capture-agent", client=sm) == "s3cret"
+    assert sm.calls == [
+        "projects/grant-capture-agent/secrets/sam-api-key/versions/latest"
+    ]
+
+
+def test_load_secret_missing_returns_none():
+    assert load_secret("nope", "p", client=_FakeSM(None)) is None

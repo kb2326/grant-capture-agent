@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uv run --quiet ruff format --quiet app ingest db evals tests >/dev/null 2>&1 || true"
+          }
+        ]
+      }
+    ]
+  }
+}

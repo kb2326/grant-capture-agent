@@ -72,3 +72,9 @@ Ask the user: Option A (simple single-project) or Option B (full CI/CD pipeline 
 - GCP: project `grant-capture-agent`, personal account only. Stop or delete Cloud SQL after use.
 - Never commit `.env`; never mention commercial products used as inspiration anywhere in the repo.
 - Commits: conventional prefix (`feat`, `fix`, `docs`, `test`, `chore`, `infra`) and the Co-Authored-By trailer.
+
+## Coding-agent workspace
+- Hook: Python is auto-formatted after edits (`.claude/settings.json`).
+- Skills: `ingest-status` (data health), `eval-report` (run and explain evals).
+- Subagent: `data-quality-reviewer`. Run it after changing `ingest/` or `db/`, before opening a PR.
+- Each milestone PR also gets a code review and, before cloud/infra changes merge, a security review.

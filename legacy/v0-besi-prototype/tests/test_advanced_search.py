@@ -1,9 +1,7 @@
-from unittest.mock import MagicMock, patch
 
-from my_agent.tools.advanced_search import (
-    check_eligibility_semantic,
-    get_competitor_intelligence,
-)
+import pytest
+from unittest.mock import patch, MagicMock
+from my_agent.tools.advanced_search import check_eligibility_semantic, get_competitor_intelligence
 
 # --- Test Data ---
 
@@ -35,13 +33,12 @@ OPEN_HTML = """
 
 # --- Tests ---
 
-
 def test_check_eligibility_semantic_knockout():
     """Test that the tool correctly flags a non-profit restricted grant."""
-    with patch("requests.get") as mock_get:
+    with patch('requests.get') as mock_get:
         mock_response = MagicMock()
         mock_response.status_code = 200
-        mock_response.content = RESTRICTED_HTML.encode("utf-8")
+        mock_response.content = RESTRICTED_HTML.encode('utf-8')
         mock_get.return_value = mock_response
 
         # Run the tool
@@ -51,13 +48,12 @@ def test_check_eligibility_semantic_knockout():
         assert "❌ ELIGIBILITY WARNINGS" in result
         assert "KNOCKOUT: Seems restricted to Non-Profits/501(c)(3)" in result
 
-
 def test_check_eligibility_semantic_pass():
     """Test that the tool passes a grant open to businesses."""
-    with patch("requests.get") as mock_get:
+    with patch('requests.get') as mock_get:
         mock_response = MagicMock()
         mock_response.status_code = 200
-        mock_response.content = OPEN_HTML.encode("utf-8")
+        mock_response.content = OPEN_HTML.encode('utf-8')
         mock_get.return_value = mock_response
 
         # Run the tool
@@ -65,19 +61,18 @@ def test_check_eligibility_semantic_pass():
 
         # Assertions
         assert "✅ ELIGIBILITY CHECK PASSED" in result
-        assert "not in result" not in result  # Double negative check
-
+        assert "not in result" not in result # Double negative check
 
 def test_get_competitor_intelligence_success():
     """Test that we can parse a valid response from USAspending."""
     mock_api_response = {
         "results": [
             {"Recipient Name": "Big Defense Corp", "Award Amount": 5000000},
-            {"Recipient Name": "University of Tech", "Award Amount": 120000},
+            {"Recipient Name": "University of Tech", "Award Amount": 120000}
         ]
     }
 
-    with patch("requests.post") as mock_post:
+    with patch('requests.post') as mock_post:
         mock_response = MagicMock()
         mock_response.status_code = 200
         mock_response.json.return_value = mock_api_response
@@ -91,10 +86,9 @@ def test_get_competitor_intelligence_success():
         assert "$5,000,000.00" in result
         assert "University of Tech" in result
 
-
 def test_get_competitor_intelligence_no_results():
     """Test handling of empty API results."""
-    with patch("requests.post") as mock_post:
+    with patch('requests.post') as mock_post:
         mock_response = MagicMock()
         mock_response.status_code = 200
         mock_response.json.return_value = {"results": []}
@@ -103,7 +97,6 @@ def test_get_competitor_intelligence_no_results():
         result = get_competitor_intelligence(keyword="SimulatedUnobtainium")
 
         assert "No direct competitor data found" in result
-
 
 if __name__ == "__main__":
     # Manually running tests if executed as script

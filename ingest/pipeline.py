@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 
 from db.models import DocumentRow, IngestRunRow, OpportunityRow
 from ingest.models import Opportunity
+from ingest.quality import check_run, previous_full_run_seen
 from ingest.sources.base import SourceAdapter
 from ingest.storage import BlobStore, is_allowed_attachment, safe_key
 
@@ -29,6 +30,7 @@ class IngestStats:
     attachments_skipped: int = 0
     attachments_duplicate: int = 0
     errors: list[str] = field(default_factory=list)
+    quality_issues: list[dict] = field(default_factory=list)
 
 
 def _apply(
@@ -111,6 +113,7 @@ def run_ingest(
 ) -> IngestStats:
     stats = IngestStats()
     started = datetime.now(UTC)
+    prev = previous_full_run_seen(session, adapter.name)
     for o in adapter.iter_opportunities(limit=limit):
         stats.seen += 1
         try:
@@ -142,11 +145,22 @@ def run_ingest(
             stats.failed += 1
             stats.errors.append(f"{o.source}:{o.source_id}: {exc}")
             log.exception("failed to ingest %s:%s", o.source, o.source_id)
+    if limit is None:
+        stats.quality_issues = [
+            asdict(i)
+            for i in check_run(
+                session,
+                adapter.name,
+                seen=stats.seen,
+                failed=stats.failed,
+                previous_seen=prev,
+            )
+        ]
     session.add(
         IngestRunRow(
             started_at=started,
             ended_at=datetime.now(UTC),
-            stats={"source": adapter.name, **asdict(stats)},
+            stats={"source": adapter.name, "limit": limit, **asdict(stats)},
         )
     )
     session.commit()

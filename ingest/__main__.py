@@ -85,6 +85,13 @@ def run(
     )
     for e in stats.errors[:20]:
         typer.echo(f"error: {e}", err=True)
+    for issue in stats.quality_issues:
+        typer.echo(
+            f"quality {issue['severity']}: {issue['check']} - {issue['message']}",
+            err=True,
+        )
+    if any(i["severity"] == "error" for i in stats.quality_issues):
+        raise typer.Exit(code=1)
 
 
 @cli.command()
@@ -114,6 +121,13 @@ def replay(
     typer.echo(
         json.dumps({k: v for k, v in stats.__dict__.items() if k != "errors"}, indent=2)
     )
+    for issue in stats.quality_issues:
+        typer.echo(
+            f"quality {issue['severity']}: {issue['check']} - {issue['message']}",
+            err=True,
+        )
+    if any(i["severity"] == "error" for i in stats.quality_issues):
+        raise typer.Exit(code=1)
 
 
 @cli.command("seed-company")

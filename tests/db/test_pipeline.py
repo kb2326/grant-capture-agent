@@ -110,3 +110,18 @@ def test_one_bad_record_does_not_stop_the_run(db_session, tmp_path: Path):
     )
     assert stats.new == 2 and stats.failed == 0 and len(stats.errors) == 1
     assert "boom.pdf" in stats.errors[0]
+
+
+def test_full_run_records_quality_issues(db_session, tmp_path: Path):
+    stats = run_ingest(
+        FakeAdapter([]), db_session, LocalBlobStore(tmp_path), FakeFetch({})
+    )
+    assert any(
+        i["check"] == "Q1_empty" and i["severity"] == "error"
+        for i in stats.quality_issues
+    )
+    run = db_session.scalars(select(IngestRunRow)).one()
+    assert (
+        run.stats["quality_issues"][0]["check"] == "Q1_empty"
+        and run.stats["limit"] is None
+    )

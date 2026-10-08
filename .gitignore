@@ -367,3 +367,4 @@ reports/
 .terraform/
 *.tfstate*
 data/cache/
+tfplan

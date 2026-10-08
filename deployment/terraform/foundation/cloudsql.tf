@@ -40,10 +40,12 @@ resource "google_sql_database" "app" {
 }
 
 resource "google_sql_user" "app" {
-  count    = var.enable_cloudsql ? 1 : 0
-  name     = "grant_app"
-  instance = google_sql_database_instance.main[0].name
-  password = random_password.db_app.result
+  count = var.enable_cloudsql ? 1 : 0
+  # The role owns the schema; it is removed together with the instance.
+  deletion_policy = "ABANDON"
+  name            = "grant_app"
+  instance        = google_sql_database_instance.main[0].name
+  password        = random_password.db_app.result
 }
 
 resource "google_secret_manager_secret_version" "db_app_password" {

@@ -4,9 +4,11 @@ variable "ingest_image" {
 }
 
 resource "google_cloud_run_v2_job" "ingest" {
-  count    = var.enable_cloudsql ? 1 : 0
-  name     = "grant-capture-ingest"
-  location = var.region
+  count = var.enable_cloudsql ? 1 : 0
+  # Recreated on demand with the database; Terraform must be able to delete it.
+  deletion_protection = false
+  name                = "grant-capture-ingest"
+  location            = var.region
   template {
     task_count = 1
     template {

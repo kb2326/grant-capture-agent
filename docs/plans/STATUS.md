@@ -3,9 +3,10 @@
 *Updated 2026-10-07. Read this first in any new session (local or cloud).*
 
 ## Where we are
-- PRD, system design and the M0 plan are done: `docs/product/PRD.md`, `docs/design/system-design.md`, `docs/plans/2026-10-07-m0-foundation.md` (21 tasks).
-- **Next step: M0 Task 1** (scaffold with agents-cli), executed **native** (in-session, test-first, with a short explanation after each task), on branch `m0-foundation` from `main`.
-- No application code exists yet. `legacy/` holds the v0 prototype (read-only).
+- *Updated 2026-10-08.* M0 **Part A (local) complete**: Tasks 1–13 incl. 2b/7b/8b/8c on branch `m0-foundation` (draft PR #6, CI green, 53 tests). Progress ledger: `.superpowers/sdd/2026-10-07-m0-foundation/progress.md` (local, git-ignored).
+- Local data: 2,736 opportunities (Grants.gov 1,199; SAM.gov 1,537), 736 documents, raw zone in `data/blobs/` (git-ignored).
+- **Next: M0 Part B (Tasks 14–17, cloud)** — waits for the user's explicit "go cloud" (creates billable resources). Terraform files for Task 14 are drafted (untracked) in `deployment/terraform/foundation/` and `scripts/`.
+- After M0: final whole-branch review, merge PR #6, then M1 (Analyze).
 
 ## Decisions that aren't obvious from the code
 - Architecture is chosen by **ablation**: simple baseline vs. richer variant, decided by evals (system design §8.0, ADRs 0016–0018). Don't assume PEV or CRAG wins.

@@ -3,7 +3,7 @@
 import logging
 from collections.abc import Iterator
 from datetime import date, timedelta
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from urllib.parse import urlparse
 
 import httpx
@@ -17,6 +17,9 @@ from ingest.models import (
     infer_kind,
     parse_date,
 )
+
+if TYPE_CHECKING:
+    from ingest.raw import RawArchive
 
 log = logging.getLogger(__name__)
 
@@ -68,6 +71,7 @@ def map_sam_gov(r: dict[str, Any]) -> Opportunity:
 
 class SamGovAdapter:
     name = "sam_gov_api"
+    version = "sam_gov_api/1"
 
     def __init__(
         self,
@@ -77,10 +81,12 @@ class SamGovAdapter:
         request_budget: int,
         today: date | None = None,
         page_size: int = 1000,
+        archive: "RawArchive | None" = None,
     ) -> None:
         self.client, self.api_key, self.page_size = client, api_key, page_size
         self.request_budget, self.today = request_budget, today or date.today()
         self.requests_made, self.budget_exhausted = 0, False
+        self.archive = archive
 
     def _search(self, ptype: str, naics: str, offset: int) -> dict[str, Any] | None:
         if self.requests_made >= self.request_budget:
@@ -100,7 +106,12 @@ class SamGovAdapter:
             "limit": str(self.page_size),
             "offset": str(offset),
         }
-        return request_json(self.client, "GET", SAM_URL, params=params, max_attempts=2)
+        payload = request_json(
+            self.client, "GET", SAM_URL, params=params, max_attempts=2
+        )
+        if self.archive:
+            self.archive.put_json(f"search-{ptype}-{naics}-{offset}", payload)
+        return payload
 
     def iter_opportunities(self, limit: int | None = None) -> Iterator[Opportunity]:
         seen: set[str] = set()

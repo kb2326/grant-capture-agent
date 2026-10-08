@@ -71,6 +71,9 @@ class Opportunity(BaseModel):
     assistance_listings: list[str] = Field(default_factory=list)
     attachments: list[AttachmentRef] = Field(default_factory=list)
     custom_fields: dict[str, Any] = Field(default_factory=dict)
+    raw_uri: str | None = Field(
+        default=None, exclude=True
+    )  # provenance; not part of content
 
     def content_hash(self) -> str:
         payload = json.dumps(

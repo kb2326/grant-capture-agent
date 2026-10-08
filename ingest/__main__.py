@@ -2,6 +2,7 @@
 
 import json
 import logging
+from datetime import date
 from pathlib import Path
 
 import typer
@@ -13,6 +14,7 @@ from db.session import make_engine, make_session_factory
 from ingest.company import seed_company
 from ingest.http import build_client, download
 from ingest.pipeline import run_ingest
+from ingest.raw import RawArchive, ReplayAdapter, replay_grants_gov, replay_sam_bulk
 from ingest.sources.grants_gov import GrantsGovAdapter
 from ingest.sources.sam_gov import SamGovAdapter
 from ingest.sources.sam_gov_bulk import SamBulkAdapter
@@ -35,15 +37,19 @@ def run(
 ) -> None:
     logging.basicConfig(level=logging.INFO)
     s = get_settings()
+    store = blob_store_from_root(s.blob_root)
+    archive = RawArchive(store, source, date.today())
     with build_client() as client, _session() as session:
         if source == "grants_gov":
             if s.simpler_grants_api_key is None:
                 raise typer.BadParameter("SIMPLER_GRANTS_API_KEY is not set")
             adapter = GrantsGovAdapter(
-                client, s.simpler_grants_api_key.get_secret_value()
+                client, s.simpler_grants_api_key.get_secret_value(), archive=archive
             )
         elif source == "sam_gov":
-            adapter = SamBulkAdapter(client, cache_path=Path("data/cache/sam_full.csv"))
+            adapter = SamBulkAdapter(
+                client, cache_path=Path("data/cache/sam_full.csv"), archive=archive
+            )
         elif source == "sam_gov_api":
             if s.sam_api_key is None:
                 raise typer.BadParameter("SAM_API_KEY is not set")
@@ -51,6 +57,7 @@ def run(
                 client,
                 s.sam_api_key.get_secret_value(),
                 request_budget=s.sam_daily_request_budget,
+                archive=archive,
             )
         else:
             raise typer.BadParameter(f"unknown source {source!r}")
@@ -68,7 +75,7 @@ def run(
         stats = run_ingest(
             adapter,
             session,
-            blob_store_from_root(s.blob_root),
+            store,
             fetch,
             limit=limit,
             download_attachments=attachments,
@@ -78,6 +85,35 @@ def run(
     )
     for e in stats.errors[:20]:
         typer.echo(f"error: {e}", err=True)
+
+
+@cli.command()
+def replay(
+    source: str = typer.Option(..., help="grants_gov or sam_gov"),
+    day: str = typer.Option(..., "--date", help="YYYY-MM-DD of the archived run"),
+) -> None:
+    """Rebuild opportunities from the raw zone without calling any API."""
+    s = get_settings()
+    store = blob_store_from_root(s.blob_root)
+    archive = RawArchive(store, source, date.fromisoformat(day))
+    factories = {
+        "grants_gov": ("grants_gov/1", lambda: replay_grants_gov(archive)),
+        "sam_gov": ("sam_gov/1", lambda: replay_sam_bulk(archive)),
+    }
+    if source not in factories:
+        raise typer.BadParameter(f"unknown source {source!r}")
+    version, factory = factories[source]
+    with _session() as session:
+        stats = run_ingest(
+            ReplayAdapter(source, version, factory),
+            session,
+            store,
+            fetch=lambda url: None,
+            download_attachments=False,
+        )
+    typer.echo(
+        json.dumps({k: v for k, v in stats.__dict__.items() if k != "errors"}, indent=2)
+    )
 
 
 @cli.command("seed-company")

@@ -105,3 +105,9 @@ def test_parse_helpers_tolerate_messy_values():
         and parse_money("N/A") is None
         and parse_money(0) is None
     )
+
+
+def test_raw_uri_is_provenance_not_content():
+    with_uri = _opp(raw_uri="raw/api/x/2026-10-07/a.json")
+    assert with_uri.raw_uri == "raw/api/x/2026-10-07/a.json"
+    assert _opp().content_hash() == with_uri.content_hash()

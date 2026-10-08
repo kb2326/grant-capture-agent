@@ -28,6 +28,7 @@ def opp(source_id: str, title: str = "Grid storage", attachments=None) -> Opport
 
 class FakeAdapter:
     name = "grants_gov"
+    version = "fake/1"
 
     def __init__(self, opps: list[Opportunity]) -> None:
         self.opps = opps
@@ -72,6 +73,8 @@ def test_first_run_inserts_and_stores(db_session, tmp_path: Path):
     assert doc.parse_status == "pending" and doc.corpus == "solicitation"
     assert (tmp_path / "raw/grants_gov/1/a.pdf").read_bytes() == b"%PDF-a"
     assert db_session.scalar(select(func.count()).select_from(IngestRunRow)) == 1
+    row = db_session.scalars(select(OpportunityRow)).one()
+    assert row.adapter_version == "fake/1" and row.fetched_at is not None
 
 
 def test_rerun_is_idempotent_and_updates_in_place(db_session, tmp_path: Path):

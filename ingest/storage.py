@@ -44,6 +44,8 @@ def safe_key(source: str, source_id: str, file_name: str) -> str:
 class BlobStore(Protocol):
     def put(self, key: str, data: bytes) -> str: ...
     def exists(self, key: str) -> bool: ...
+    def get(self, key: str) -> bytes: ...
+    def list(self, prefix: str) -> list[str]: ...
 
 
 class LocalBlobStore:
@@ -65,6 +67,18 @@ class LocalBlobStore:
     def exists(self, key: str) -> bool:
         return self._path(key).exists()
 
+    def get(self, key: str) -> bytes:
+        return self._path(key).read_bytes()
+
+    def list(self, prefix: str) -> list[str]:
+        base = self._path(prefix.rsplit("/", 1)[0]) if "/" in prefix else self.root
+        if not base.exists():
+            return []
+        keys = (
+            f.relative_to(self.root).as_posix() for f in base.rglob("*") if f.is_file()
+        )
+        return sorted(k for k in keys if k.startswith(prefix))
+
 
 class GCSBlobStore:
     def __init__(self, bucket: str, client=None) -> None:
@@ -80,6 +94,14 @@ class GCSBlobStore:
 
     def exists(self, key: str) -> bool:
         return self._bucket.blob(key).exists()
+
+    def get(self, key: str) -> bytes:
+        return self._bucket.blob(key).download_as_bytes()
+
+    def list(self, prefix: str) -> list[str]:
+        return sorted(
+            b.name for b in self._client.list_blobs(self.bucket_name, prefix=prefix)
+        )
 
 
 def blob_store_from_root(root: str) -> BlobStore:

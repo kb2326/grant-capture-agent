@@ -2,7 +2,7 @@
 
 import time
 from collections.abc import Iterator
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import httpx
 
@@ -17,6 +17,9 @@ from ingest.models import (
     parse_date,
     parse_money,
 )
+
+if TYPE_CHECKING:
+    from ingest.raw import RawArchive
 
 GRANTS_BASE = "https://api.simpler.grants.gov"
 _STATUS = {
@@ -90,6 +93,7 @@ def map_grants_gov(d: dict[str, Any]) -> Opportunity:
 
 class GrantsGovAdapter:
     name = "grants_gov"
+    version = "grants_gov/1"
 
     def __init__(
         self,
@@ -99,11 +103,13 @@ class GrantsGovAdapter:
         min_interval_s: float = 1.1,
         sleep=time.sleep,
         clock=time.monotonic,
+        archive: "RawArchive | None" = None,
     ) -> None:
         self.client, self.page_size = client, page_size
         self.headers = {"X-API-Key": api_key, "Content-Type": "application/json"}
         self.min_interval_s, self._sleep, self._clock = min_interval_s, sleep, clock
         self._last: float | None = None
+        self.archive = archive
 
     def _call(self, method: str, url: str, **kwargs):
         # Simpler Grants allows 60 requests/minute per key; stay just under it.
@@ -130,11 +136,20 @@ class GrantsGovAdapter:
             payload = self._call(
                 "POST", f"{GRANTS_BASE}/v1/opportunities/search", json=body
             )
+            if self.archive:
+                self.archive.put_json(f"search-page-{page:04d}", payload)
             for item in payload.get("data") or []:
                 detail = self._call(
                     "GET", f"{GRANTS_BASE}/v1/opportunities/{item['opportunity_id']}"
                 )
-                yield map_grants_gov(detail["data"])
+                raw_key = (
+                    self.archive.put_json(f"detail-{item['opportunity_id']}", detail)
+                    if self.archive
+                    else None
+                )
+                yield map_grants_gov(detail["data"]).model_copy(
+                    update={"raw_uri": raw_key}
+                )
                 yielded += 1
                 if limit is not None and yielded >= limit:
                     return

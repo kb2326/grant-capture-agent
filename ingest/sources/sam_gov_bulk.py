@@ -8,6 +8,7 @@ from pathlib import Path
 import httpx
 
 from ingest.models import Opportunity, OppStatus, OppTimeline, infer_kind, parse_date
+from ingest.raw import SAM_CSV_NAME, RawArchive
 from ingest.sources.sam_gov import R_AND_D_NAICS
 
 csv.field_size_limit(10_000_000)  # descriptions can be very long
@@ -54,6 +55,7 @@ def map_sam_csv_row(r: dict[str, str]) -> Opportunity:
 
 class SamBulkAdapter:
     name = "sam_gov"
+    version = "sam_gov/1"
 
     def __init__(
         self,
@@ -63,14 +65,17 @@ class SamBulkAdapter:
         url: str = SAM_BULK_URL,
         max_age_hours: float = 20,
         naics: tuple[str, ...] = R_AND_D_NAICS,
+        archive: RawArchive | None = None,
     ) -> None:
         self.client, self.cache_path, self.url = client, cache_path, url
         self.max_age_s, self.naics = max_age_hours * 3600, frozenset(naics)
+        self.archive = archive
 
-    def _ensure_file(self) -> Path:
+    def _ensure_file(self) -> tuple[Path, bool]:
+        """Return the cached extract and whether it was freshly downloaded."""
         path = self.cache_path
         if path.exists() and time.time() - path.stat().st_mtime < self.max_age_s:
-            return path
+            return path, False
         path.parent.mkdir(parents=True, exist_ok=True)
         tmp = path.with_suffix(".part")
         with (
@@ -81,21 +86,30 @@ class SamBulkAdapter:
             for chunk in resp.iter_bytes():
                 fh.write(chunk)
         tmp.replace(path)
-        return path
+        return path, True
 
     def iter_opportunities(self, limit: int | None = None) -> Iterator[Opportunity]:
         yielded = 0
+        path, downloaded = self._ensure_file()
+        csv_key = None
+        if self.archive:
+            csv_key = self.archive.key(SAM_CSV_NAME)
+            if downloaded or not self.archive.store.exists(csv_key):
+                self.archive.put_bytes(SAM_CSV_NAME, path.read_bytes())
         # The extract is not strictly UTF-8; decode leniently so one bad byte can't stop the run.
-        with self._ensure_file().open(
-            encoding="utf-8", errors="replace", newline=""
-        ) as fh:
+        with path.open(encoding="utf-8", errors="replace", newline="") as fh:
             for row in csv.DictReader(fh):
                 if (
                     _get(row, "NaicsCode") not in self.naics
                     or _get(row, "BaseType") not in BASE_TYPES
                 ):
                     continue
-                yield map_sam_csv_row(row)
+                o = map_sam_csv_row(row)
+                yield (
+                    o.model_copy(update={"raw_uri": f"{csv_key}#{o.source_id}"})
+                    if csv_key
+                    else o
+                )
                 yielded += 1
                 if limit is not None and yielded >= limit:
                     return

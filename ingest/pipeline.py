@@ -31,7 +31,9 @@ class IngestStats:
     errors: list[str] = field(default_factory=list)
 
 
-def _apply(row: OpportunityRow, o: Opportunity, content_hash: str) -> None:
+def _apply(
+    row: OpportunityRow, o: Opportunity, content_hash: str, adapter_version: str
+) -> None:
     row.kind, row.title, row.agency = o.kind, o.title, o.agency
     row.summary, row.url, row.status = o.description, o.source_url, o.status.value
     row.posted_at, row.close_at = o.key_dates.post_date, o.key_dates.close_date
@@ -49,6 +51,9 @@ def _apply(row: OpportunityRow, o: Opportunity, content_hash: str) -> None:
     )
     row.raw = cg.model_dump(mode="json", by_alias=True, exclude_none=True)
     row.content_hash = content_hash
+    row.fetched_at = now
+    row.raw_uri = o.raw_uri
+    row.adapter_version = adapter_version
 
 
 def _store_attachments(
@@ -127,7 +132,7 @@ def run_ingest(
                 stats.new += 1
             else:
                 stats.updated += 1
-            _apply(row, o, content_hash)
+            _apply(row, o, content_hash, getattr(adapter, "version", "unknown"))
             session.flush()
             if download_attachments:
                 _store_attachments(session, row, o, store, fetch, stats)

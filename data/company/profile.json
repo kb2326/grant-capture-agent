@@ -1,0 +1,25 @@
+{
+  "name": "Lumen Grid Labs",
+  "synthetic": true,
+  "legal_form": "LLC",
+  "entity_type": "for_profit",
+  "employees": 32,
+  "us_ownership_pct": 100,
+  "foreign_affiliation": false,
+  "state": "CO",
+  "city": "Golden",
+  "sam_registered": true,
+  "uei": "LGLSYNTH0001",
+  "cage": "9SYN1",
+  "naics": ["541715", "335999", "541330"],
+  "sbir_awards": {"I": 2, "II": 0},
+  "founded": 2019,
+  "core_capabilities": [
+    "Solid-state battery management systems for grid storage",
+    "Wide-bandgap (SiC/GaN) power converters for inverters",
+    "Grid-forming inverter controls",
+    "Hardware-in-the-loop testing of power electronics",
+    "Battery degradation modeling"
+  ],
+  "preferences": {"exclude_agencies": [], "min_award_usd": 50000}
+}

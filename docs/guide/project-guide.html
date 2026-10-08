@@ -551,6 +551,12 @@ flowchart LR
       <tr><td colspan="2"><b>Expected total for M0</b></td><td class="num"><b>About $0.50–1</b></td></tr>
     </tbody>
   </table></div>
+  <div class="grid2">
+    <div class="panel"><h3>Why Docker on the laptop?</h3><p>Docker runs a real Postgres database with vector search in a container, the same one every time. Development and all 53 tests use it, and GitHub CI starts the same container. It's free, starts in seconds, and needs no cloud account, so tests never cost money or depend on the internet.</p></div>
+    <div class="panel"><h3>Why Terraform?</h3><p>Terraform describes the whole Google Cloud setup as code files. Instead of clicking through the console, you review a plan ("these 40 things will be created") and apply it. The same files can rebuild everything or delete it, which is how we delete the database between milestones to save money and recreate it in about 10 minutes.</p></div>
+    <div class="panel"><h3>Why the cloud now?</h3><p>Production runs in the cloud: agents on Agent Runtime, nightly ingestion as a Cloud Run Job, files in Cloud Storage, keys in Secret Manager, one limited identity per component. M0 sets up that foundation and proves the loader works there. M4 deploys the full product on it. It's also the material for your exam's deployment and security sections.</p></div>
+  </div>
+  <p class="small">Full reasoning: <code>docs/adr/0019-local-docker-terraform-cloud.md</code>.</p>
   <p class="small">Where the work happens: the database for tests runs in Docker on your laptop (free). Everything shared or deployed lives on Google Cloud and is written as Terraform code, so it can be rebuilt or torn down with one command.</p>
 </section>
 
@@ -651,6 +657,7 @@ flowchart LR
       <tr><td class="num">2026-10-06</td><td>Added the Solicitation agent (Analyze) and a hand-built RAG library shared by all agents.</td></tr>
       <tr><td class="num">2026-10-06</td><td>Fictional test company "Lumen Grid Labs" replaces BESI's real capability document.</td></tr>
       <tr><td class="num">2026-10-06</td><td>Stack: ADK 2.x, Gemini 3.x, Cloud SQL Postgres + pgvector, Docling, Agent Runtime (pending your review).</td></tr>
+      <tr><td class="num">2026-10-08</td><td>ADR-0019 written: Docker for local development, tests and CI; Terraform-managed Google Cloud for anything shared or deployed.</td></tr>
       <tr><td class="num">2026-10-08</td><td>M0 Part A complete: 2,736 opportunities and 736 documents loaded, 53 tests, CI green. 14 plan deviations recorded with reasons. Part B (cloud) waits for go-ahead.</td></tr>
       <tr><td class="num">2026-10-08</td><td>Company documents and ADRs written by parallel helper agents (cheaper model), verified by tests.</td></tr>
       <tr><td class="num">2026-10-07</td><td>Architecture choices inherited from v0 re-examined against current guidance. Discover: single pass vs. Plan-Execute-Verify, decided by ablation (ADR-0017). Analyze: whole-document long-context reading by default, chunking only for oversized packages (ADR-0016). Draft: long context vs. corrective RAG on an expanded ~80-document corpus (ADR-0018). Claude Code workspace added to M0 (Task 2b).</td></tr>

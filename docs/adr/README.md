@@ -20,3 +20,4 @@ An architecture decision record (ADR) is a short note that captures one signific
 | [0016](0016-analyze-long-context.md) | Analyze reads whole documents in long context | Accepted (decision method); outcome measured in M1 |
 | [0017](0017-discover-architecture-by-ablation.md) | Discover architecture chosen by ablation | Accepted (decision method); outcome measured in M2 |
 | [0018](0018-draft-architecture-by-ablation.md) | Draft architecture chosen by ablation | Accepted (decision method); outcome measured in M3 |
+| [0019](0019-local-docker-terraform-cloud.md) | Docker locally, Terraform-managed Google Cloud for anything shared or deployed | Accepted |

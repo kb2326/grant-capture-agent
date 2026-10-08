@@ -109,7 +109,7 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
   <p class="lede">An AI system that finds federal funding a small R&amp;D company can actually win, rules out the ones it is not allowed to win, and drafts the proposal from the company's own evidence. It is an open, measured take on the workflow commercial GovCon platforms sell, built on Google ADK and Google Cloud, and run the way an AI product team would run it.</p>
   <div class="meta">
     <span>Owner: Karthick Balaje (kb2326)</span>
-    <span>Current phase: M0 Part A (laptop) complete · Part B (cloud) next</span>
+    <span>Current phase: M0 complete · M1 Analyze next</span>
     <span>Last updated: 8 Oct 2026</span>
   </div>
 </header>
@@ -121,6 +121,7 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
     <li><a href="#status">Where we are</a></li>
     <li><a href="#built">What we've built</a></li>
     <li><a href="#next">Your next steps</a></li>
+    <li><a href="#deploy">Deployment, step by step</a></li>
     <li><a href="#why">Why this exists</a></li>
     <li><a href="#product">What we're building</a></li>
     <li><a href="#process">How a team runs it</a></li>
@@ -160,7 +161,7 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
 
 <section id="built">
   <header><span class="eyebrow">Section 01a</span><h2>What we've built so far</h2></header>
-  <p>M0 Part A, the part that runs on your laptop, is finished: 16 of 21 tasks, with 53 automated tests passing and CI green on GitHub (draft pull request #6). Here is each piece in plain terms.</p>
+  <p><b>M0 is finished</b>: all 21 tasks. Part A runs on your laptop; Part B put the same loader on Google Cloud and proved it works there. 54 automated tests pass and CI is green on GitHub (pull request #6). Here is each piece in plain terms.</p>
 
   <div class="tablewrap"><table>
     <thead><tr><th>Measured on real data (8 Oct 2026)</th><th>Result</th></tr></thead>
@@ -219,17 +220,17 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
   <header><span class="eyebrow">Section 01b</span><h2>Your next steps</h2></header>
   <p>Everything needed to start building is set up. The M0 plan now has 21 tasks, including a raw zone, provenance and quality checks. Here is what is done, what you do next, and what happens after that.</p>
   <div class="grid2">
-    <div class="panel"><span class="eyebrow">Done</span><h3>M0 Part A (laptop)</h3>
+    <div class="panel"><span class="eyebrow">Done</span><h3>M0 Foundation</h3>
       <ul class="tight">
-        <li>16 of 21 M0 tasks complete; 53 tests passing; CI green</li>
-        <li>2,736 real opportunities and 736 documents loaded locally</li>
-        <li>Branch <code>m0-foundation</code>, draft pull request #6</li>
+        <li>All 21 tasks; 54 tests; CI green; independent final review</li>
+        <li>Laptop: 2,736 opportunities, 736 documents</li>
+        <li>Cloud: foundation live, loader proven as a Cloud Run Job, database deleted to save cost</li>
       </ul></div>
-    <div class="panel"><span class="eyebrow">You</span><h3>What to do now</h3>
+    <div class="panel"><span class="eyebrow">You</span><h3>What to do next</h3>
       <ol class="tight">
-        <li>Read <b>What we've built so far</b> (above) and skim <code>docs/adr/</code> for the decisions.</li>
-        <li>Try it yourself: <code>uv run python -m ingest stats</code> and <code>agents-cli playground</code>.</li>
-        <li>When ready, reply <b>"go cloud"</b> for Part B: Terraform builds the Google Cloud setup, the loader runs once as a Cloud Run Job, then the cloud database is deleted. Expected cost: under $1.</li>
+        <li>Read <b>Deployment, step by step</b> (above), then look around the Cloud Console: Storage, Secret Manager, IAM, Artifact Registry.</li>
+        <li>Read <code>evals/LABELING.md</code>. M1 starts with you labeling about 30 real solicitations (2–3 hours).</li>
+        <li>Say <b>"start M1"</b> to begin the Analyze milestone.</li>
       </ol></div>
     <div class="panel"><span class="eyebrow">Then</span><h3>What happens after M0</h3>
       <ul class="tight">
@@ -238,6 +239,27 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
         <li><b>M3 Draft:</b> you time drafting with and without the system.</li>
         <li><b>M4 Ship:</b> live demo on Google Cloud, followed by the README results table, the LinkedIn post and the Medium article.</li>
       </ul></div>
+  </div>
+</section>
+
+<section id="deploy">
+  <header><span class="eyebrow">Section 01c</span><h2>Deployment, step by step</h2></header>
+  <p>What we did to put the loader on Google Cloud (M0 Part B), in the order we did it, with the idea behind each step. Reread this before M4, when the whole product gets deployed the same way.</p>
+  <ol class="steps">
+    <li><div><b>The big picture</b><span>Deploying means running code on machines you don't own, so it works when your laptop is off. Our code doesn't change; only its surroundings do: the database becomes Cloud SQL, the files folder becomes a Cloud Storage bucket, <code>.env</code> becomes Secret Manager, "runs as me" becomes a service account, and typing a command becomes a Cloud Run Job.</span></div></li>
+    <li><div><b>Google Cloud basics</b><span>A <b>project</b> holds everything and has one bill (ours: <code>grant-capture-agent</code>). A <b>budget</b> only alerts and never stops spending. Each product's <b>API</b> must be switched on first. A <b>region</b> is the data-center location (ours: <code>us-central1</code>). <b>Managed services</b> mean Google runs the machines.</span></div></li>
+    <li><div><b>Terraform's state bucket</b><span>Terraform keeps a record ("state") of what it created. Teams store it in a private, versioned bucket so it's shared and safe: <code>gs://grant-capture-agent-tfstate</code>.</span></div></li>
+    <li><div><b>init, plan, apply</b><span><code>init</code> downloads the Google plugin. <code>plan</code> lists exactly what would be created, changed or deleted, without doing it; we read it and checked for public access before applying. <code>apply</code> does exactly that plan. Result: 41 resources created.</span></div></li>
+    <li><div><b>Identity and permissions (IAM)</b><span>Four robot identities (service accounts): <code>gca-ingest</code>, <code>gca-agent</code>, <code>gca-api</code>, <code>gca-ci</code>. Each gets only what it needs (least privilege). GitHub signs in as <code>gca-ci</code> without any stored key (Workload Identity Federation), and only from this repository.</span></div></li>
+    <li><div><b>Secrets</b><span>The two API keys moved from <code>.env</code> into Secret Manager (encrypted, every read logged). The database password was generated by Terraform and stored there too; no human ever typed it.</span></div></li>
+    <li><div><b>The cloud database and migrations</b><span>The Cloud SQL Auth Proxy opened an encrypted tunnel using your login (no open network ports). One Alembic command built the identical schema in the cloud, the same reviewed migration file that built the laptop database.</span></div></li>
+    <li><div><b>Containers</b><span>A container image packages our code plus Python and every library into one sealed file. Cloud Build made it from our <code>Dockerfile.ingest</code> and stored it in Artifact Registry. <code>.env</code> and the 460 MB of local files were never uploaded.</span></div></li>
+    <li><div><b>The Cloud Run Job</b><span>Google started the container as <code>gca-ingest</code>, read the key from Secret Manager, wrote PDFs to Cloud Storage and rows to Cloud SQL, then shut down. Result: 500 grants processed, 0 failures, 226 documents. A nightly schedule exists but is paused until M2.</span></div></li>
+    <li><div><b>Cleaning up</b><span>Teardown hit two real safety features. Cloud Run Jobs are protected from deletion by default, and Postgres won't drop a user who owns tables. We fixed both in code, deleted the database, and set it off by default. <code>terraform plan</code> now says "No changes", so the cloud matches the code exactly.</span></div></li>
+  </ol>
+  <div class="grid2">
+    <div class="panel"><h3>What stays running (almost free)</h3><p>Buckets, secrets, service accounts, keyless GitHub sign-in and the stored container image cost cents a month. The database (about $0.25/day) is deleted.</p></div>
+    <div class="panel"><h3>Bringing the database back</h3><p><code>terraform apply -var enable_cloudsql=true</code>, about 10 minutes, then <code>alembic upgrade head</code> and re-run ingestion or replay the raw copies.</p></div>
   </div>
 </section>
 
@@ -276,7 +298,7 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
     <div class="phase"><span class="n">03</span><div><h3>Decision records (ADRs)</h3><p>One short file per big choice, with the options we turned down and why. Listed in the design; written in M0 Task 11. <code>docs/adr/</code></p></div><span class="pill todo">in M0</span></div>
     <div class="phase"><span class="n">04</span><div><h3>Evals first</h3><p>Decide what "correct" means and label test data before writing features. The harness and labeling guide come in M0; labeled sets in M1–M3. <code>evals/</code></p></div><span class="pill todo">in M0</span></div>
     <div class="phase"><span class="n">05</span><div><h3>Implementation plan</h3><p>Each milestone broken into small, testable tasks. M0 has 21 tasks. <code>docs/plans/2026-10-07-m0-foundation.md</code></p></div><span class="pill done">M0 done</span></div>
-    <div class="phase current"><span class="n">06</span><div><h3>Build</h3><p>Tests first, small pull requests, CI on every pull request. M0 Part A done (16/21 tasks); Part B (cloud) next.</p></div><span class="pill now">in progress</span></div>
+    <div class="phase current"><span class="n">06</span><div><h3>Build</h3><p>Tests first, small pull requests, CI on every pull request. M0 done; M1 next.</p></div><span class="pill now">in progress</span></div>
     <div class="phase"><span class="n">07</span><div><h3>Ship</h3><p>Deploy to Google Cloud with a demo UI, tracing, and an eval gate that blocks a bad release.</p></div><span class="pill todo">to do</span></div>
     <div class="phase"><span class="n">08</span><div><h3>Operate and report</h3><p>Eval report, cost report, and a write-up of what went wrong and what you'd change.</p></div><span class="pill todo">to do</span></div>
   </div>
@@ -583,7 +605,7 @@ flowchart LR
   <div class="tablewrap"><table>
     <thead><tr><th>Milestone</th><th>What gets built</th><th>What you learn</th><th>Status</th></tr></thead>
     <tbody>
-      <tr><td><b>M0 Foundation</b></td><td>Part A (laptop): scaffold, settings, Postgres schema, Grants.gov + SAM.gov ingestion, fake company documents, eval harness, ADRs, CI. Part B (cloud): Terraform, Cloud Storage, Secret Manager, Cloud SQL, service accounts, keyless GitHub sign-in, ingestion as a Cloud Run Job.</td><td>Data pipelines, schema design, Terraform, IAM, CI</td><td><span class="pill now">Part A done</span></td></tr>
+      <tr><td><b>M0 Foundation</b></td><td>Part A (laptop): scaffold, settings, Postgres schema, Grants.gov + SAM.gov ingestion, fake company documents, eval harness, ADRs, CI. Part B (cloud): Terraform, Cloud Storage, Secret Manager, Cloud SQL, service accounts, keyless GitHub sign-in, ingestion as a Cloud Run Job.</td><td>Data pipelines, schema design, Terraform, IAM, CI</td><td><span class="pill done">done</span></td></tr>
       <tr><td><b>M1 Analyze</b></td><td>Parsing and chunking, Solicitation agent, knockout rules, labeled set of 25+ solicitations</td><td>Document parsing, structured extraction, labeling, precision/recall</td><td><span class="pill todo">to do</span></td></tr>
       <tr><td><b>M2 Discover</b></td><td>Hybrid search, reranking, ADK 2 PEV workflow, approval step, timing benchmark</td><td>Retrieval engineering, agent graphs, human-in-the-loop</td><td><span class="pill todo">to do</span></td></tr>
       <tr><td><b>M3 Draft</b></td><td>Corrective RAG over company documents, faithfulness check, MCP server</td><td>CRAG, LLM judges, citation design, MCP</td><td><span class="pill todo">to do</span></td></tr>
@@ -657,6 +679,7 @@ flowchart LR
       <tr><td class="num">2026-10-06</td><td>Added the Solicitation agent (Analyze) and a hand-built RAG library shared by all agents.</td></tr>
       <tr><td class="num">2026-10-06</td><td>Fictional test company "Lumen Grid Labs" replaces BESI's real capability document.</td></tr>
       <tr><td class="num">2026-10-06</td><td>Stack: ADK 2.x, Gemini 3.x, Cloud SQL Postgres + pgvector, Docling, Agent Runtime (pending your review).</td></tr>
+      <tr><td class="num">2026-10-08</td><td>M0 Part B done: Terraform created 41 cloud resources; the loader ran as a Cloud Run Job (500 grants, 0 failures); teardown fixes added; Cloud SQL deleted and off by default. M0 complete.</td></tr>
       <tr><td class="num">2026-10-08</td><td>ADR-0019 written: Docker for local development, tests and CI; Terraform-managed Google Cloud for anything shared or deployed.</td></tr>
       <tr><td class="num">2026-10-08</td><td>M0 Part A complete: 2,736 opportunities and 736 documents loaded, 53 tests, CI green. 14 plan deviations recorded with reasons. Part B (cloud) waits for go-ahead.</td></tr>
       <tr><td class="num">2026-10-08</td><td>Company documents and ADRs written by parallel helper agents (cheaper model), verified by tests.</td></tr>

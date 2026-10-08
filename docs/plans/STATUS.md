@@ -3,10 +3,10 @@
 *Updated 2026-10-07. Read this first in any new session (local or cloud).*
 
 ## Where we are
-- *Updated 2026-10-08.* M0 **Part A (local) complete**: Tasks 1–13 incl. 2b/7b/8b/8c on branch `m0-foundation` (draft PR #6, CI green, 53 tests). Progress ledger: `.superpowers/sdd/2026-10-07-m0-foundation/progress.md` (local, git-ignored).
-- Local data: 2,736 opportunities (Grants.gov 1,199; SAM.gov 1,537), 736 documents, raw zone in `data/blobs/` (git-ignored).
-- **Next: M0 Part B (Tasks 14–17, cloud)** — waits for the user's explicit "go cloud" (creates billable resources). Terraform files for Task 14 are drafted (untracked) in `deployment/terraform/foundation/` and `scripts/`.
-- After M0: final whole-branch review, merge PR #6, then M1 (Analyze).
+- *Updated 2026-10-08.* **M0 complete** (Parts A + B) on branch `m0-foundation` (PR #6), pending final review and merge.
+- Local: 2,736 opportunities, 736 documents. Cloud: foundation live (buckets, secrets, Artifact Registry with `ingest:m0`, service accounts, WIF); the ingestion job ran once on Cloud SQL (487 opportunities, 226 documents, 0 failures); **Cloud SQL then deleted** (off by default).
+- **Next: M1 Analyze** — brainstorm → spec update → plan. Starts with you hand-labeling 30+ solicitations (evals/LABELING.md).
+- Deferred cleanups: ingestion job imports the agent package (harmless BigQuery warning); `uv run` rebuilds the project at container start.
 
 ## Decisions that aren't obvious from the code
 - Architecture is chosen by **ablation**: simple baseline vs. richer variant, decided by evals (system design §8.0, ADRs 0016–0018). Don't assume PEV or CRAG wins.

@@ -78,3 +78,10 @@ Ask the user: Option A (simple single-project) or Option B (full CI/CD pipeline 
 - Skills: `ingest-status` (data health), `eval-report` (run and explain evals).
 - Subagent: `data-quality-reviewer`. Run it after changing `ingest/` or `db/`, before opening a PR.
 - Each milestone PR also gets a code review and, before cloud/infra changes merge, a security review.
+
+## Cloud commands (M0 Part B)
+- Infra is Terraform in `deployment/terraform/foundation/` (state in `gs://grant-capture-agent-tfstate`). Always `terraform plan` and read it before `apply`.
+- Cloud SQL is OFF by default (`enable_cloudsql = false` in `terraform.tfvars`, ADR-0019). To use it: `terraform apply -var enable_cloudsql=true`; when done: `terraform apply` (back to false).
+- Tunnel to Cloud SQL: `bash scripts/cloudsql.sh proxy` (localhost:5434); password: `gcloud secrets versions access latest --secret db-app-password`.
+- Keys to Secret Manager: `bash scripts/secrets_put.sh` (never prints values).
+- Ingestion image: `gcloud builds submit --config cloudbuild.ingest.yaml --substitutions _IMAGE=<artifact_repo>/ingest:<tag> .`; run: `gcloud run jobs execute grant-capture-ingest --region us-central1 --wait`.

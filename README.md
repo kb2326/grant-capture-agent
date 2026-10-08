@@ -241,7 +241,7 @@ docs/         PRD, system design, ADRs, plans, reports, guide
 legacy/       v0 prototype (Nov–Dec 2025)
 ```
 
-*Directories are added milestone by milestone. Today the repo contains `docs/` and `legacy/`.*
+*Directories are added milestone by milestone; `rag/`, `mcp_server/`, `api/` and `web/` arrive in M1–M4.*
 
 ## Getting started
 
@@ -264,7 +264,7 @@ agents-cli playground           # chat with the agent locally
 
 ## Roadmap
 
-- [ ] **M0 Foundation:** scaffold, synthetic company data, Postgres schema, ingestion, CI, eval harness, ADRs
+- [x] **M0 Foundation:** scaffold, synthetic company data, Postgres schema, ingestion, CI, eval harness, ADRs
 - [ ] **M1 Analyze:** parsing and chunking, Solicitation agent, knockout rules, hand-labeled golden sets
 - [ ] **M2 Discover:** hybrid search + rerank, PEV workflow with approval, timing benchmark
 - [ ] **M3 Draft:** corrective RAG, calibrated grader, faithfulness check, MCP server

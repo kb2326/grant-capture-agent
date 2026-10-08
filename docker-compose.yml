@@ -1,0 +1,17 @@
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: grant
+      POSTGRES_PASSWORD: grant
+      POSTGRES_DB: grant_capture
+    ports: ["5433:5432"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U grant"]
+      interval: 5s
+      retries: 10
+volumes:
+  pgdata: {}

@@ -14,7 +14,7 @@ repos:
         types: [python]
       - id: codespell
         name: codespell
-        entry: uv run codespell --skip "uv.lock,*.json,legacy/*"
+        entry: uv run codespell
         language: system
         types: [text]
       - id: unit-tests

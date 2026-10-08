@@ -34,7 +34,7 @@ jobs:
         run: |
           uv run ruff check .
           uv run ruff format --check .
-          uv run codespell --skip "uv.lock,*.json,legacy/*"
+          uv run codespell
       - name: Type check
         run: uv run ty check app ingest db evals
       - name: Unit and database tests

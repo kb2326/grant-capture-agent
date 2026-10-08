@@ -366,3 +366,4 @@ data/blobs/
 reports/
 .terraform/
 *.tfstate*
+data/cache/

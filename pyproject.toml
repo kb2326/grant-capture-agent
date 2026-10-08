@@ -38,6 +38,7 @@ dev = [
     "nest-asyncio>=1.6.0,<2.0.0",
     "respx>=0.22",
     "pre-commit>=4.0",
+    "codespell>=2.3",
 ]
 
 [project.optional-dependencies]

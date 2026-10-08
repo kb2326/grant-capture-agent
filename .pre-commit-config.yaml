@@ -1,17 +1,22 @@
+# Hooks run the project's own pinned tools (uv.lock), so pre-commit and CI format identically.
 repos:
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.8.6
-    hooks:
-      - id: ruff
-        args: [--fix]
-      - id: ruff-format
-  - repo: https://github.com/codespell-project/codespell
-    rev: v2.3.0
-    hooks:
-      - id: codespell
-        args: [--skip, "uv.lock,*.json,legacy/*"]
   - repo: local
     hooks:
+      - id: ruff
+        name: ruff check
+        entry: uv run ruff check --fix
+        language: system
+        types: [python]
+      - id: ruff-format
+        name: ruff format
+        entry: uv run ruff format
+        language: system
+        types: [python]
+      - id: codespell
+        name: codespell
+        entry: uv run codespell --skip "uv.lock,*.json,legacy/*"
+        language: system
+        types: [text]
       - id: unit-tests
         name: unit tests
         entry: uv run pytest tests/unit -q

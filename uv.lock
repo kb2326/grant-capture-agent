@@ -1406,6 +1406,7 @@ lint = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "codespell" },
     { name = "nest-asyncio" },
     { name = "pre-commit" },
     { name = "pytest" },
@@ -1444,6 +1445,7 @@ provides-extras = ["eval", "lint"]
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "codespell", specifier = ">=2.3" },
     { name = "nest-asyncio", specifier = ">=1.6.0,<2.0.0" },
     { name = "pre-commit", specifier = ">=4.0" },
     { name = "pytest", specifier = ">=9.0.2,<10.0.0" },

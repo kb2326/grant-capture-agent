@@ -34,6 +34,9 @@ class Settings(BaseSettings):
     model_agent: str = "gemini-3.8-flash"
     model_grader: str = "gemini-3.5-flash-lite"
     model_drafter: str = "gemini-3.1-pro-preview"
+    model_labeler: str = (
+        "gemini-3.1-pro-preview"  # AI (silver) labels; must differ from model_agent
+    )
     model_embedding: str = "gemini-embedding-001"
     embedding_dim: int = 768
 
@@ -51,6 +54,8 @@ class Settings(BaseSettings):
         0.75  # gemini-3.8-flash, launch pricing through 2026-12-31
     )
     price_agent_output_per_m: float = 3.75
+    price_labeler_input_per_m: float = 2.0  # gemini-3.1-pro-preview
+    price_labeler_output_per_m: float = 12.0
 
     @model_validator(mode="after")
     def _secrets_from_secret_manager(self) -> "Settings":

@@ -31,7 +31,7 @@ M2 runs **cost-minimal**: it is a learning prototype, the whole milestone is bud
 | A7 | Three ablations | embeddings, rerank, B0 vs. B1: quality, p50/p95 latency, $ per request in `reports/m2/ablation.md` |
 | A8 | Decisions recorded | ADR-0017 outcome; ADR-0020 (embedding) written |
 | A9 | Approval step | ADK 2 workflow pauses at `approve_plan`; resumes with the approved or edited plan |
-| A10 | Analyze over A2A (local) | Analyze exposed with ADK `to_a2a`; Discover's V4 check calls it; test with the service down |
+| A10 | Analyze over A2A (local) | Analyze exposed with ADK `to_a2a`; V4 transport switch `direct`/`a2a`; tests show both give the same verdict and a down service gives `unchecked` |
 | A11 | Preferences | plan edits and rejected candidates become stored preferences that the next plan reads |
 | A12 | Spend | M2 Gemini spend ≤ $2, measured from Cloud Monitoring token counts |
 
@@ -97,7 +97,7 @@ Filters (applied in both CTEs): `kind IN`, `status IN` (default open, forecasted
 `Candidate.why` cites a passage of the card (opportunity text); `matched_chunks` stays empty in M2.
 
 ### 3.6 Verify rules (`app/rules/verify.py`)
-V1 status open/forecasted · V2 days to close ≥ `min_days_to_close` · V3 rerank score ≥ τ (τ tuned on the 5 dev queries; skipped when not reranked) · V4 no `INELIGIBLE` verdict for the company (cached verdict first; otherwise ask Analyze over A2A for at most 5 top candidates per request; if the service is down the candidate is marked `unchecked` and kept) · V5 no duplicate `source_id`. `K = 5`; every rejection records its `rule_id`.
+V1 status open/forecasted · V2 days to close ≥ `min_days_to_close` · V3 rerank score ≥ τ (τ tuned on the 5 dev queries; skipped when not reranked) · V4 no `INELIGIBLE` verdict for the company (cached verdict first; otherwise ask Analyze through `EligibilityChecker` for at most 5 top candidates per request; if the check fails or the service is down the candidate is marked `unchecked` and kept) · V5 no duplicate `source_id`. `K = 5`; every rejection records its `rule_id`.
 
 **V4 cost guard:** Analyze costs ≈ $0.04 per solicitation, so V4 is **off in evals** (it would measure Analyze, not Discover) and on in the workflow, capped at 5 calls per request.
 
@@ -112,8 +112,12 @@ V1 status open/forecasted · V2 days to close ≥ `min_days_to_close` · V3 rera
 - Written when the user edits a plan (removed agency → `exclude_agency`) or rejects a candidate with a reason; also loaded into ADK's `InMemoryMemoryService` so the agent can `load_memory` them in chat.
 - The planner prompt receives the current preferences; `exclude_agency` and `min_award_usd` are also applied as hard search filters.
 
-### 3.9 Analyze over A2A (local)
-`app/analyze/a2a_app.py` wraps the existing Analyze agent with `google.adk.a2a.utils.agent_to_a2a.to_a2a` and serves it with uvicorn on port 8001. `a2a_client.py` sends "analyze opportunity <id> for company <id>" and parses the returned verdict JSON. Timeout 120 s.
+### 3.9 Analyze over A2A (local), behind a switch
+V4 asks for verdicts through one interface, `EligibilityChecker.check(opportunity_id, company_id) -> verdict | "unchecked"`, with two transports chosen by `settings.discover_v4_transport`:
+- `direct` (default): calls `app.analyze.service.analyze_opportunity()` in-process.
+- `a2a`: `app/discover/a2a_client.py` sends the request to the Analyze A2A service and reads the verdict from the `analyze_opportunity` tool result carried in the returned A2A task. Timeout 120 s.
+
+`app/analyze/a2a_app.py` wraps the Analyze agent (an `LlmAgent` whose only tool is `analyze_opportunity`) with ADK's `to_a2a` and serves it with uvicorn on port 8001; its agent card is checked into `app/analyze/agent_card.json`. A test runs both transports against the same stubbed Analyze service and asserts the same verdict; another asserts that an unreachable service yields `unchecked`. The core workflow never requires the second server. Deploying the service on Agent Runtime is M4.
 
 ## 4. Query set and labels
 

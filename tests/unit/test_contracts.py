@@ -65,3 +65,44 @@ def test_out_of_range_doc_index_is_dropped_and_counted():
 
 def test_model_schema_has_no_uuid_fields():
     assert "uuid" not in str(ModelBrief.model_json_schema()).lower()
+
+
+def test_model_constraint_is_a_typed_object_gemini_can_fill():
+    schema = ModelBrief.model_json_schema()
+    constraint = schema["$defs"]["ModelConstraint"]
+    assert {
+        "allowed",
+        "max_employees",
+        "states",
+        "requires_prior_phase",
+        "min_pct",
+    } <= set(constraint["properties"])
+
+
+def test_to_brief_keeps_only_the_constraint_fields_the_model_set():
+    mb = ModelBrief.model_validate(
+        {
+            "eligibility": [
+                {
+                    "category": "size",
+                    "citation": {
+                        "doc": 1,
+                        "page": 1,
+                        "quote": "500 or fewer employees",
+                    },
+                    "constraint": {
+                        "max_employees": 500,
+                        "includes_affiliates": True,
+                        "states": None,
+                    },
+                }
+            ],
+        }
+    )
+    brief = to_brief(
+        mb, [D1], opportunity_id=OPP, variant="B0", model="m", prompt_version="v"
+    )
+    assert brief.eligibility[0].constraint == {
+        "max_employees": 500,
+        "includes_affiliates": True,
+    }

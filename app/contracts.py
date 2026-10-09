@@ -30,10 +30,26 @@ class ModelCitation(BaseModel):
     )
 
 
+class ModelConstraint(BaseModel):
+    """Every checkable field, all optional; set only the ones the clause states (rules validate per category)."""
+
+    allowed: list[str] | None = None
+    excluded: list[str] | None = None
+    max_employees: int | None = None
+    includes_affiliates: bool | None = None
+    min_us_ownership_pct: float | None = None
+    foreign_owned_allowed: bool | None = None
+    us_only: bool | None = None
+    states: list[str] | None = None
+    requires: list[str] | None = None
+    requires_prior_phase: str | None = None
+    min_pct: float | None = None
+
+
 class ModelClause(BaseModel):
     category: Category
     citation: ModelCitation
-    constraint: dict | None = None
+    constraint: ModelConstraint | None = None
 
 
 class ModelRequirement(BaseModel):
@@ -161,6 +177,10 @@ def to_brief(
                 dropped += 1
                 continue
             data = item.model_dump(exclude={"citation"})
+            if data.get("constraint") is not None:
+                data["constraint"] = {
+                    k: v for k, v in data["constraint"].items() if v is not None
+                } or None
             data["citation"] = Citation(
                 document_id=doc_ids[c.doc - 1], page=c.page, quote=c.quote
             )

@@ -27,6 +27,8 @@ Fields:
   program_phase → {"requires_prior_phase": "I" or "II"}
   cost_share → {"min_pct": number}
   other → null. Use null whenever you are unsure.
+  Emit one clause per rule. If one sentence states several rules (e.g. small business AND an employee limit),
+  return a separate clause for each, citing the same quote.
 - requirements: every statement of what the PROPOSER shall/must/will do or submit. Not the agency's obligations.
 - evaluation_criteria: each scoring criterion with its weight as written (or null).
 - required_sections: each section the proposal must contain, with its page limit if stated.

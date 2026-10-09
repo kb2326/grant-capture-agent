@@ -11,7 +11,7 @@
 
 An open, measured take on the grant-capture workflow that commercial GovCon platforms sell. It uses multi-agent workflows on **Google ADK**, a **hand-built hybrid RAG pipeline**, **deterministic eligibility rules**, and **evaluation gates in CI**, and runs on **Gemini Enterprise Agent Platform**.
 
-> **Status:** v1 is being built in public, milestone by milestone (see the [roadmap](#roadmap)). The first prototype is kept in [`legacy/`](legacy/). Every number in [Results](#results) will come from a reproducible eval. Until then it says *pending*.
+> **Status:** v1 is being built in public, milestone by milestone (see the [roadmap](#roadmap)). The first prototype is kept in [`legacy/`](legacy/). Every number in [Results](#results) comes from a reproducible eval; anything not yet measured says *pending*. M1 numbers are agreement with an independent AI labeler (a silver set), not human-verified accuracy.
 
 ---
 
@@ -189,13 +189,13 @@ flowchart LR
 
 | Metric | Target | Measured |
 |---|---|---|
-| Knockout recall / precision | ≥ 0.95 / ≥ 0.85 | *pending (M1)* |
-| Requirement extraction recall | ≥ 0.85 | *pending (M1)* |
+| Knockout recall / precision | ≥ 0.95 / ≥ 0.85 | **1.00 / 0.91** on 40 solicitations (10 knockouts) · AI-labeled silver set |
+| Requirement extraction recall | ≥ 0.85 | **0.15** whole-document; **0.69** page windows (n=7) · not met, see [ADR-0016](docs/adr/0016-analyze-long-context.md) |
 | Discover precision@10 | ≥ 0.70 | *pending (M2)* |
 | Time to qualified shortlist vs. manual | ≥ 50% faster | *pending (M2)* |
 | Draft context relevance / faithfulness | ≥ 0.60 / ≥ 0.90 | *pending (M3)* |
 | Time to first draft vs. manual | ≥ 40% faster | *pending (M3)* |
-| Cost per full run · p95 latency | < $0.25 · < 90 s | *pending (M4)* |
+| Cost per full run · p95 latency | < $0.25 · < 90 s | Analyze alone: $0.04 · p50 61 s, p95 561 s · full run *pending (M4)* |
 
 ---
 
@@ -265,7 +265,7 @@ agents-cli playground           # chat with the agent locally
 ## Roadmap
 
 - [x] **M0 Foundation:** scaffold, synthetic company data, Postgres schema, ingestion, CI, eval harness, ADRs
-- [ ] **M1 Analyze:** parsing and chunking, Solicitation agent, knockout rules, hand-labeled golden sets
+- [x] **M1 Analyze:** page-tagged text layer, brief extraction (whole-document vs. page-window ablation), quote verification, knockout rules E0–E7, AI-labeled silver set ([report](reports/m1/ablation.md))
 - [ ] **M2 Discover:** hybrid search + rerank, PEV workflow with approval, timing benchmark
 - [ ] **M3 Draft:** corrective RAG, calibrated grader, faithfulness check, MCP server
 - [ ] **M4 Ship:** Agent Runtime + Cloud Run, Terraform, tracing, CI eval gate, red team, eval report

@@ -7,7 +7,7 @@ An architecture decision record (ADR) is a short note that captures one signific
 | [0001](0001-rebuild-from-scratch.md) | Rebuild from scratch | Accepted |
 | [0002](0002-adk-2-workflow-graphs.md) | ADK 2 workflow graphs | Accepted |
 | [0003](0003-postgres-pgvector.md) | Postgres + pgvector | Accepted |
-| [0004](0004-docling-for-parsing.md) | Docling for parsing | Accepted |
+| [0004](0004-document-parsing.md) | Document parsing: Gemini reads PDFs natively; pypdf/HTML/DOCX text layer for quote checks (revised M1) | Accepted |
 | [0005](0005-embeddings.md) | Embeddings | Accepted |
 | [0006](0006-llm-extracts-rules-decide.md) | LLM extracts, rules decide | Accepted |
 | [0007](0007-offline-index-live-fallback.md) | Offline index + live fallback | Accepted |

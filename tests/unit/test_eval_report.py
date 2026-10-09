@@ -20,6 +20,23 @@ def test_report_files_and_pass_logic(tmp_path: Path):
     )
 
 
-def test_smoke_run_with_no_suites_writes_empty_report(tmp_path: Path):
+def test_smoke_run_exits_zero_and_writes_report(tmp_path: Path):
     assert main(["--suite", "smoke", "--out", str(tmp_path)]) == 0
     assert list(tmp_path.glob("*.json")) and list(tmp_path.glob("*.md"))
+
+
+def test_smoke_runs_the_offline_analyze_suite(tmp_path):
+    from evals.run import SMOKE
+
+    assert "analyze_smoke" in SMOKE
+    assert main(["--suite", "smoke", "--out", str(tmp_path)]) == 0
+    assert "analyze_smoke" in next(tmp_path.glob("*.md")).read_text(encoding="utf-8")
+
+
+def test_labeling_page_escapes_every_interpolated_value():
+    import re
+
+    html = Path("evals/label_ui.html").read_text(encoding="utf-8")
+    raw = [m for m in re.findall(r"\$\{([^}]*)\}", html) if not m.startswith("esc(")]
+    assert raw == [], f"unescaped interpolations: {raw}"
+    assert "function esc(" in html and "safeUrl(" in html

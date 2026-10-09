@@ -472,7 +472,7 @@ These capabilities make the system behave like a governed enterprise deployment 
 | 0001 | Rebuild from scratch; keep v0 in `legacy/` | Incremental refactor of v0 |
 | 0002 | Google ADK 2 workflow graphs | LangGraph; ADK 1 `LoopAgent` |
 | 0003 | Cloud SQL Postgres + pgvector for metadata, full-text and vectors | AlloyDB; Vertex AI Vector Search; RAG Engine |
-| 0004 | Docling for parsing | Document AI Layout Parser |
+| 0004 | Gemini reads PDFs natively; pypdf + HTML/DOCX text layer verifies quotes (revised M1) | Docling everywhere; Document AI Layout Parser |
 | 0005 | gemini-embedding-001 at 768 dimensions (embedding-2 retried in M2) | Full 3072 dimensions; text-embedding-005 |
 | 0006 | LLM extracts, rules decide eligibility | LLM-judged eligibility |
 | 0007 | Offline index with live API fallback | Live API calls per query (v0) |

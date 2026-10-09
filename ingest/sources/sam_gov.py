@@ -151,6 +151,46 @@ class SamGovAdapter:
             self.archive.put_json(f"search-{ptype}-{naics}-{offset}", payload)
         return payload
 
+    def fetch_notice(
+        self, notice_id: str, posted_at: date | None = None
+    ) -> dict | None:
+        """One notice by ID (one budgeted request). None if the budget is spent or the call fails.
+
+        The API requires a posted-date range; searching a day either side of the notice's own posted
+        date finds notices that are older than a year (long-running BAAs)."""
+        if self.budget_exhausted or self.requests_made >= self.request_budget:
+            self.budget_exhausted = True
+            return None
+        self.requests_made += 1
+        if self.quota:
+            self.quota.record(self.requests_made)
+        params = {
+            "api_key": self.api_key,
+            "noticeid": notice_id,
+            "limit": "1",
+            "offset": "0",
+            "postedFrom": (
+                posted_at - timedelta(days=1)
+                if posted_at
+                else self.today - timedelta(days=364)
+            ).strftime("%m/%d/%Y"),
+            "postedTo": (
+                posted_at + timedelta(days=1) if posted_at else self.today
+            ).strftime("%m/%d/%Y"),
+        }
+        try:
+            payload = request_json(
+                self.client, "GET", SAM_URL, params=params, max_attempts=1
+            )
+        except (httpx.HTTPError, RetryableHTTPError) as exc:
+            log.warning("SAM.gov notice lookup failed (%s)", _describe(exc))
+            self.budget_exhausted = True
+            return None
+        if self.archive:
+            self.archive.put_json(f"notice-{notice_id}", payload)
+        records = payload.get("opportunitiesData") or []
+        return records[0] if records else None
+
     def iter_opportunities(self, limit: int | None = None) -> Iterator[Opportunity]:
         seen: set[str] = set()
         for ptype in NOTICE_TYPES:

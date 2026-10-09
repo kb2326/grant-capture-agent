@@ -27,6 +27,12 @@ dependencies = [
     "google-cloud-storage>=2.19",
     "google-cloud-secret-manager>=2.22",
     "common-grants-sdk>=0.8.1",
+    "pypdf>=5.0",
+    "beautifulsoup4>=4.12",
+    "markdownify>=0.13",
+    "python-docx>=1.1",
+    "fastapi>=0.115",
+    "uvicorn>=0.30",
 ]
 requires-python = ">=3.11,<3.14"
 
@@ -39,6 +45,7 @@ dev = [
     "respx>=0.22",
     "pre-commit>=4.0",
     "codespell>=2.3",
+    "fpdf2>=2.8",
 ]
 
 [project.optional-dependencies]
@@ -96,7 +103,7 @@ deprecated = "ignore"
 
 [tool.codespell]
 ignore-words-list = "rouge,opps,unparseable"
-skip = "./locust_env/*,uv.lock,.venv,./frontend,**/package-lock.json,*.json,./legacy/*,legacy/*,./data/cache/*,./reports/*"
+skip = "./locust_env/*,uv.lock,.venv,./frontend,**/package-lock.json,*.json,./legacy/*,legacy/*,./data/cache/*,./reports/*,*.jsonl"
 
 
 [build-system]

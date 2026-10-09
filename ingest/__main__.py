@@ -3,6 +3,7 @@
 import json
 from datetime import date
 from pathlib import Path
+from typing import Annotated
 
 import typer
 from sqlalchemy import func, select
@@ -159,6 +160,70 @@ def stats() -> None:
         typer.echo(
             f"last run: {last.started_at:%Y-%m-%d %H:%M} {last.stats.get('source')}"
         )
+
+
+@cli.command()
+def parse(
+    limit: int | None = typer.Option(None), opportunity: str | None = typer.Option(None)
+) -> None:
+    """Build the page-tagged text layer for pending documents."""
+    import uuid as _uuid
+
+    from ingest.parsing import parse_documents
+    from ingest.storage import read_uri
+
+    with _session() as session:
+        stats = parse_documents(
+            session,
+            read_uri,
+            limit=limit,
+            opportunity_id=_uuid.UUID(opportunity) if opportunity else None,
+        )
+    typer.echo(json.dumps(stats, indent=2))
+
+
+@cli.command("sam-attachments")
+def sam_attachments(
+    notice: Annotated[list[str], typer.Option(help="SAM notice IDs (repeatable)")],
+) -> None:
+    """Fetch attachments for specific SAM.gov notices (uses the daily API quota)."""
+    configure_logging()
+    s = get_settings()
+    if s.sam_api_key is None:
+        raise typer.BadParameter("SAM_API_KEY is not set")
+    store = blob_store_from_root(s.blob_root)
+    from ingest.sam_attachments import attach_sam_documents
+
+    with build_client() as client, _session() as session:
+        adapter = SamGovAdapter(
+            client,
+            s.sam_api_key.get_secret_value(),
+            request_budget=s.sam_daily_request_budget,
+            quota=SamQuota(store, date.today()),
+            archive=RawArchive(store, "sam_gov_api", date.today()),
+        )
+        stats = attach_sam_documents(
+            session, adapter, client, store, notice, max_bytes=s.max_attachment_bytes
+        )
+    typer.echo(json.dumps(stats, indent=2))
+
+
+@cli.command("store-descriptions")
+def store_descriptions_cmd(
+    manifest: Path = Path("evals/data/golden/m1_sample.json"),
+) -> None:
+    """Store each SAM.gov sample notice's description as a document (no API calls)."""
+    import uuid
+
+    from ingest.descriptions import store_descriptions
+
+    items = json.loads(manifest.read_text(encoding="utf-8"))["items"]
+    ids = [uuid.UUID(i["opportunity_id"]) for i in items if i["source"] == "sam_gov"]
+    with _session() as session:
+        stats = store_descriptions(
+            session, blob_store_from_root(get_settings().blob_root), ids
+        )
+    typer.echo(json.dumps(stats, indent=2))
 
 
 if __name__ == "__main__":

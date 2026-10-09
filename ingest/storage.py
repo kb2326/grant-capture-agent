@@ -17,9 +17,13 @@ _ALLOWED_SUFFIXES = frozenset({".pdf", ".docx", ".doc", ".html", ".htm", ".txt"}
 _UNSAFE = re.compile(r"[^A-Za-z0-9._-]+")
 
 
+_GENERIC_MIME = frozenset({"", "application/octet-stream", "binary/octet-stream"})
+
+
 def is_allowed_attachment(mime: str | None, file_name: str) -> bool:
-    if mime:
-        return mime.split(";")[0].strip().lower() in ALLOWED_MIME_TYPES
+    m = (mime or "").split(";")[0].strip().lower()
+    if m and m not in _GENERIC_MIME:
+        return m in ALLOWED_MIME_TYPES
     return PurePosixPath(file_name.lower()).suffix in _ALLOWED_SUFFIXES
 
 
@@ -108,3 +112,18 @@ def blob_store_from_root(root: str) -> BlobStore:
     if root.startswith("gs://"):
         return GCSBlobStore(root.removeprefix("gs://").split("/", 1)[0])
     return LocalBlobStore(Path(root))
+
+
+def read_uri(uri: str) -> bytes:
+    """Read a stored blob by the URI recorded in documents.gcs_uri."""
+    from urllib.parse import urlparse
+    from urllib.request import url2pathname
+
+    if uri.startswith("gs://"):
+        from google.cloud import storage
+
+        bucket, _, key = uri.removeprefix("gs://").partition("/")
+        return storage.Client().bucket(bucket).blob(key).download_as_bytes()
+    if uri.startswith("file:"):
+        return Path(url2pathname(urlparse(uri).path)).read_bytes()
+    return Path(uri).read_bytes()

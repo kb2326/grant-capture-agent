@@ -1,0 +1,296 @@
+{
+  "seed": 20261009,
+  "created": "2026-10-09T07:51:02.959936+00:00",
+  "terms": [
+    "nonprofit",
+    "non-profit",
+    "institutions of higher education",
+    "state governments",
+    "tribal",
+    "phase ii",
+    "cost share",
+    "cost-share"
+  ],
+  "items": [
+    {
+      "opportunity_id": "f224034d-3f86-4d29-9786-43f7cd2c3143",
+      "source": "grants_gov",
+      "agency": "Department of Agriculture / National Institute of Food and Agriculture",
+      "title": "Hispanic-Serving Institutions Education Grants Program",
+      "requirements": false
+    },
+    {
+      "opportunity_id": "da86fea7-77c8-4fe7-9280-249f095a024c",
+      "source": "grants_gov",
+      "agency": "Department of Defense / Defense Health Agency Contracting Activity - DHACA",
+      "title": "DoW Traumatic Brain Injury and Psychological Health, Clinical Trial Award",
+      "requirements": true
+    },
+    {
+      "opportunity_id": "17c9cc18-2eac-4e29-8009-b2f148558a6d",
+      "source": "grants_gov",
+      "agency": "Department of Commerce / Economic Development Administration",
+      "title": "EDA FY25 Disaster Supplemental",
+      "requirements": true
+    },
+    {
+      "opportunity_id": "7105a507-3508-4945-9cb8-6aac9e9bdcc8",
+      "source": "sam_gov",
+      "agency": "HEALTH AND HUMAN SERVICES, DEPARTMENT OF > NATIONAL INSTITUTES OF HEALTH > NATIONAL INSTITUTES OF HEALTH OLAO",
+      "title": "NIMH: Procurement of Multishank neural recording p",
+      "requirements": false
+    },
+    {
+      "opportunity_id": "d4dd8315-f23f-4c71-b043-b126d56fa457",
+      "source": "grants_gov",
+      "agency": "Department of Health and Human Services / National Institutes of Health",
+      "title": "HEAL Initiative: Non-addictive Analgesic Therapeutics Development [Small Molecules and Biologics] to Treat Pain (UG3/UH3 Clinical Trial Optional)",
+      "requirements": false
+    },
+    {
+      "opportunity_id": "2952a87b-6c5b-4728-bf69-3d80874817db",
+      "source": "sam_gov",
+      "agency": "DEPT OF DEFENSE > DEPT OF THE AIR FORCE > FA2377 USAF AFMC AFRL PZL AFRL RYKS",
+      "title": "Autonomous Decisions, Algorithms, and Modeling (ADAM)",
+      "requirements": false
+    },
+    {
+      "opportunity_id": "5c2ff7d2-a739-4197-8667-d9481ee1aa83",
+      "source": "grants_gov",
+      "agency": "Department of Defense / Defense Health Agency Contracting Activity - DHACA",
+      "title": "DoW Rare Cancers Idea Development Award",
+      "requirements": true
+    },
+    {
+      "opportunity_id": "9cafd07a-91f3-44ab-b6d7-0668a4f76fd6",
+      "source": "sam_gov",
+      "agency": "DEPT OF DEFENSE > DEPT OF THE ARMY > W6QK ACC-APG DURHAM",
+      "title": "DEVCOM ANALYSIS CENTER BROAD AGENCY ANNOUNCEMENT FOR APPLIED RESEARCH",
+      "requirements": false
+    },
+    {
+      "opportunity_id": "2ed3ef18-1d33-4984-aefb-8e582d92350e",
+      "source": "grants_gov",
+      "agency": "Department of Defense / Defense Threat Reduction Agency",
+      "title": "Fundamental Research to Counter Weapons of Mass Destruction",
+      "requirements": false
+    },
+    {
+      "opportunity_id": "c02dbab4-8efe-4d89-81ca-9b3ea7e6ae31",
+      "source": "sam_gov",
+      "agency": "DEPT OF DEFENSE > DEPT OF THE AIR FORCE > FA9453  AFRL RVK",
+      "title": "Space Technology Advanced Research (STAR)",
+      "requirements": false
+    },
+    {
+      "opportunity_id": "7d9d62d4-7731-45fe-b1c3-612f86268c03",
+      "source": "grants_gov",
+      "agency": "Department of Health and Human Services / National Institutes of Health",
+      "title": "Diabetes Research Centers (P30 Clinical Trial Optional)",
+      "requirements": false
+    },
+    {
+      "opportunity_id": "0ddb2f62-68bd-4623-925c-f9f0e27c4bfe",
+      "source": "grants_gov",
+      "agency": "Department of State / Bureau of African Affairs",
+      "title": "U.S.-Africa Strategic Investment Program",
+      "requirements": false
+    },
+    {
+      "opportunity_id": "860575ad-9ad9-46bb-8af9-98a727dd5215",
+      "source": "sam_gov",
+      "agency": "DEPT OF DEFENSE > NATIONAL GEOSPATIAL-INTELLIGENCE AGENCY (NGA) > ATTN: MS S84 - OCS",
+      "title": "NGA - Boosting Innovative GEOINT - Science & Technology Broad Agency Announcement (BIG-ST BAA)",
+      "requirements": false
+    },
+    {
+      "opportunity_id": "4621dc19-cbc0-4d6d-99ab-c91f1ebd85ea",
+      "source": "grants_gov",
+      "agency": "Department of Health and Human Services / Food and Drug Administration",
+      "title": "Reissue of RFA-FD-23-001- Clinical Studies of Orphan Products Addressing Unmet Needs of Rare Diseases (R01 Clinical Trials Required)",
+      "requirements": true
+    },
+    {
+      "opportunity_id": "fe1a7607-61ea-4bd6-9dda-d364ebc786ad",
+      "source": "grants_gov",
+      "agency": "Department of Agriculture / Forest Service",
+      "title": "Great Lakes Restoration Initiative: Community Forest and Open Space Conservation Program",
+      "requirements": false
+    },
+    {
+      "opportunity_id": "207e68c3-8a8a-4c59-b956-b08fb3b7135b",
+      "source": "sam_gov",
+      "agency": "DEPT OF DEFENSE > DEFENSE ADVANCED RESEARCH PROJECTS AGENCY  (DARPA) > DEF ADVANCED RESEARCH PROJECTS AGCY",
+      "title": "Precision Inertial Navigation & Positioning On an Integrated Tesseract (PINPOINT)",
+      "requirements": false
+    },
+    {
+      "opportunity_id": "cf3ae52e-bfb8-4caf-8aef-d5ad8b206a1c",
+      "source": "grants_gov",
+      "agency": "Department of the Interior / National Park Service",
+      "title": "Readiness and Recreation Initiative (RARI) \u2013 Recurring 5 Year Notice",
+      "requirements": false
+    },
+    {
+      "opportunity_id": "2ba39536-238c-4ce8-a0fb-d2a9f7dde126",
+      "source": "sam_gov",
+      "agency": "DEPT OF DEFENSE > DEPT OF THE AIR FORCE > FA8750  AFRL RIK",
+      "title": "Automated Processes for Knowledge Discovery and Information Retrieval",
+      "requirements": false
+    },
+    {
+      "opportunity_id": "a47d4ef1-93ba-4245-a9f7-5d492ae50fc4",
+      "source": "grants_gov",
+      "agency": "Department of State / Office to Monitor-Combat Trafficking in Persons",
+      "title": "Notice of Intent:  Program to End Modern Slavery FY 2025",
+      "requirements": false
+    },
+    {
+      "opportunity_id": "d44a6fc5-41b6-49ac-9951-405f484dd26c",
+      "source": "sam_gov",
+      "agency": "DEPT OF DEFENSE > DEPT OF THE AIR FORCE > FA8750  AFRL RIK",
+      "title": "Multi-Domain Force Applications and Traffic Management for Unmanned Aircraft Systems (M-FAT)",
+      "requirements": false
+    },
+    {
+      "opportunity_id": "0cfba8c8-05ac-431b-a107-1b0a3be9e39b",
+      "source": "grants_gov",
+      "agency": "Department of State / U.S. Mission to Tunisia",
+      "title": "Annual Program Statement (APS) For Fiscal Year 2026",
+      "requirements": false
+    },
+    {
+      "opportunity_id": "49e90f41-b246-4234-9019-0dc1a41dfc6b",
+      "source": "grants_gov",
+      "agency": "Department of Housing and Urban Development",
+      "title": "Fair Housing Initiatives Program - Education and Outreach Initiative",
+      "requirements": false
+    },
+    {
+      "opportunity_id": "5146d048-dd25-49eb-adef-0354f7e2aa3c",
+      "source": "grants_gov",
+      "agency": "Department of Health and Human Services / National Institutes of Health",
+      "title": "Discovery of the Genetic Basis of Childhood Cancers and of Congenital Anomalies: Gabriella Miller Kids First Pediatric Research Program (X01 Clinical Trial Not Allowed)",
+      "requirements": true
+    },
+    {
+      "opportunity_id": "26c041db-2529-4d14-89cb-bb10e3689a63",
+      "source": "grants_gov",
+      "agency": "Department of Defense / Defense Health Agency Contracting Activity - DHACA",
+      "title": "DoW Vision, Clinical Trial Award",
+      "requirements": false
+    },
+    {
+      "opportunity_id": "5faae3ed-996c-469b-af5a-205d698fd693",
+      "source": "grants_gov",
+      "agency": "Department of the Interior / Fish and Wildlife Service",
+      "title": "F26AS00030 Cooperative Endangered Species Conservation Fund: Recovery Land Acquisition Grant Program",
+      "requirements": true
+    },
+    {
+      "opportunity_id": "13d9f633-0d5a-4001-84bb-c7b095927d44",
+      "source": "sam_gov",
+      "agency": "DEPT OF DEFENSE > DEPT OF THE ARMY > W4LD USA HECSA",
+      "title": "Strategic Environmental Research and Development Program (SERDP) \ufffd Open Topics Broad Agency Announcement (BAA)",
+      "requirements": false
+    },
+    {
+      "opportunity_id": "ae54c5a5-70e5-446f-8d1a-f1d47558e659",
+      "source": "grants_gov",
+      "agency": "Department of the Interior / Bureau of Reclamation",
+      "title": "Native American Affairs: Fiscal Year 2025 Colorado River Basin Tribal Drought Resiliency Program",
+      "requirements": false
+    },
+    {
+      "opportunity_id": "7eab5f76-65b3-4ec3-a16c-4d425bf3a80a",
+      "source": "grants_gov",
+      "agency": "Department of the Interior / National Park Service",
+      "title": "Exploring and Enhancing Outdoor and Heritage Tourism in the Chesapeake Bay Watershed",
+      "requirements": false
+    },
+    {
+      "opportunity_id": "1fbb63bd-bd86-45ab-8d55-ec7c33e1c903",
+      "source": "grants_gov",
+      "agency": "Department of Agriculture / Forest Service",
+      "title": "Community Forest and Open Space Conservation Program",
+      "requirements": true
+    },
+    {
+      "opportunity_id": "646ee398-a80d-4e63-83f4-966291581ebf",
+      "source": "grants_gov",
+      "agency": "Department of Defense / Dept of the Army -- Materiel Command",
+      "title": "Staff Research Program",
+      "requirements": false
+    },
+    {
+      "opportunity_id": "cbcba794-a028-473f-96c0-a69f10fd4ba7",
+      "source": "grants_gov",
+      "agency": "Department of the Interior / Bureau of Reclamation",
+      "title": "Title XVI Water Reclamation and Reuse Projects",
+      "requirements": false
+    },
+    {
+      "opportunity_id": "eb1deb90-7817-40d7-ba8a-83dca4e16784",
+      "source": "grants_gov",
+      "agency": "Department of Agriculture / National Institute of Food and Agriculture",
+      "title": "Tribal Colleges Extension Program Special Emphasis",
+      "requirements": false
+    },
+    {
+      "opportunity_id": "1366f7c9-bff4-4f70-9e8d-b2cd266b2f85",
+      "source": "sam_gov",
+      "agency": "DEPT OF DEFENSE > DEPT OF THE AIR FORCE > FA8750  AFRL RIK",
+      "title": "ADAPTIVE FUSION, & REASONING OF MULTI-SOURCE DATA (AFAR)",
+      "requirements": false
+    },
+    {
+      "opportunity_id": "3e17dda9-06e1-4e7b-bd78-766070dd0aac",
+      "source": "sam_gov",
+      "agency": "DEPT OF DEFENSE > DEFENSE ADVANCED RESEARCH PROJECTS AGENCY  (DARPA) > DEF ADVANCED RESEARCH PROJECTS AGCY",
+      "title": "Information Processing Techniques Office Office-Wide",
+      "requirements": false
+    },
+    {
+      "opportunity_id": "04201230-76ac-4de4-853e-36e4cb91c422",
+      "source": "grants_gov",
+      "agency": "Department of Defense / Defense Health Agency Contracting Activity - DHACA",
+      "title": "DoW Joint Warfighter Medical, Military Medical Research and Development Award",
+      "requirements": true
+    },
+    {
+      "opportunity_id": "fa82a64f-2808-4626-ad09-d3b7d4e31236",
+      "source": "grants_gov",
+      "agency": "Department of State / Office to Monitor-Combat Trafficking in Persons",
+      "title": "TIP Office International Programs to Combat Human Trafficking Annual Program Statement",
+      "requirements": true
+    },
+    {
+      "opportunity_id": "c50c3d11-5d58-49eb-9479-a4734a9f67b1",
+      "source": "grants_gov",
+      "agency": "Department of Health and Human Services / National Institutes of Health",
+      "title": "Early-Stage Development of Informatics Technologies for Cancer Research and Management (U01 Clinical Trial Optional)",
+      "requirements": true
+    },
+    {
+      "opportunity_id": "a711fb4d-248a-4219-ae5c-e981317f3427",
+      "source": "sam_gov",
+      "agency": "DEPT OF DEFENSE > DEFENSE ADVANCED RESEARCH PROJECTS AGENCY  (DARPA) > DEF ADVANCED RESEARCH PROJECTS AGCY",
+      "title": "Resilient",
+      "requirements": false
+    },
+    {
+      "opportunity_id": "8fcd7b26-d2cc-4e2e-b54e-c1120452e209",
+      "source": "grants_gov",
+      "agency": "Department of Defense / Office of Naval Research",
+      "title": "FY25 Long Range Broad Agency Announcement (BAA) for Navy and Marine Corps Science and Technology",
+      "requirements": false
+    },
+    {
+      "opportunity_id": "7de9fc4f-7696-4171-a217-c462cebaa051",
+      "source": "grants_gov",
+      "agency": "Department of the Interior / Fish and Wildlife Service",
+      "title": "F26AS00084 Aquatic Invasive Species Grants to Great Lakes Tribes - Fiscal Year 2026 Great Lakes Restoration Initiative",
+      "requirements": false
+    }
+  ]
+}

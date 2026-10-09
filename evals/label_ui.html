@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Golden-set labeling</title>
+<style>
+:root{--bg:#f6f7f9;--panel:#fff;--ink:#1b2430;--muted:#5b6675;--line:#d9dee5;--accent:#1d5c8a;--ok:#2f7a4d;--bad:#a33a2b}
+@media (prefers-color-scheme:dark){:root{--bg:#12171d;--panel:#1a222c;--ink:#e3e8ee;--muted:#9aa6b3;--line:#2b3644;--accent:#7db4de;--ok:#7cc79c;--bad:#e28a7c}}
+*{box-sizing:border-box}body{margin:0;font:15px/1.5 system-ui,sans-serif;background:var(--bg);color:var(--ink)}
+header{padding:10px 16px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+select,input,textarea,button{font:inherit;color:inherit;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:6px 8px}
+button{cursor:pointer}button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+main{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:12px;padding:12px 16px}
+@media (max-width:900px){main{grid-template-columns:1fr}}
+section{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px;min-width:0}
+.page{border-top:1px solid var(--line);padding:8px 0}.page b{color:var(--muted);font-weight:600}
+.docs{max-height:75vh;overflow:auto}.row{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.row>*{flex:1 1 120px}.muted{color:var(--muted)}.saved{color:var(--ok)}.err{color:var(--bad)}
+label{display:block;margin-top:8px;font-weight:600}
+</style></head><body>
+<header><strong>Golden-set labeling</strong>
+<select id="item"></select><span id="progress" class="muted"></span>
+<span class="muted">Label from the documents only. Model output is never shown here.</span></header>
+<main>
+<section class="docs"><h3 id="title"></h3><div id="meta" class="muted"></div><div id="docs"></div></section>
+<section>
+<h3>Knockout verdict</h3>
+<div class="row"><select id="verdict"><option value="">— choose —</option><option>ELIGIBLE</option>
+<option>INELIGIBLE</option><option>NEEDS_REVIEW</option></select></div>
+<label>Deciding clauses</label><div id="clauses"></div><button id="addClause">+ clause</button>
+<label for="notes">Notes</label><textarea id="notes" rows="2" style="width:100%"></textarea>
+<div class="row"><button class="primary" id="saveKo">Save verdict</button><span id="koMsg"></span></div>
+<div id="reqBox" hidden><h3>Requirements ("shall / must / will" for the proposer)</h3>
+<div id="reqs"></div><button id="addReq">+ requirement</button>
+<div class="row"><button class="primary" id="saveReq">Save requirements</button><span id="reqMsg"></span></div></div>
+</section></main>
+<script>
+const CATS=["entity_type","size","ownership","location","registration","program_phase","cost_share","other"];
+let cur=null;
+const $=id=>document.getElementById(id);
+// Every value from the server or a document is escaped: file names come from remote servers.
+function esc(v){return String(v??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]))}
+function safeUrl(u){return /^https?:\/\//i.test(u||"")?u:"#"}
+function opt(value,label,selected){return '<option value="'+esc(value)+'"'+(selected?" selected":"")+">"+esc(label)+"</option>"}
+function docOptions(sel){return cur.documents.map(d=>opt(d.id,d.title,d.id===sel)).join("")}
+function catOptions(sel){return CATS.map(k=>opt(k,k,k===sel)).join("")}
+function input(ph,val,type){return '<input'+(type?' type="'+type+'" min="1"':"")+' placeholder="'+esc(ph)+'" value="'+esc(val)+'">'}
+function row(html,target){const div=document.createElement("div");div.className="row";
+ div.innerHTML=html+'<button type="button">✕</button>';div.querySelector("button").onclick=()=>div.remove();$(target).append(div)}
+function clauseRow(c={}){row(input("exact quote",c.quote)+"<select>"+docOptions(c.document_id)+"</select>"+input("page",c.page,"number")+"<select>"+catOptions(c.category)+"</select>","clauses")}
+function reqRow(r={}){row(input("requirement as written",r.text)+"<select>"+docOptions(r.document_id)+"</select>"+input("page",r.page,"number"),"reqs")}
+async function loadList(selectId){const items=await (await fetch("/api/items")).json();
+ $("item").innerHTML=items.map((i,n)=>opt(i.opportunity_id,(n+1)+". "+(i.knockout_labeled?"✓":"·")+" "+i.title.slice(0,70),false)).join("");
+ $("progress").textContent=items.filter(i=>i.knockout_labeled).length+" / "+items.length+" verdicts";
+ if(selectId)$("item").value=selectId;await loadItem($("item").value,items)}
+async function loadItem(id,items){cur=await (await fetch("/api/items/"+encodeURIComponent(id))).json();
+ $("title").textContent=cur.title;
+ $("meta").innerHTML=esc(cur.agency)+" · "+esc(cur.source)+" · closes "+esc(cur.close_at||"n/a")+' · <a href="'+esc(safeUrl(cur.url))+'" target="_blank" rel="noopener">source</a>';
+ $("docs").innerHTML=cur.documents.map(d=>"<h4>"+esc(d.title)+' <span class="muted">('+esc(d.parse_status)+')</span> <a href="/api/documents/'+esc(d.id)+'/file" target="_blank" rel="noopener">open file</a></h4>'
+  +d.pages.map(p=>'<div class="page"><b>page '+esc(p.page)+(p.heading?" · "+esc(p.heading):"")+"</b><div>"+esc(p.text)+"</div></div>").join("")).join("");
+ $("verdict").value=cur.knockout?.verdict||"";$("notes").value=cur.knockout?.notes||"";$("clauses").innerHTML="";
+ (cur.knockout?.clauses||[]).forEach(clauseRow);$("reqs").innerHTML="";(cur.requirements?.requirements||[]).forEach(reqRow);
+ const meta=(items||[]).find(i=>i.opportunity_id===id);$("reqBox").hidden=!(meta&&meta.requirements);$("koMsg").textContent="";$("reqMsg").textContent=""}
+async function post(url,body,msg){const r=await fetch(url,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)});
+ $(msg).className=r.ok?"saved":"err";$(msg).textContent=r.ok?"Saved":"Error "+r.status+": "+(await r.text());if(r.ok)loadList(cur.id)}
+$("item").onchange=()=>loadList($("item").value);$("addClause").onclick=()=>clauseRow();$("addReq").onclick=()=>reqRow();
+$("saveKo").onclick=()=>post("/api/labels/knockout",{opportunity_id:cur.id,verdict:$("verdict").value,notes:$("notes").value,
+ clauses:[...$("clauses").children].map(r=>{const f=r.querySelectorAll("input,select");return{quote:f[0].value,document_id:f[1].value,page:+f[2].value,category:f[3].value}})},"koMsg");
+$("saveReq").onclick=()=>post("/api/labels/requirements",{opportunity_id:cur.id,
+ requirements:[...$("reqs").children].map(r=>{const f=r.querySelectorAll("input,select");return{text:f[0].value,document_id:f[1].value,page:+f[2].value}})},"reqMsg");
+loadList();
+</script></body></html>

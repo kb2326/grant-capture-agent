@@ -34,6 +34,9 @@ class Settings(BaseSettings):
     model_agent: str = "gemini-3.8-flash"
     model_grader: str = "gemini-3.5-flash-lite"
     model_drafter: str = "gemini-3.1-pro-preview"
+    model_labeler: str = (
+        "gemini-3.1-pro-preview"  # AI (silver) labels; must differ from model_agent
+    )
     model_embedding: str = "gemini-embedding-001"
     embedding_dim: int = 768
 
@@ -45,6 +48,17 @@ class Settings(BaseSettings):
     sam_daily_request_budget: int = 8
 
     max_attachment_bytes: int = 25 * 1024 * 1024
+    analyze_context_budget: int = 300_000
+    analyze_window_pages: int = 5
+    price_agent_input_per_m: float = (
+        0.75  # gemini-3.8-flash, launch pricing through 2026-12-31
+    )
+    price_agent_output_per_m: float = 3.75
+    price_labeler_input_per_m: float = 2.0  # gemini-3.1-pro-preview
+    price_labeler_output_per_m: float = 12.0
+    eval_budget_usd: float = (
+        1.25  # hard cap per eval variant run (estimated Gemini spend)
+    )
 
     @model_validator(mode="after")
     def _secrets_from_secret_manager(self) -> "Settings":

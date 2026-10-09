@@ -1,0 +1,17 @@
+{
+  "opportunity_id": "00000000-0000-0000-0000-000000000001",
+  "documents": [{"id": "10000000-0000-0000-0000-000000000001", "title": "nofo.html", "kind": "html",
+                 "pages": ["Eligible applicants: Only nonprofit organizations may apply for this program.",
+                           "Proposals shall not exceed fifteen pages. Applicants must submit a budget justification."]}],
+  "model_output": {
+    "eligibility": [{"category": "entity_type", "constraint": {"allowed": ["nonprofit"]},
+                     "citation": {"doc": 1, "page": 1, "quote": "Only nonprofit organizations may apply"}}],
+    "requirements": [{"text": "15 pages", "citation": {"doc": 1, "page": 2, "quote": "Proposals shall not exceed fifteen pages"}},
+                     {"text": "budget", "citation": {"doc": 1, "page": 2, "quote": "Applicants must submit a budget justification"}}],
+    "evaluation_criteria": [], "required_sections": [], "deadlines": []
+  },
+  "gold_knockout": {"verdict": "INELIGIBLE", "clauses": [{"quote": "Only nonprofit organizations may apply",
+                    "document_id": "10000000-0000-0000-0000-000000000001", "page": 1, "category": "entity_type"}]},
+  "gold_requirements": [{"text": "Proposals shall not exceed fifteen pages", "document_id": "10000000-0000-0000-0000-000000000001", "page": 2},
+                        {"text": "Applicants must submit a budget justification", "document_id": "10000000-0000-0000-0000-000000000001", "page": 2}]
+}

@@ -1,0 +1,61 @@
+{
+  "opportunity_id": "00000000-0000-0000-0000-000000000002",
+  "documents": [
+    {
+      "id": "10000000-0000-0000-0000-000000000002",
+      "title": "sbir_topic.html",
+      "kind": "html",
+      "pages": [
+        "Eligibility: Only small business concerns with 500 or fewer employees may apply.",
+        "The technical volume shall not exceed 20 pages in length."
+      ]
+    }
+  ],
+  "model_output": {
+    "eligibility": [
+      {
+        "category": "size",
+        "constraint": {
+          "max_employees": 500,
+          "includes_affiliates": true
+        },
+        "citation": {
+          "doc": 1,
+          "page": 1,
+          "quote": "Only small business concerns with 500 or fewer employees may apply."
+        }
+      }
+    ],
+    "requirements": [
+      {
+        "text": "20 pages",
+        "citation": {
+          "doc": 1,
+          "page": 2,
+          "quote": "The technical volume shall not exceed 20 pages"
+        }
+      }
+    ],
+    "evaluation_criteria": [],
+    "required_sections": [],
+    "deadlines": []
+  },
+  "gold_knockout": {
+    "verdict": "ELIGIBLE",
+    "clauses": [
+      {
+        "quote": "Only small business concerns with 500 or fewer employees may apply.",
+        "document_id": "10000000-0000-0000-0000-000000000002",
+        "page": 1,
+        "category": "size"
+      }
+    ]
+  },
+  "gold_requirements": [
+    {
+      "text": "The technical volume shall not exceed 20 pages in length.",
+      "document_id": "10000000-0000-0000-0000-000000000002",
+      "page": 2
+    }
+  ]
+}

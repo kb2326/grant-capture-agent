@@ -64,3 +64,35 @@ def download(client: httpx.Client, url: str, *, max_bytes: int) -> bytes | None:
                 return None
             chunks.append(chunk)
         return b"".join(chunks)
+
+
+def filename_from_disposition(header: str | None) -> str | None:
+    import re
+    from urllib.parse import unquote
+
+    if not header:
+        return None
+    star = re.search(r"filename\*\s*=\s*[^']*''([^;]+)", header)
+    if star:
+        return unquote(star.group(1).strip().strip('"'))
+    plain = re.search(r'filename\s*=\s*"?([^";]+)"?', header)
+    return plain.group(1).strip() if plain else None
+
+
+def download_named(
+    client: httpx.Client, url: str, *, max_bytes: int
+) -> tuple[bytes | None, str | None, str | None]:
+    with client.stream("GET", url) as response:
+        response.raise_for_status()
+        name = filename_from_disposition(response.headers.get("content-disposition"))
+        ctype = response.headers.get("content-type")
+        declared = response.headers.get("content-length")
+        if declared is not None and declared.isdigit() and int(declared) > max_bytes:
+            return None, name, ctype
+        chunks, total = [], 0
+        for chunk in response.iter_bytes():
+            total += len(chunk)
+            if total > max_bytes:
+                return None, name, ctype
+            chunks.append(chunk)
+        return b"".join(chunks), name, ctype

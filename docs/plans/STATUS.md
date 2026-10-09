@@ -3,16 +3,27 @@
 *Read this first in any new session (local or cloud).*
 
 ## Where we are
-- *Updated 2026-10-09.* **M0 Foundation complete and merged to `main`** (PR #6). 65 tests (unit + db), CI green. An independent whole-branch review found 2 Critical + 4 Important issues; all fixed test-first.
-- Local: 2,736 opportunities, 736 documents. Cloud: foundation live; Cloud SQL deleted (off by default, `enable_cloudsql=false`). The `ingest:m0` image predates the review fixes, so rebuild it before the next cloud run.
-- **Next: M1 Analyze.** Brainstorm, then spec update, then plan. Starts with hand-labeling 30+ solicitations (`evals/LABELING.md`).
+- *Updated 2026-10-09.* **M0 Foundation and M1 Analyze complete** (M1 merged from branch `m1-analyze`).
+- M1 results (`reports/m1/ablation.md`, AI-labeled silver set of 40): knockout recall 1.00 (10/10), strict precision 0.91 (0.45 before the bullet-list rules fix), requirement recall 0.15 whole-document vs 0.69 page windows (n=7), quote fidelity 0.93, $0.04 per solicitation. ADR-0016: B0 for eligibility; hybrid (windows for requirements) planned for M3.
+- Spend: M1 ~$8.60 of the $10/month budget (measured from Cloud Monitoring token counts). **From M2 on: cost-minimal** — small samples, Flash/Flash-Lite, local EmbeddingGemma 2, hard `eval_budget_usd` caps, estimate shown before any run > $0.50.
+- **Next: M2 Discover** (brainstorm → spec → plan).
+- Open data items: SAM.gov attachments for the 12 sampled notices were never fetched (quota spent on a failed run, since fixed); retry one notice first: `uv run python -m ingest sam-attachments --notice <id>`. NIH announcements sit behind a bot challenge and are not fetched.
+
+## Deferred minors from the M1 review
+- Quote normalization misses curly quotes and bullets; `MIN_QUOTE_CHARS` rejects "Phase II".
+- Prompt-injection: injected text can make the model omit a clause; escape delimiter look-alikes inside documents.
+- `analyze_opportunity` tool: validate `variant` and the UUID, return error dicts instead of raising.
+- ADK workflow (not wired to the agent): stop on no documents, write a RunRow, guard a missing company profile.
+- Labeling page "open file" downloads instead of showing the PDF inline.
+- Scanned PDFs estimate 0 tokens and are not sent in B1.
+- `app/agent.py` hard-codes the model ID (pre-existing).
+- `sam_attachments` file-name fallback picks the wrong URL segment for links not ending in `/download`.
+- The silver labeler shares input format and model family with the system (correlated errors).
 
 ## Deferred minors from the M0 review (fix when the area is next touched)
 - The nightly job runs `--limit 500`, so cloud runs skip quality checks. Separate a safety cap from the partial-run flag.
 - SAM bulk archiving loads the 210 MB extract into memory. Stream it to GCS before the M2 cloud SAM job.
 - A fresh-but-yesterday SAM cache gets archived under today's date. Key the raw zone by extract date.
-- Generic mime (`application/octet-stream`) on a `.pdf` is skipped. Fall back to the suffix or check the response Content-Type.
-- SAM `resourceLinks` names have no suffix. Use Content-Disposition when M1 fetches SAM attachments.
 - A blank `SIMPLER_GRANTS_API_KEY=` skips the Secret Manager fallback. Treat empty as unset.
 - `estimated_award_count` accepts `bool`.
 - WIF trusts the repo name and every ref. Use repository_id/owner_id plus a ref condition before M4 grants deploy rights.

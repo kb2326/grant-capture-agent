@@ -16,11 +16,11 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Literal
 
-from google import genai
 from google.genai import types
 from pydantic import BaseModel, Field
 
 from app.analyze.extract import LoadedDoc, b0_parts
+from app.analyze.llm import make_client
 from app.analyze.quotes import verify
 from app.analyze.service import page_index
 from app.contracts import Category, Citation
@@ -163,11 +163,7 @@ def main(argv: list[str] | None = None) -> int:
     settings = get_settings()
     manifest = json.loads(Path(args.manifest).read_text(encoding="utf-8"))
     profile = json.loads(Path("data/company/profile.json").read_text(encoding="utf-8"))
-    client = genai.Client(
-        vertexai=True,
-        project=settings.google_cloud_project,
-        location=settings.google_cloud_location,
-    )
+    client = make_client(settings)
     ko_path, req_path = GOLDEN / "knockout.jsonl", GOLDEN / "requirements.jsonl"
     meta = {
         "labeler": f"ai:{settings.model_labeler}",

@@ -30,14 +30,27 @@ class BriefModel(Protocol):
     def extract(self, parts: list, instruction: str) -> LlmResult: ...
 
 
+def make_client(settings: Settings) -> genai.Client:
+    """Vertex AI client that waits and retries on rate limits (429) and transient server errors."""
+    return genai.Client(
+        vertexai=True,
+        project=settings.google_cloud_project,
+        location=settings.google_cloud_location,
+        http_options=types.HttpOptions(
+            retry_options=types.HttpRetryOptions(
+                attempts=6,
+                initial_delay=5,
+                max_delay=90,
+                http_status_codes=[408, 429, 500, 502, 503, 504],
+            )
+        ),
+    )
+
+
 class GeminiBriefModel:
     def __init__(self, settings: Settings, client: genai.Client | None = None) -> None:
         self.model_id = settings.model_agent
-        self.client = client or genai.Client(
-            vertexai=True,
-            project=settings.google_cloud_project,
-            location=settings.google_cloud_location,
-        )
+        self.client = client or make_client(settings)
 
     def extract(self, parts: list, instruction: str) -> LlmResult:
         config = types.GenerateContentConfig(

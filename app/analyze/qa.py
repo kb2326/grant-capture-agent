@@ -2,11 +2,11 @@
 
 import uuid
 
-from google import genai
 from google.genai import types
 from pydantic import BaseModel
 
 from app.analyze.extract import LoadedDoc, b0_parts
+from app.analyze.llm import make_client
 from app.analyze.quotes import verify
 from app.analyze.service import load_documents, page_index
 from app.config import Settings, get_settings
@@ -101,9 +101,5 @@ def ask_solicitation(opportunity_id: str, question: str) -> dict:
             "citations": [],
             "unverified": 0,
         }
-    client = genai.Client(
-        vertexai=True,
-        project=settings.google_cloud_project,
-        location=settings.google_cloud_location,
-    )
+    client = make_client(settings)
     return answer_question(docs, question, client, settings, _CACHES)

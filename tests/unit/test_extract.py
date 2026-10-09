@@ -117,3 +117,10 @@ def test_over_budget_package_switches_to_b1_and_notes_it():
 
 def test_parts_are_genai_parts():
     assert all(isinstance(p, types.Part) for p in b0_parts([text_doc(1)]))
+
+
+def test_gemini_client_retries_rate_limits():
+    from app.analyze.llm import make_client
+
+    opts = make_client(Settings(_env_file=None))._api_client._http_options.retry_options
+    assert opts.attempts >= 5 and 429 in opts.http_status_codes

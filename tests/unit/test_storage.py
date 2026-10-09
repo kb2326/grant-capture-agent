@@ -31,3 +31,8 @@ def test_local_store_round_trip(tmp_path: Path):
     assert store.exists(key)
     assert uri.startswith("file:")
     assert (tmp_path / key).read_bytes() == b"data"
+
+
+def test_generic_mime_falls_back_to_suffix():
+    assert is_allowed_attachment("application/octet-stream", "nofo.pdf")
+    assert not is_allowed_attachment("application/octet-stream", "data.bin")

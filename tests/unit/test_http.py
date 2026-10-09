@@ -3,7 +3,13 @@ import pytest
 import respx
 from tenacity import wait_none
 
-from ingest.http import build_client, download, request_json
+from ingest.http import (
+    build_client,
+    download,
+    download_named,
+    filename_from_disposition,
+    request_json,
+)
 
 
 @respx.mock
@@ -43,3 +49,34 @@ def test_download_respects_cap_by_header_and_by_stream():
         assert download(c, "https://f.test/big", max_bytes=1024) is None
         assert download(c, "https://f.test/sneaky", max_bytes=1024) is None
         assert download(c, "https://f.test/ok", max_bytes=1024) == b"%PDF-1.7"
+
+
+def test_filename_from_content_disposition():
+    assert (
+        filename_from_disposition('attachment; filename="Topic A27-012.pdf"')
+        == "Topic A27-012.pdf"
+    )
+    assert (
+        filename_from_disposition("attachment; filename*=UTF-8''r%C3%A9sum%C3%A9.pdf")
+        == "résumé.pdf"
+    )
+    assert filename_from_disposition(None) is None
+
+
+@respx.mock
+def test_download_named_returns_name_and_type():
+    respx.get("https://f.test/files/abc/download").mock(
+        return_value=httpx.Response(
+            200,
+            content=b"%PDF",
+            headers={
+                "content-disposition": 'attachment; filename="sol.pdf"',
+                "content-type": "application/pdf",
+            },
+        )
+    )
+    with build_client() as c:
+        data, name, ctype = download_named(
+            c, "https://f.test/files/abc/download", max_bytes=1024
+        )
+    assert (data, name, ctype) == (b"%PDF", "sol.pdf", "application/pdf")

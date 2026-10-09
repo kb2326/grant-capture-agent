@@ -112,3 +112,24 @@ def test_quota_is_shared_across_runs_on_the_same_day(tmp_path):
         )
         assert list(second.iter_opportunities()) == []
     assert route.call_count == 3 and second.budget_exhausted
+
+
+@respx.mock
+def test_fetch_notice_uses_noticeid_and_counts_quota(tmp_path):
+    route = respx.get(SAM_URL).mock(
+        return_value=httpx.Response(
+            200,
+            json={
+                "totalRecords": 1,
+                "opportunitiesData": [FIX["opportunitiesData"][0]],
+            },
+        )
+    )
+    store, day = LocalBlobStore(tmp_path), date(2026, 10, 9)
+    with build_client() as c:
+        adapter = SamGovAdapter(
+            c, "k", request_budget=2, today=day, quota=SamQuota(store, day)
+        )
+        rec = adapter.fetch_notice("n-001")
+    assert rec["noticeId"] == "n-001" and adapter.requests_made == 1
+    assert dict(route.calls[0].request.url.params)["noticeid"] == "n-001"

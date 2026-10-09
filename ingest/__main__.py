@@ -3,6 +3,7 @@
 import json
 from datetime import date
 from pathlib import Path
+from typing import Annotated
 
 import typer
 from sqlalchemy import func, select
@@ -177,6 +178,31 @@ def parse(
             read_uri,
             limit=limit,
             opportunity_id=_uuid.UUID(opportunity) if opportunity else None,
+        )
+    typer.echo(json.dumps(stats, indent=2))
+
+
+@cli.command("sam-attachments")
+def sam_attachments(
+    notice: Annotated[list[str], typer.Option(help="SAM notice IDs (repeatable)")],
+) -> None:
+    """Fetch attachments for specific SAM.gov notices (uses the daily API quota)."""
+    configure_logging()
+    s = get_settings()
+    if s.sam_api_key is None:
+        raise typer.BadParameter("SAM_API_KEY is not set")
+    store = blob_store_from_root(s.blob_root)
+    from ingest.sam_attachments import attach_sam_documents
+
+    with build_client() as client, _session() as session:
+        adapter = SamGovAdapter(
+            client,
+            s.sam_api_key.get_secret_value(),
+            request_budget=s.sam_daily_request_budget,
+            quota=SamQuota(store, date.today()),
+        )
+        stats = attach_sam_documents(
+            session, adapter, client, store, notice, max_bytes=s.max_attachment_bytes
         )
     typer.echo(json.dumps(stats, indent=2))
 

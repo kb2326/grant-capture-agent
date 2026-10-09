@@ -12,7 +12,7 @@
 
 Given a request in plain English ("SBIR work on grid-forming inverters"), return a short, ranked list of **open opportunities the company can actually go after**, each with a one-sentence reason that quotes the opportunity text. Measure how good the list is, and let the measurements pick the architecture:
 
-1. **Embeddings:** `gemini-embedding-001` (cloud) vs. EmbeddingGemma (local, free).
+1. **Embeddings:** `gemini-embedding-001` (cloud) vs. EmbeddingGemma 2 (local, free).
 2. **Rerank:** Vertex AI Ranking API vs. no rerank.
 3. **Workflow (ADR-0017):** single pass (B0) vs. Plan → Execute → Verify with refinement (B1).
 
@@ -76,7 +76,7 @@ Card text = `title | agency | kind | status | close date | assistance listings |
 
 ### 3.2 Embeddings (`rag/embed.py`)
 - `GeminiEmbedder`: `gemini-embedding-001`, 768-d, `us-central1`, task types `RETRIEVAL_DOCUMENT` / `RETRIEVAL_QUERY`, batches of 100, retries on 429/5xx, records tokens and cost.
-- `LocalEmbedder`: EmbeddingGemma (`google/embeddinggemma-300m`) via `sentence-transformers` on CPU, 768-d, using the model's document/query prompts. It is an optional dependency group (`local-embed`), so CI and the container never install PyTorch. The model is gated on Hugging Face: the user accepts its license once and puts `HF_TOKEN` in `.env`.
+- `LocalEmbedder`: EmbeddingGemma 2 (`google/embeddinggemma-2`, released 2026-09-14, Apache-2.0, not gated) via `sentence-transformers` on CPU, 768-d native output, 8K context, using its `Document` / `SearchQuery` prompts. It is an optional dependency group (`local-embed`), so CI and the container never install PyTorch.
 - One quick check that `gemini-embedding-2` still returns 404; if it now works it is noted in ADR-0020 but not added as an arm (cost).
 - Both vectors live in `opportunity_cards` (`emb_gemini vector(768)`, `emb_local vector(768)`), each with an HNSW cosine index. The model and dimension are recorded per column in a migration comment and in config.
 

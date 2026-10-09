@@ -78,7 +78,10 @@ class GeminiBriefModel:
             )
             usage = response.usage_metadata
             tokens_in += (usage.prompt_token_count or 0) if usage else 0
-            tokens_out += (usage.candidates_token_count or 0) if usage else 0
+            if usage:  # thinking tokens are billed as output
+                tokens_out += (usage.candidates_token_count or 0) + (
+                    getattr(usage, "thoughts_token_count", 0) or 0
+                )
             try:
                 brief = ModelBrief.model_validate_json(response.text or "")
             except ValidationError as exc:

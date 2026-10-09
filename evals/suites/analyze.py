@@ -177,6 +177,25 @@ def case_from_result(opportunity_id: str, result, latency_s: float, pages: int) 
     }
 
 
+def run_cases(opp_ids: list[str], analyze_one, *, max_usd: float) -> list[dict]:
+    """Run cases in order; stop before one more case (as costly as the costliest so far) could exceed max_usd."""
+    cases, spent, worst = [], 0.0, 0.0
+    for opp_id in opp_ids:
+        if spent + worst > max_usd:
+            cases.append(
+                {"opportunity_id": opp_id, "error": "skipped: eval budget reached"}
+            )
+            continue
+        try:
+            case = analyze_one(opp_id)
+        except Exception as exc:  # a failed case is reported, never hidden
+            case = {"opportunity_id": opp_id, "error": f"{type(exc).__name__}: {exc}"}
+        cost = case.get("cost_usd") or 0.0
+        spent, worst = spent + cost, max(worst, cost)
+        cases.append(case)
+    return cases
+
+
 def run_variant(
     variant: str,
     *,
@@ -193,33 +212,35 @@ def run_variant(
     gold_ko = load_golden(golden_dir / "knockout.jsonl")
     gold_req = load_golden(golden_dir / "requirements.jsonl")
     model = GeminiBriefModel(settings)
-    cases = []
     with make_session_factory(make_engine(settings.database_url))() as session:
-        for opp_id in sorted(set(gold_ko) | set(gold_req)):
+
+        def analyze_one(opp_id: str) -> dict:
             start = time.monotonic()
-            try:
-                pages = sum(
-                    len(d.pages)
-                    for d in load_documents(session, uuid.UUID(opp_id), read_uri)
-                )
-                r = analyze(
-                    session,
-                    uuid.UUID(opp_id),
-                    variant=variant,
-                    model=model,
-                    read=read_uri,
-                    settings=settings,
-                    persist=False,
-                )
-                cases.append(
-                    case_from_result(opp_id, r, time.monotonic() - start, pages)
-                )
-            except Exception as exc:  # a failed case is reported, never hidden
-                cases.append(
-                    {"opportunity_id": opp_id, "error": f"{type(exc).__name__}: {exc}"}
-                )
+            docs = load_documents(session, uuid.UUID(opp_id), read_uri)
+            r = analyze(
+                session,
+                uuid.UUID(opp_id),
+                variant=variant,
+                model=model,
+                read=read_uri,
+                settings=settings,
+                persist=False,
+            )
+            return case_from_result(
+                opp_id, r, time.monotonic() - start, sum(len(d.pages) for d in docs)
+            )
+
+        cases = run_cases(
+            sorted(set(gold_ko) | set(gold_req)),
+            analyze_one,
+            max_usd=settings.eval_budget_usd,
+        )
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / f"{variant}-cases.json").write_text(
         json.dumps(cases, indent=2), encoding="utf-8"
+    )
+    spent = sum(c.get("cost_usd") or 0.0 for c in cases)
+    print(
+        f"{variant}: {len(cases)} cases, estimated cost ${spent:.2f} (cap ${settings.eval_budget_usd:.2f})"
     )
     return evaluate_cases(f"analyze_{variant.lower()}", cases, gold_ko, gold_req)

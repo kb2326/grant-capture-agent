@@ -56,6 +56,9 @@ class Settings(BaseSettings):
     price_agent_output_per_m: float = 3.75
     price_labeler_input_per_m: float = 2.0  # gemini-3.1-pro-preview
     price_labeler_output_per_m: float = 12.0
+    eval_budget_usd: float = (
+        1.25  # hard cap per eval variant run (estimated Gemini spend)
+    )
 
     @model_validator(mode="after")
     def _secrets_from_secret_manager(self) -> "Settings":

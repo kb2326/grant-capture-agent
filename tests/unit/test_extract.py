@@ -124,3 +124,19 @@ def test_gemini_client_retries_rate_limits():
 
     opts = make_client(Settings(_env_file=None))._api_client._http_options.retry_options
     assert opts.attempts >= 5 and 429 in opts.http_status_codes
+
+
+def test_thinking_tokens_count_as_output():
+    from types import SimpleNamespace
+
+    from app.analyze.llm import GeminiBriefModel
+
+    resp = SimpleNamespace(
+        text=BRIEF.model_dump_json(),
+        usage_metadata=SimpleNamespace(
+            prompt_token_count=100, candidates_token_count=20, thoughts_token_count=300
+        ),
+    )
+    client = SimpleNamespace(models=SimpleNamespace(generate_content=lambda **kw: resp))
+    result = GeminiBriefModel(Settings(_env_file=None), client=client).extract([], "x")
+    assert result.tokens_out == 320

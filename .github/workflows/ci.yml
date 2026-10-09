@@ -36,7 +36,7 @@ jobs:
           uv run ruff format --check .
           uv run codespell
       - name: Type check
-        run: uv run ty check app ingest db evals
+        run: uv run ty check app ingest db evals rag
       - name: Unit and database tests
         run: uv run pytest tests/unit tests/db -q
       - name: Eval smoke

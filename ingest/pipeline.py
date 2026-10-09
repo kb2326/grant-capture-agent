@@ -66,7 +66,9 @@ def _store_attachments(
     store: BlobStore,
     fetch: Callable[[str], bytes | None],
     stats: IngestStats,
-) -> None:
+) -> bool:
+    """Store allowed attachments. Returns True if any download failed (retry next run)."""
+    failed = False
     for att in o.attachments:
         if not is_allowed_attachment(att.mime_type, att.file_name):
             stats.attachments_skipped += 1
@@ -75,6 +77,7 @@ def _store_attachments(
             data = fetch(att.url)
         except Exception as exc:  # one bad file must not stop the run
             stats.errors.append(f"{o.source}:{o.source_id}:{att.file_name}: {exc}")
+            failed = True
             continue
         if data is None:
             stats.attachments_skipped += 1
@@ -88,7 +91,11 @@ def _store_attachments(
         if exists:
             stats.attachments_duplicate += 1
             continue
-        uri = store.put(safe_key(o.source, o.source_id, att.file_name), data)
+        # The content hash makes keys unique and immutable: names that clean to the same
+        # string, or a revised file under the same name, never overwrite each other.
+        uri = store.put(
+            safe_key(o.source, o.source_id, f"{sha[:12]}-{att.file_name}"), data
+        )
         session.add(
             DocumentRow(
                 opportunity_id=row.id,
@@ -101,6 +108,7 @@ def _store_attachments(
             )
         )
         stats.attachments_stored += 1
+    return failed
 
 
 def _ingest_all(
@@ -136,7 +144,8 @@ def _ingest_all(
             _apply(row, o, content_hash, getattr(adapter, "version", "unknown"))
             session.flush()
             if download_attachments:
-                _store_attachments(session, row, o, store, fetch, stats)
+                if _store_attachments(session, row, o, store, fetch, stats):
+                    row.content_hash = "retry-attachments"  # forces a retry next run
             session.commit()
         except Exception as exc:
             session.rollback()

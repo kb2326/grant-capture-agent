@@ -71,7 +71,8 @@ def test_first_run_inserts_and_stores(db_session, tmp_path: Path):
     assert fetch.calls == ["https://f/a.pdf", "https://f/big.pdf"]  # zip never fetched
     doc = db_session.scalars(select(DocumentRow)).one()
     assert doc.parse_status == "pending" and doc.corpus == "solicitation"
-    assert (tmp_path / "raw/grants_gov/1/a.pdf").read_bytes() == b"%PDF-a"
+    stored = list((tmp_path / "raw/grants_gov/1").glob("*-a.pdf"))
+    assert len(stored) == 1 and stored[0].read_bytes() == b"%PDF-a"
     assert db_session.scalar(select(func.count()).select_from(IngestRunRow)) == 1
     row = db_session.scalars(select(OpportunityRow)).one()
     assert row.adapter_version == "fake/1" and row.fetched_at is not None
@@ -147,3 +148,51 @@ def test_adapter_item_errors_count_as_failed(db_session, tmp_path: Path):
     adapter.errors = ["grants_gov:x: HTTP 404"]
     stats = run_ingest(adapter, db_session, LocalBlobStore(tmp_path), FakeFetch({}))
     assert stats.failed == 1 and any("HTTP 404" in e for e in stats.errors)
+
+
+def test_colliding_attachment_names_are_stored_separately(db_session, tmp_path: Path):
+    a1 = AttachmentRef(
+        url="https://f/x1", file_name="a b.pdf", mime_type="application/pdf"
+    )
+    a2 = AttachmentRef(
+        url="https://f/x2", file_name="a_b.pdf", mime_type="application/pdf"
+    )
+    fetch = FakeFetch({"https://f/x1": b"%PDF-one", "https://f/x2": b"%PDF-two"})
+    stats = run_ingest(
+        FakeAdapter([opp("1", attachments=[a1, a2])]),
+        db_session,
+        LocalBlobStore(tmp_path),
+        fetch,
+    )
+    assert stats.attachments_stored == 2
+    docs = db_session.scalars(select(DocumentRow)).all()
+    assert len({d.gcs_uri for d in docs}) == 2
+
+
+class FlakyFetch:
+    """Fails the first time each URL is fetched, then succeeds."""
+
+    def __init__(self, data: bytes) -> None:
+        self.data, self.seen = data, set()
+
+    def __call__(self, url: str) -> bytes | None:
+        if url not in self.seen:
+            self.seen.add(url)
+            raise RuntimeError("timeout")
+        return self.data
+
+
+def test_failed_attachment_is_retried_on_the_next_run(db_session, tmp_path: Path):
+    flaky = AttachmentRef(
+        url="https://f/nofo.pdf", file_name="nofo.pdf", mime_type="application/pdf"
+    )
+    store, fetch = LocalBlobStore(tmp_path), FlakyFetch(b"%PDF-nofo")
+    first = run_ingest(
+        FakeAdapter([opp("1", attachments=[flaky])]), db_session, store, fetch
+    )
+    assert first.attachments_stored == 0 and len(first.errors) == 1
+    second = run_ingest(
+        FakeAdapter([opp("1", attachments=[flaky])]), db_session, store, fetch
+    )
+    assert second.attachments_stored == 1
+    assert db_session.scalar(select(func.count()).select_from(DocumentRow)) == 1

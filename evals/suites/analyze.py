@@ -202,12 +202,24 @@ def run_cases(opp_ids: list[str], analyze_one, *, max_usd: float) -> list[dict]:
     return cases
 
 
+def cases_to_rerun(cases: list[dict]) -> list[str]:
+    return [c["opportunity_id"] for c in cases if c.get("error")]
+
+
+def merge_cases(old: list[dict], new: list[dict]) -> list[dict]:
+    """Earlier results with re-run cases replaced, original order kept."""
+    by_id = {c["opportunity_id"]: c for c in new}
+    return [by_id.get(c["opportunity_id"], c) for c in old]
+
+
 def run_variant(
     variant: str,
     *,
     golden_dir: Path = Path("evals/data/golden"),
     out_dir: Path = Path("reports/m1"),
+    resume: bool = False,
 ) -> list[MetricResult]:
+    """Run one variant over the sample. resume=True re-runs only skipped/failed cases of the last run."""
     from app.analyze.llm import GeminiBriefModel
     from app.analyze.service import analyze, load_documents
     from app.config import get_settings
@@ -236,11 +248,16 @@ def run_variant(
                 opp_id, r, time.monotonic() - start, sum(len(d.pages) for d in docs)
             )
 
-        cases = run_cases(
-            eval_opportunity_ids(golden_dir),
-            analyze_one,
-            max_usd=settings.eval_budget_usd,
+        path = out_dir / f"{variant}-cases.json"
+        previous = (
+            json.loads(path.read_text(encoding="utf-8"))
+            if resume and path.exists()
+            else None
         )
+        ids = cases_to_rerun(previous) if previous else eval_opportunity_ids(golden_dir)
+        cases = run_cases(ids, analyze_one, max_usd=settings.eval_budget_usd)
+        if previous:
+            cases = merge_cases(previous, cases)
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / f"{variant}-cases.json").write_text(
         json.dumps(cases, indent=2), encoding="utf-8"

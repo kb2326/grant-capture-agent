@@ -51,3 +51,24 @@ def test_eval_ids_come_from_the_sample_manifest_not_the_labels(tmp_path):
         json.dumps({"items": [{"opportunity_id": "b"}, {"opportunity_id": "a"}]})
     )
     assert eval_opportunity_ids(tmp_path) == ["a", "b"]
+
+
+def test_resume_keeps_finished_cases_and_reruns_the_rest():
+    from evals.suites.analyze import cases_to_rerun, merge_cases
+
+    old = [
+        {"opportunity_id": "a", "error": None, "cost_usd": 0.1},
+        {"opportunity_id": "b", "error": "skipped: eval budget reached"},
+        {"opportunity_id": "c", "error": "ClientError: 429"},
+    ]
+    assert cases_to_rerun(old) == ["b", "c"]
+    new = [
+        {"opportunity_id": "b", "error": None, "cost_usd": 0.1},
+        {"opportunity_id": "c", "error": "skipped: eval budget reached"},
+    ]
+    merged = merge_cases(old, new)
+    assert [(c["opportunity_id"], c["error"]) for c in merged] == [
+        ("a", None),
+        ("b", None),
+        ("c", "skipped: eval budget reached"),
+    ]

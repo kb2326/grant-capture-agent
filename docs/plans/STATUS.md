@@ -1,12 +1,24 @@
 # Project status and handoff
 
-*Updated 2026-10-07. Read this first in any new session (local or cloud).*
+*Read this first in any new session (local or cloud).*
 
 ## Where we are
-- *Updated 2026-10-08.* **M0 complete** (Parts A + B) on branch `m0-foundation` (PR #6), pending final review and merge.
-- Local: 2,736 opportunities, 736 documents. Cloud: foundation live (buckets, secrets, Artifact Registry with `ingest:m0`, service accounts, WIF); the ingestion job ran once on Cloud SQL (487 opportunities, 226 documents, 0 failures); **Cloud SQL then deleted** (off by default).
-- **Next: M1 Analyze** — brainstorm → spec update → plan. Starts with you hand-labeling 30+ solicitations (evals/LABELING.md).
-- Deferred cleanups: ingestion job imports the agent package (harmless BigQuery warning); `uv run` rebuilds the project at container start.
+- *Updated 2026-10-09.* **M0 Foundation complete and merged to `main`** (PR #6). 65 tests (unit + db), CI green. An independent whole-branch review found 2 Critical + 4 Important issues; all fixed test-first.
+- Local: 2,736 opportunities, 736 documents. Cloud: foundation live; Cloud SQL deleted (off by default, `enable_cloudsql=false`). The `ingest:m0` image predates the review fixes, so rebuild it before the next cloud run.
+- **Next: M1 Analyze.** Brainstorm, then spec update, then plan. Starts with hand-labeling 30+ solicitations (`evals/LABELING.md`).
+
+## Deferred minors from the M0 review (fix when the area is next touched)
+- The nightly job runs `--limit 500`, so cloud runs skip quality checks. Separate a safety cap from the partial-run flag.
+- SAM bulk archiving loads the 210 MB extract into memory. Stream it to GCS before the M2 cloud SAM job.
+- A fresh-but-yesterday SAM cache gets archived under today's date. Key the raw zone by extract date.
+- Generic mime (`application/octet-stream`) on a `.pdf` is skipped. Fall back to the suffix or check the response Content-Type.
+- SAM `resourceLinks` names have no suffix. Use Content-Disposition when M1 fetches SAM attachments.
+- A blank `SIMPLER_GRANTS_API_KEY=` skips the Secret Manager fallback. Treat empty as unset.
+- `estimated_award_count` accepts `bool`.
+- WIF trusts the repo name and every ref. Use repository_id/owner_id plus a ref condition before M4 grants deploy rights.
+- `scripts/secrets_put.sh` exits 1 when `SAM_API_KEY` is empty.
+- `variables.tf` defaults `enable_cloudsql=true` (tfvars overrides it to false).
+- The ingestion job imports the agent package (BigQuery warning), and `uv run` rebuilds at container start.
 
 ## Decisions that aren't obvious from the code
 - Architecture is chosen by **ablation**: simple baseline vs. richer variant, decided by evals (system design §8.0, ADRs 0016–0018). Don't assume PEV or CRAG wins.

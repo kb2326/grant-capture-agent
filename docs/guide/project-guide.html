@@ -110,7 +110,7 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
   <div class="meta">
     <span>Owner: Karthick Balaje (kb2326)</span>
     <span>Current phase: M0 complete · M1 Analyze next</span>
-    <span>Last updated: 8 Oct 2026</span>
+    <span>Last updated: 9 Oct 2026</span>
   </div>
 </header>
 
@@ -161,7 +161,7 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
 
 <section id="built">
   <header><span class="eyebrow">Section 01a</span><h2>What we've built so far</h2></header>
-  <p><b>M0 is finished</b>: all 21 tasks. Part A runs on your laptop; Part B put the same loader on Google Cloud and proved it works there. 54 automated tests pass and CI is green on GitHub (pull request #6). Here is each piece in plain terms.</p>
+  <p><b>M0 is finished</b>: all 21 tasks. Part A runs on your laptop; Part B put the same loader on Google Cloud and proved it works there. 65 automated tests pass, an independent review's critical and important findings are fixed, and it's merged into main (pull request #6). Here is each piece in plain terms.</p>
 
   <div class="tablewrap"><table>
     <thead><tr><th>Measured on real data (8 Oct 2026)</th><th>Result</th></tr></thead>
@@ -679,6 +679,7 @@ flowchart LR
       <tr><td class="num">2026-10-06</td><td>Added the Solicitation agent (Analyze) and a hand-built RAG library shared by all agents.</td></tr>
       <tr><td class="num">2026-10-06</td><td>Fictional test company "Lumen Grid Labs" replaces BESI's real capability document.</td></tr>
       <tr><td class="num">2026-10-06</td><td>Stack: ADK 2.x, Gemini 3.x, Cloud SQL Postgres + pgvector, Docling, Agent Runtime (pending your review).</td></tr>
+      <tr><td class="num">2026-10-09</td><td>Independent review of the whole M0 branch found 2 critical issues (the SAM.gov key could appear in logs; the SAM.gov daily cap could be exceeded) and 4 important ones (one bad record could end a run; attachment names could collide; failed downloads weren't retried; two SAM sources overwrote each other). All six fixed test-first (65 tests), 11 minor items noted for later. M0 merged into main.</td></tr>
       <tr><td class="num">2026-10-08</td><td>M0 Part B done: Terraform created 41 cloud resources; the loader ran as a Cloud Run Job (500 grants, 0 failures); teardown fixes added; Cloud SQL deleted and off by default. M0 complete.</td></tr>
       <tr><td class="num">2026-10-08</td><td>ADR-0019 written: Docker for local development, tests and CI; Terraform-managed Google Cloud for anything shared or deployed.</td></tr>
       <tr><td class="num">2026-10-08</td><td>M0 Part A complete: 2,736 opportunities and 736 documents loaded, 53 tests, CI green. 14 plan deviations recorded with reasons. Part B (cloud) waits for go-ahead.</td></tr>

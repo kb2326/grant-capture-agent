@@ -1,0 +1,44 @@
+{
+  "opportunity_id": "00000000-0000-0000-0000-000000000003",
+  "documents": [
+    {
+      "id": "10000000-0000-0000-0000-000000000003",
+      "title": "foa.html",
+      "kind": "html",
+      "pages": [
+        "Cost sharing: A cost share of at least 20 percent is required for this program."
+      ]
+    }
+  ],
+  "model_output": {
+    "eligibility": [
+      {
+        "category": "cost_share",
+        "constraint": {
+          "min_pct": 20
+        },
+        "citation": {
+          "doc": 1,
+          "page": 1,
+          "quote": "A cost share of at least 20 percent is required"
+        }
+      }
+    ],
+    "requirements": [],
+    "evaluation_criteria": [],
+    "required_sections": [],
+    "deadlines": []
+  },
+  "gold_knockout": {
+    "verdict": "NEEDS_REVIEW",
+    "clauses": [
+      {
+        "quote": "A cost share of at least 20 percent is required",
+        "document_id": "10000000-0000-0000-0000-000000000003",
+        "page": 1,
+        "category": "cost_share"
+      }
+    ]
+  },
+  "gold_requirements": []
+}

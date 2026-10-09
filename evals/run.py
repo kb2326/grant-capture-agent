@@ -7,9 +7,29 @@ from pathlib import Path
 
 from evals.report import MetricResult, write_report
 
+
 # Suites register here as milestones add them (M1: knockout, requirements; M2: discover; M3: draft).
-SUITES: dict[str, Callable[[], list[MetricResult]]] = {}
-SMOKE: tuple[str, ...] = ()
+def _analyze_smoke():
+    from evals.suites.analyze_smoke import run
+
+    return run()
+
+
+def _analyze(variant: str):
+    def _run():
+        from evals.suites.analyze import run_variant
+
+        return run_variant(variant)
+
+    return _run
+
+
+SUITES: dict[str, Callable[[], list[MetricResult]]] = {
+    "analyze_smoke": _analyze_smoke,
+    "analyze_b0": _analyze("B0"),
+    "analyze_b1": _analyze("B1"),
+}
+SMOKE: tuple[str, ...] = ("analyze_smoke",)
 
 
 def main(argv: list[str] | None = None) -> int:

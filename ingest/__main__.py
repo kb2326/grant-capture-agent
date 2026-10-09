@@ -1,7 +1,6 @@
 """python -m ingest {run,seed-company,stats}"""
 
 import json
-import logging
 from datetime import date
 from pathlib import Path
 
@@ -13,10 +12,11 @@ from db.models import DocumentRow, IngestRunRow, OpportunityRow
 from db.session import make_engine, make_session_factory
 from ingest.company import seed_company
 from ingest.http import build_client, download
+from ingest.logging_setup import configure_logging
 from ingest.pipeline import run_ingest
 from ingest.raw import RawArchive, ReplayAdapter, replay_grants_gov, replay_sam_bulk
 from ingest.sources.grants_gov import GrantsGovAdapter
-from ingest.sources.sam_gov import SamGovAdapter
+from ingest.sources.sam_gov import SamGovAdapter, SamQuota
 from ingest.sources.sam_gov_bulk import SamBulkAdapter
 from ingest.storage import blob_store_from_root
 
@@ -35,7 +35,7 @@ def run(
     limit: int | None = typer.Option(None),
     attachments: bool = typer.Option(True),
 ) -> None:
-    logging.basicConfig(level=logging.INFO)
+    configure_logging()
     s = get_settings()
     store = blob_store_from_root(s.blob_root)
     archive = RawArchive(store, source, date.today())
@@ -57,6 +57,7 @@ def run(
                 client,
                 s.sam_api_key.get_secret_value(),
                 request_budget=s.sam_daily_request_budget,
+                quota=SamQuota(store, date.today()),
                 archive=archive,
             )
         else:

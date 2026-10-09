@@ -1,5 +1,6 @@
 """SAM.gov Get Opportunities API v2. Public keys allow ~10 requests/day, so every call is budgeted."""
 
+import json
 import logging
 from collections.abc import Iterator
 from datetime import date, timedelta
@@ -8,7 +9,7 @@ from urllib.parse import urlparse
 
 import httpx
 
-from ingest.http import request_json
+from ingest.http import RetryableHTTPError, request_json
 from ingest.models import (
     AttachmentRef,
     Opportunity,
@@ -20,6 +21,7 @@ from ingest.models import (
 
 if TYPE_CHECKING:
     from ingest.raw import RawArchive
+    from ingest.storage import BlobStore
 
 log = logging.getLogger(__name__)
 
@@ -38,7 +40,7 @@ def _file_name(url: str) -> str:
 def map_sam_gov(r: dict[str, Any]) -> Opportunity:
     links = r.get("resourceLinks") or []
     return Opportunity(
-        source="sam_gov",
+        source="sam_gov_api",  # on-demand lookups; never overwrites the bulk-extract rows
         source_id=str(r["noticeId"]),
         kind=infer_kind(
             r.get("title"), r.get("solicitationNumber"), default="contract"
@@ -69,6 +71,29 @@ def map_sam_gov(r: dict[str, Any]) -> Opportunity:
     )
 
 
+class SamQuota:
+    """Per-day SAM.gov API request count, persisted so separate runs share one budget."""
+
+    def __init__(self, store: "BlobStore", day: date) -> None:
+        self.store = store
+        self.key = f"raw/api/sam_gov_api/{day:%Y-%m-%d}/_quota.json"
+
+    def used(self) -> int:
+        if not self.store.exists(self.key):
+            return 0
+        return int(json.loads(self.store.get(self.key)).get("requests", 0))
+
+    def record(self, requests: int) -> None:
+        self.store.put(self.key, json.dumps({"requests": requests}).encode("utf-8"))
+
+
+def _describe(exc: Exception) -> str:
+    """Error summary without the URL query string (it carries the API key)."""
+    if isinstance(exc, httpx.HTTPStatusError):
+        return f"HTTP {exc.response.status_code}"
+    return type(exc).__name__
+
+
 class SamGovAdapter:
     name = "sam_gov_api"
     version = "sam_gov_api/1"
@@ -82,10 +107,13 @@ class SamGovAdapter:
         today: date | None = None,
         page_size: int = 1000,
         archive: "RawArchive | None" = None,
+        quota: SamQuota | None = None,
     ) -> None:
         self.client, self.api_key, self.page_size = client, api_key, page_size
         self.request_budget, self.today = request_budget, today or date.today()
-        self.requests_made, self.budget_exhausted = 0, False
+        self.quota = quota
+        self.requests_made = quota.used() if quota else 0
+        self.budget_exhausted = False
         self.archive = archive
 
     def _search(self, ptype: str, naics: str, offset: int) -> dict[str, Any] | None:
@@ -96,7 +124,9 @@ class SamGovAdapter:
                 )
             self.budget_exhausted = True
             return None
-        self.requests_made += 1
+        self.requests_made += 1  # every HTTP attempt counts: there are no retries below
+        if self.quota:
+            self.quota.record(self.requests_made)
         params = {
             "api_key": self.api_key,
             "ptype": ptype,
@@ -106,9 +136,17 @@ class SamGovAdapter:
             "limit": str(self.page_size),
             "offset": str(offset),
         }
-        payload = request_json(
-            self.client, "GET", SAM_URL, params=params, max_attempts=2
-        )
+        try:
+            payload = request_json(
+                self.client, "GET", SAM_URL, params=params, max_attempts=1
+            )
+        except (httpx.HTTPError, RetryableHTTPError) as exc:
+            log.warning(
+                "SAM.gov request failed (%s); stopping to protect the daily quota",
+                _describe(exc),
+            )
+            self.budget_exhausted = True
+            return None
         if self.archive:
             self.archive.put_json(f"search-{ptype}-{naics}-{offset}", payload)
         return payload

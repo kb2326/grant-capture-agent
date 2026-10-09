@@ -13,7 +13,7 @@ from common_grants_sdk.schemas.pydantic import OpportunityBase
 from pydantic import BaseModel, ConfigDict, Field
 
 Kind = Literal["grant", "sbir", "sttr", "contract"]
-Source = Literal["grants_gov", "sam_gov"]
+Source = Literal["grants_gov", "sam_gov", "sam_gov_api"]
 
 
 class OppStatus(StrEnum):

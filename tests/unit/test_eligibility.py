@@ -15,11 +15,16 @@ FACTS = CompanyFacts.from_profile(
 )
 
 
-def clause(category: str, constraint: dict | None) -> Clause:
+DOC = uuid.uuid4()
+
+
+def clause(
+    category: str, constraint: dict | None, page: int = 1, doc: uuid.UUID = DOC
+) -> Clause:
     return Clause(
         category=category,
         constraint=constraint,
-        citation=Citation(document_id=uuid.uuid4(), page=1, quote="quoted clause text"),
+        citation=Citation(document_id=doc, page=page, quote="quoted clause text"),
     )
 
 
@@ -149,3 +154,35 @@ def test_hits_report_the_clause_as_extracted():
         {"allowed": ["university"]},
         {"allowed": ["small_business"]},
     ]
+
+
+def test_eligible_types_from_another_section_do_not_rescue_a_knockout():
+    # "Eligible applicants: universities; nonprofits" (p3) ... "small businesses may be subawardees" (p9)
+    assert (
+        status(
+            clause("entity_type", {"allowed": ["university"]}, page=3),
+            clause("entity_type", {"allowed": ["nonprofit"]}, page=3),
+            clause("entity_type", {"allowed": ["small_business"]}, page=9),
+        )
+        == "INELIGIBLE"
+    )
+
+
+def test_a_list_spanning_a_page_break_is_still_one_list():
+    assert (
+        status(
+            clause("entity_type", {"allowed": ["university"]}, page=3),
+            clause("entity_type", {"allowed": ["small_business"]}, page=4),
+        )
+        == "ELIGIBLE"
+    )
+
+
+def test_lists_in_different_documents_are_not_merged():
+    assert (
+        status(
+            clause("entity_type", {"allowed": ["university"]}, doc=uuid.uuid4()),
+            clause("entity_type", {"allowed": ["small_business"]}, doc=uuid.uuid4()),
+        )
+        == "INELIGIBLE"
+    )

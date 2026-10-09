@@ -156,3 +156,29 @@ def test_rescore_reapplies_the_rules_offline_from_saved_clauses():
     assert rescore(
         [{"opportunity_id": "b", "error": "skipped: eval budget reached"}], facts
     )[0]["error"]
+
+
+def test_knockout_metrics_with_nothing_to_measure_are_none_not_perfect():
+    from evals.suites.analyze import knockout_metrics
+
+    m = knockout_metrics([("ELIGIBLE", "NEEDS_REVIEW")])
+    assert (
+        m["flagged_recall"] is None
+        and m["strict_recall"] is None
+        and m["strict_precision"] is None
+    )
+
+
+def test_budget_counts_the_cost_of_failed_cases():
+    from evals.suites.analyze import run_cases
+
+    def analyze_one(opp_id):
+        exc = RuntimeError("schema failure")
+        exc.cost_usd = 0.6
+        raise exc
+
+    cases = run_cases(["a", "b", "c"], analyze_one, max_usd=1.0)
+    assert (
+        cases[0]["cost_usd"] == 0.6
+        and cases[1]["error"] == "skipped: eval budget reached"
+    )

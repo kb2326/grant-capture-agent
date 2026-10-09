@@ -31,3 +31,12 @@ def test_smoke_runs_the_offline_analyze_suite(tmp_path):
     assert "analyze_smoke" in SMOKE
     assert main(["--suite", "smoke", "--out", str(tmp_path)]) == 0
     assert "analyze_smoke" in next(tmp_path.glob("*.md")).read_text(encoding="utf-8")
+
+
+def test_labeling_page_escapes_every_interpolated_value():
+    import re
+
+    html = Path("evals/label_ui.html").read_text(encoding="utf-8")
+    raw = [m for m in re.findall(r"\$\{([^}]*)\}", html) if not m.startswith("esc(")]
+    assert raw == [], f"unescaped interpolations: {raw}"
+    assert "function esc(" in html and "safeUrl(" in html

@@ -56,3 +56,26 @@ def test_apply_keeps_unverified_clause_as_needs_review_and_drops_other_items():
     out = apply_verification(brief, PAGES)
     assert len(out.eligibility) == 1 and out.eligibility[0].constraint is None
     assert out.requirements == [] and out.dropped_quotes == 1
+
+
+def test_verification_marks_each_clause_so_fidelity_is_not_confused_with_null_constraints():
+    brief = SolicitationBrief(
+        opportunity_id=uuid.uuid4(),
+        variant="B0",
+        model="m",
+        prompt_version="v",
+        eligibility=[
+            Clause(
+                category="other",
+                citation=c(1, "500 or fewer employees including affiliates"),
+                constraint=None,
+            ),
+            Clause(
+                category="size",
+                citation=c(1, "invented clause text here"),
+                constraint={"max_employees": 1},
+            ),
+        ],
+    )
+    out = apply_verification(brief, PAGES)
+    assert [cl.verified for cl in out.eligibility] == [True, False]

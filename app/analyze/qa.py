@@ -46,10 +46,9 @@ def _cache_name(
     return cache.name
 
 
-def answer_question(
-    docs: list[LoadedDoc], question: str, client, settings: Settings, cache_store: dict
-) -> dict:
-    cached = _cache_name(docs, client, settings, cache_store)
+def _ask(
+    docs: list[LoadedDoc], question: str, client, settings: Settings, cached: str | None
+):
     config = types.GenerateContentConfig(
         temperature=0,
         response_mime_type="application/json",
@@ -60,9 +59,23 @@ def answer_question(
     contents = (
         [question] if cached else [*b0_parts(docs), types.Part.from_text(text=question)]
     )
-    response = client.models.generate_content(
+    return client.models.generate_content(
         model=settings.model_agent, contents=contents, config=config
     )
+
+
+def answer_question(
+    docs: list[LoadedDoc], question: str, client, settings: Settings, cache_store: dict
+) -> dict:
+    cached = _cache_name(docs, client, settings, cache_store)
+    try:
+        response = _ask(docs, question, client, settings, cached)
+    except Exception:
+        if cached is None:
+            raise
+        # the cache expires after its TTL: forget it and answer uncached
+        cache_store.pop(",".join(str(d.id) for d in docs), None)
+        response = _ask(docs, question, client, settings, None)
     parsed = QaAnswer.model_validate_json(response.text or "{}")
     pages = page_index(docs)
     verified, unverified = [], 0

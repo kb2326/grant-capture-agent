@@ -27,7 +27,8 @@ def load_golden(path: Path) -> dict[str, dict]:
     return out
 
 
-def knockout_metrics(pairs: list[tuple[str, str]]) -> dict[str, float]:
+def knockout_metrics(pairs: list[tuple[str, str]]) -> dict[str, float | None]:
+    """None (reported n/a) when there is nothing to measure, so an empty slice can't look perfect."""
     gold_in = [p for g, p in pairs if g == "INELIGIBLE"]
     pred_in = [g for g, p in pairs if p == "INELIGIBLE"]
     return {
@@ -35,13 +36,13 @@ def knockout_metrics(pairs: list[tuple[str, str]]) -> dict[str, float]:
             sum(p in ("INELIGIBLE", "NEEDS_REVIEW") for p in gold_in) / len(gold_in)
         )
         if gold_in
-        else 1.0,
+        else None,
         "strict_recall": (sum(p == "INELIGIBLE" for p in gold_in) / len(gold_in))
         if gold_in
-        else 1.0,
+        else None,
         "strict_precision": (sum(g == "INELIGIBLE" for g in pred_in) / len(pred_in))
         if pred_in
-        else 1.0,
+        else None,
         "accuracy": (sum(g == p for g, p in pairs) / len(pairs)) if pairs else 0.0,
     }
 
@@ -157,7 +158,7 @@ def case_from_result(opportunity_id: str, result, latency_s: float, pages: int) 
         + len(b.required_sections)
         + len(b.deadlines)
     )
-    unverified_clauses = sum(c.constraint is None for c in b.eligibility)
+    unverified_clauses = sum(not c.verified for c in b.eligibility)
     return {
         "opportunity_id": opportunity_id,
         "verdict": result.verdict.status,
@@ -207,8 +208,14 @@ def run_cases(opp_ids: list[str], analyze_one, *, max_usd: float) -> list[dict]:
             continue
         try:
             case = analyze_one(opp_id)
-        except Exception as exc:  # a failed case is reported, never hidden
-            case = {"opportunity_id": opp_id, "error": f"{type(exc).__name__}: {exc}"}
+        except (
+            Exception
+        ) as exc:  # a failed case is reported, never hidden; its spend still counts
+            case = {
+                "opportunity_id": opp_id,
+                "error": f"{type(exc).__name__}: {exc}",
+                "cost_usd": getattr(exc, "cost_usd", 0.0),
+            }
         cost = case.get("cost_usd") or 0.0
         spent, worst = spent + cost, max(worst, cost)
         cases.append(case)
@@ -271,16 +278,28 @@ def run_variant(
 
         def analyze_one(opp_id: str) -> dict:
             start = time.monotonic()
-            docs = load_documents(session, uuid.UUID(opp_id), read_uri)
-            r = analyze(
-                session,
-                uuid.UUID(opp_id),
-                variant=variant,
-                model=model,
-                read=read_uri,
-                settings=settings,
-                persist=False,
-            )
+            before = (model.total_tokens_in, model.total_tokens_out)
+            try:
+                docs = load_documents(session, uuid.UUID(opp_id), read_uri)
+                r = analyze(
+                    session,
+                    uuid.UUID(opp_id),
+                    variant=variant,
+                    model=model,
+                    read=read_uri,
+                    settings=settings,
+                    persist=False,
+                )
+            except (
+                Exception
+            ) as exc:  # e.g. a B1 window failing after earlier windows were billed
+                exc.cost_usd = (
+                    (model.total_tokens_in - before[0])
+                    * settings.price_agent_input_per_m
+                    + (model.total_tokens_out - before[1])
+                    * settings.price_agent_output_per_m
+                ) / 1_000_000
+                raise
             return case_from_result(
                 opp_id, r, time.monotonic() - start, sum(len(d.pages) for d in docs)
             )

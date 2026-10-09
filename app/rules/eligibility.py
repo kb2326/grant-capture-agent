@@ -6,7 +6,7 @@ from pydantic import BaseModel, ConfigDict, ValidationError, model_validator
 
 from app.contracts import Clause, EligibilityVerdict, RuleHit
 
-RULES_VERSION = "2026-10-09.2"
+RULES_VERSION = "2026-10-09.3"
 ENTITY_TYPES = {
     "for_profit",
     "small_business",
@@ -229,30 +229,52 @@ def evaluate_clause(clause: Clause, f: CompanyFacts) -> RuleHit | None:
     return _hit("E7", "NEEDS_REVIEW", clause, "-", "cost share is a business decision")
 
 
-def _allowed_union(clauses: list[Clause]) -> set[str]:
-    """Solicitations list eligible applicant types as bullets, one clause each: together they mean ANY of them."""
-    union: set[str] = set()
-    for c in clauses:
-        if c.category == "entity_type":
-            parsed = validate_constraint(c.category, c.constraint)
-            if isinstance(parsed, EntityTypeC) and parsed.allowed:
-                union |= set(parsed.allowed)
-    return union
+def _list_unions(clauses: list[Clause]) -> dict[int, set[str]]:
+    """Group entity-type clauses into lists: same document, pages consecutive (a list may cross a page break).
+
+    Solicitations list eligible applicant types as bullets, one clause each; within one list they mean ANY
+    of them. Lists in other sections or documents (e.g. "small businesses may be subawardees") stay separate,
+    so they can't rescue a real knockout. Returns clause index -> union of its list's allowed types.
+    """
+    typed = []
+    for i, c in enumerate(clauses):
+        parsed = (
+            validate_constraint(c.category, c.constraint)
+            if c.category == "entity_type"
+            else None
+        )
+        if isinstance(parsed, EntityTypeC):
+            typed.append(
+                (
+                    str(c.citation.document_id),
+                    c.citation.page,
+                    i,
+                    set(parsed.allowed or []),
+                )
+            )
+    unions: dict[int, set[str]] = {}
+    group: list[tuple] = []
+    for item in sorted(typed, key=lambda t: (t[0], t[1])):
+        if group and (item[0] != group[-1][0] or item[1] - group[-1][1] > 1):
+            union = set().union(*(g[3] for g in group))
+            unions.update({g[2]: union for g in group})
+            group = []
+        group.append(item)
+    if group:
+        union = set().union(*(g[3] for g in group))
+        unions.update({g[2]: union for g in group})
+    return unions
 
 
 def decide(clauses: list[Clause], facts: CompanyFacts) -> EligibilityVerdict:
-    union = _allowed_union(clauses)
+    unions = _list_unions(clauses)
     hits = []
-    for original in clauses:
+    for i, original in enumerate(clauses):
         c = original
-        if (
-            union
-            and c.category == "entity_type"
-            and isinstance(validate_constraint(c.category, c.constraint), EntityTypeC)
-        ):
-            # judge each listed type against the whole list, keeping this clause's own exclusions
+        if unions.get(i):
+            # judge each listed type against its whole list, keeping this clause's own exclusions
             c = c.model_copy(
-                update={"constraint": {**c.constraint, "allowed": sorted(union)}}
+                update={"constraint": {**c.constraint, "allowed": sorted(unions[i])}}
             )
         hit = evaluate_clause(c, facts)
         if hit is not None:

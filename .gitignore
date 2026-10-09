@@ -363,7 +363,8 @@ credentials*.json
 # grant-capture-agent
 .env
 data/blobs/
-reports/
+reports/*
+!reports/m1/
 .terraform/
 *.tfstate*
 data/cache/

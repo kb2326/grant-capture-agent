@@ -51,6 +51,10 @@ class GeminiBriefModel:
     def __init__(self, settings: Settings, client: genai.Client | None = None) -> None:
         self.model_id = settings.model_agent
         self.client = client or make_client(settings)
+        self.total_tokens_in = (
+            0  # every billed call, including failed attempts (for budget caps)
+        )
+        self.total_tokens_out = 0
 
     def extract(self, parts: list, instruction: str) -> LlmResult:
         config = types.GenerateContentConfig(
@@ -82,6 +86,19 @@ class GeminiBriefModel:
                 tokens_out += (usage.candidates_token_count or 0) + (
                     getattr(usage, "thoughts_token_count", 0) or 0
                 )
+            self.total_tokens_in, self.total_tokens_out = (
+                self.total_tokens_in
+                + ((usage.prompt_token_count or 0) if usage else 0),
+                self.total_tokens_out
+                + (
+                    (
+                        (usage.candidates_token_count or 0)
+                        + (getattr(usage, "thoughts_token_count", 0) or 0)
+                    )
+                    if usage
+                    else 0
+                ),
+            )
             try:
                 brief = ModelBrief.model_validate_json(response.text or "")
             except ValidationError as exc:

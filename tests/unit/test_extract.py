@@ -140,3 +140,23 @@ def test_thinking_tokens_count_as_output():
     client = SimpleNamespace(models=SimpleNamespace(generate_content=lambda **kw: resp))
     result = GeminiBriefModel(Settings(_env_file=None), client=client).extract([], "x")
     assert result.tokens_out == 320
+
+
+def test_tokens_from_failed_attempts_are_still_counted():
+    from types import SimpleNamespace
+
+    import pytest
+
+    from app.analyze.llm import ExtractionError, GeminiBriefModel
+
+    resp = SimpleNamespace(
+        text="not json",
+        usage_metadata=SimpleNamespace(
+            prompt_token_count=100, candidates_token_count=10, thoughts_token_count=0
+        ),
+    )
+    client = SimpleNamespace(models=SimpleNamespace(generate_content=lambda **kw: resp))
+    model = GeminiBriefModel(Settings(_env_file=None), client=client)
+    with pytest.raises(ExtractionError):
+        model.extract([], "x")
+    assert (model.total_tokens_in, model.total_tokens_out) == (200, 20)

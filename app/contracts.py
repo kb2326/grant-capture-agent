@@ -95,6 +95,9 @@ class Clause(BaseModel):
     category: Category
     citation: Citation
     constraint: dict | None = None
+    verified: bool = (
+        True  # set False by quote verification when the quote is not on the cited page
+    )
 
 
 class Requirement(BaseModel):

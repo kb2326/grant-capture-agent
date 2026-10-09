@@ -48,7 +48,7 @@ def apply_verification(brief: SolicitationBrief, pages: PageIndex) -> Solicitati
         clauses.append(
             clause
             if verify(clause.citation, pages)
-            else clause.model_copy(update={"constraint": None})
+            else clause.model_copy(update={"constraint": None, "verified": False})
         )
     kept: dict[str, list] = {}
     for field in (

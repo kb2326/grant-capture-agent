@@ -52,3 +52,22 @@ def test_qa_falls_back_without_cache_and_verifies_citations():
     assert out["answer"] == "November 3, 2026"
     assert out["citations"][0]["page"] == 1 and out["unverified"] == 0
     assert client.models.configs[0].cached_content is None
+
+
+class ExpiringModels(FakeModels):
+    def generate_content(self, model, contents, config):
+        self.configs.append(config)
+        if config.cached_content:
+            raise RuntimeError("404 CachedContent not found (expired)")
+        return _Resp()
+
+
+def test_expired_cache_is_dropped_and_the_question_answered_uncached():
+    client = FakeClient()
+    client.models = ExpiringModels()
+    store = {str(DOC.id): "cachedContents/old"}
+    out = answer_question(
+        [DOC], "When is it due?", client, Settings(_env_file=None), cache_store=store
+    )
+    assert out["answer"] == "November 3, 2026" and store == {}
+    assert client.models.configs[-1].cached_content is None

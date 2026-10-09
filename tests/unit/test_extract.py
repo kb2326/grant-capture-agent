@@ -85,7 +85,8 @@ def test_instruction_treats_documents_as_data():
 def test_b1_windows_cover_pages_with_overlap():
     calls = b1_calls([text_doc(12)], size=5, overlap=1)
     assert len(calls) == 3
-    assert "[PAGE 5]" in calls[1][1].text and "[PAGE 9]" in calls[1][1].text
+    window = calls[1][1].text or ""
+    assert "[PAGE 5]" in window and "[PAGE 9]" in window
 
 
 def test_merge_deduplicates_identical_quotes():
@@ -123,6 +124,11 @@ def test_gemini_client_retries_rate_limits():
     from app.analyze.llm import make_client
 
     opts = make_client(Settings(_env_file=None))._api_client._http_options.retry_options
+    assert (
+        opts is not None
+        and opts.attempts is not None
+        and opts.http_status_codes is not None
+    )
     assert opts.attempts >= 5 and 429 in opts.http_status_codes
 
 

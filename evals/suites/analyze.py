@@ -199,7 +199,9 @@ def eval_opportunity_ids(golden_dir: Path) -> list[str]:
 
 def run_cases(opp_ids: list[str], analyze_one, *, max_usd: float) -> list[dict]:
     """Run cases in order; stop before one more case (as costly as the costliest so far) could exceed max_usd."""
-    cases, spent, worst = [], 0.0, 0.0
+    cases: list[dict] = []
+    spent: float = 0.0
+    worst: float = 0.0
     for opp_id in opp_ids:
         if spent + worst > max_usd:
             cases.append(
@@ -216,7 +218,7 @@ def run_cases(opp_ids: list[str], analyze_one, *, max_usd: float) -> list[dict]:
                 "error": f"{type(exc).__name__}: {exc}",
                 "cost_usd": getattr(exc, "cost_usd", 0.0),
             }
-        cost = case.get("cost_usd") or 0.0
+        cost = float(case.get("cost_usd") or 0.0)
         spent, worst = spent + cost, max(worst, cost)
         cases.append(case)
     return cases

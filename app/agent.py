@@ -24,6 +24,9 @@ from google.adk.plugins.bigquery_agent_analytics_plugin import (
 )
 from google.cloud import bigquery
 
+from app.analyze.qa import ask_solicitation
+from app.analyze.service import analyze_opportunity
+
 
 MODEL = "gemini-3.8-flash"
 
@@ -39,12 +42,13 @@ root_agent = Agent(
         retry_options=types.HttpRetryOptions(attempts=3),
     ),
     instruction=(
-        "You are the grant-capture assistant for a small R&D company. "
-        "The Discover, Analyze and Draft workflows are not connected yet. "
-        "If asked to find, analyze or draft, say which milestone adds that capability "
-        "(Analyze: M1, Discover: M2, Draft: M3) and do not invent results."
+        "You are the grant-capture assistant for a small R&D company (Lumen Grid Labs). "
+        "To decide whether the company may apply and what a solicitation requires, call analyze_opportunity "
+        "with the opportunity ID. For follow-up questions about a solicitation, call ask_solicitation. "
+        "Report the verdict exactly as returned, quote the deciding clauses with their pages, and never "
+        "invent eligibility rules. Discover (search) arrives in M2 and Draft in M3."
     ),
-    tools=[],
+    tools=[analyze_opportunity, ask_solicitation],
 )
 import os
 

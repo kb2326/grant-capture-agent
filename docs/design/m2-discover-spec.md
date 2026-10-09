@@ -85,7 +85,7 @@ One SQL statement, two CTEs over `opportunity_cards` joined to `opportunities`:
 - dense: top 50 by cosine distance on the chosen embedding column;
 - sparse: top 50 by `ts_rank_cd(tsv, websearch_to_tsquery('english', :q))`;
 - fused with RRF, `score = Σ 1/(60 + rank)`, top `k` returned.
-Filters (applied in both CTEs): `kind IN`, `status IN` (default open, forecasted), `close_at >= today + min_days_to_close` (null close dates pass), `agency NOT IN exclude`.
+Filters (applied in both CTEs): `kind IN`, `status IN` (default open, forecasted), `close_at >= today + min_days_to_close` (null close dates pass), award ceiling ≥ `award_min` (null passes), and agency exclusion by case-insensitive substring (agency strings are paths such as `DEPT OF DEFENSE > DEPT OF THE ARMY > …`, so excluding `defense` removes all of them).
 
 ### 3.4 Rerank (`rag/rerank.py`)
 `VertexRanker` uses the Vertex AI Ranking API (`semantic-ranker-default-004`) on the top 30 fused hits, using card text. On any error it returns the fused order with `reranked=False`; a request never fails because of reranking. `NoRerank` returns the fused order.
@@ -105,7 +105,7 @@ V1 status open/forecasted · V2 days to close ≥ `min_days_to_close` · V3 rera
 - **B0:** plan → execute → verify → present (top 10 that pass).
 - **B1:** plan → execute → verify → if fewer than K pass and iteration < 3: refine → execute → verify; stops early if the refined plan's queries equal an earlier plan's.
 - ADK 2 graph: `plan → approve_plan (interrupt; user may edit) → search → present`. The `search` node calls `service.run_plan()`, which holds the execute → verify → refine loop, so the workflow and the evals share one code path. Evals call `service.discover()` directly with auto-approval.
-- Models: planning and refinement use `model_agent` (Flash). The `why` sentences for the top 10 come from one extra Flash call per request (in evals they are produced but not scored).
+- Models: planning and refinement use `model_agent` (Flash). The `why` sentences for the top 10 come from one extra Flash call per request (skipped in evals, where they would cost money and are not scored).
 
 ### 3.8 Preferences (`app/memory.py`)
 - Stored in a `preferences(company_id, kind, value, source, created_at)` table: `exclude_agency`, `min_award_usd`, `avoid_topic`, `prefer_topic`.
@@ -143,7 +143,7 @@ V4 asks for verdicts through one interface, `EligibilityChecker.check(opportunit
 | Rerank | on vs. off | winning embedding, no LLM |
 | Workflow | B0 vs. B1 | winning embedding + rerank setting |
 
-- Decision rule: a richer arm is kept only if it improves nDCG@10 by ≥ 0.03 overall or on the vague slice without more than doubling $ per request or p95 latency. Ties go to the simpler or cheaper arm.
+- Decision rule: a richer arm is kept only if it improves nDCG@10 by ≥ 0.03 overall or on the vague slice without more than doubling $ per request or p95 latency (an increase under $0.005 per request or under 2 s is always acceptable, so a free baseline does not block a cheap improvement). Ties go to the simpler or cheaper arm.
 - Report: `reports/m2/ablation.md` with the three tables, the silver-set and pooling caveats, and the decision.
 
 ## 6. Error handling
@@ -158,7 +158,7 @@ V4 asks for verdicts through one interface, `EligibilityChecker.check(opportunit
 ## 7. Testing
 - Unit: card text and hash; RRF fusion math; verify rules V1–V5; refine stop conditions (cap and repeated plan); metric math (P@10, nDCG@10, Recall@20) on hand-computed examples; preference extraction from a plan edit; reranker fallback; A2A client timeout → `unchecked`.
 - DB (`tests/db`): migration; hybrid search over 10 seeded cards with known vectors finds the expected top hit for a dense-only query, a keyword-only query and a filter.
-- No assertions on LLM text. A 3-query smoke evalset for `agents-cli eval run`.
+- No assertions on LLM text. An offline `discover_smoke` suite (saved runs + labels in `evals/fixtures/discover_smoke/`) runs in `python -m evals.run --suite smoke` at no cost, like M1's.
 
 ## 8. Cost (estimate, enforced by caps)
 

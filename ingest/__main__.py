@@ -208,5 +208,23 @@ def sam_attachments(
     typer.echo(json.dumps(stats, indent=2))
 
 
+@cli.command("store-descriptions")
+def store_descriptions_cmd(
+    manifest: Path = Path("evals/data/golden/m1_sample.json"),
+) -> None:
+    """Store each SAM.gov sample notice's description as a document (no API calls)."""
+    import uuid
+
+    from ingest.descriptions import store_descriptions
+
+    items = json.loads(manifest.read_text(encoding="utf-8"))["items"]
+    ids = [uuid.UUID(i["opportunity_id"]) for i in items if i["source"] == "sam_gov"]
+    with _session() as session:
+        stats = store_descriptions(
+            session, blob_store_from_root(get_settings().blob_root), ids
+        )
+    typer.echo(json.dumps(stats, indent=2))
+
+
 if __name__ == "__main__":
     cli()

@@ -239,3 +239,62 @@ class IngestRunRow(Base):
     started_at: Mapped[datetime] = _now()
     ended_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     stats: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+
+
+class OpportunityCardRow(Base):
+    """One searchable card per opportunity (M2 spec §3.1). Two embedding columns for the embedding ablation."""
+
+    __tablename__ = "opportunity_cards"
+    __table_args__ = (
+        Index(
+            "ix_cards_emb_gemini_hnsw",
+            "emb_gemini",
+            postgresql_using="hnsw",
+            postgresql_with={"m": 16, "ef_construction": 64},
+            postgresql_ops={"emb_gemini": "vector_cosine_ops"},
+        ),
+        Index(
+            "ix_cards_emb_local_hnsw",
+            "emb_local",
+            postgresql_using="hnsw",
+            postgresql_with={"m": 16, "ef_construction": 64},
+            postgresql_ops={"emb_local": "vector_cosine_ops"},
+        ),
+        Index("ix_cards_tsv", "tsv", postgresql_using="gin"),
+    )
+
+    opportunity_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("opportunities.id", ondelete="CASCADE"),
+        primary_key=True,
+    )
+    text: Mapped[str] = mapped_column(Text)
+    text_hash: Mapped[str] = mapped_column(String(64))
+    # gemini-embedding-001, 768-d, RETRIEVAL_DOCUMENT
+    emb_gemini: Mapped[list[float] | None] = mapped_column(Vector(EMBEDDING_DIM))
+    # google/embeddinggemma-2, 768-d, Document prompt, normalized
+    emb_local: Mapped[list[float] | None] = mapped_column(Vector(EMBEDDING_DIM))
+    tsv: Mapped[str] = mapped_column(
+        TSVECTOR, Computed("to_tsvector('english', text)", persisted=True)
+    )
+    updated_at: Mapped[datetime] = _now()
+
+
+class PreferenceRow(Base):
+    __tablename__ = "preferences"
+    __table_args__ = (
+        CheckConstraint(
+            "kind in ('exclude_agency','min_award_usd','avoid_topic','prefer_topic')",
+            name="ck_preferences_kind",
+        ),
+        UniqueConstraint("company_id", "kind", "value", name="uq_preferences_value"),
+    )
+
+    id: Mapped[uuid.UUID] = _uuid_pk()
+    company_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("companies.id", ondelete="CASCADE")
+    )
+    kind: Mapped[str] = mapped_column(String(32))
+    value: Mapped[str] = mapped_column(Text)
+    source: Mapped[str] = mapped_column(String(32))  # plan_edit | rejection | profile
+    created_at: Mapped[datetime] = _now()

@@ -99,3 +99,53 @@ def test_aggregation_ineligible_beats_needs_review():
     )
     assert v.status == "INELIGIBLE" and v.rules_version == RULES_VERSION
     assert {h.rule_id for h in v.hits} == {"E7", "E1"}
+
+
+def test_a_bulleted_list_of_eligible_types_means_any_of_them():
+    # "Eligible applicants: higher education; nonprofits; small businesses" -> one clause per bullet
+    assert (
+        status(
+            clause("entity_type", {"allowed": ["university"]}),
+            clause("entity_type", {"allowed": ["nonprofit"]}),
+            clause("entity_type", {"allowed": ["small_business"]}),
+        )
+        == "ELIGIBLE"
+    )
+
+
+def test_a_list_without_the_company_type_is_still_a_knockout():
+    v = decide(
+        [
+            clause("entity_type", {"allowed": ["university"]}),
+            clause("entity_type", {"allowed": ["nonprofit"]}),
+        ],
+        FACTS,
+    )
+    assert v.status == "INELIGIBLE" and [h.outcome for h in v.hits] == [
+        "INELIGIBLE",
+        "INELIGIBLE",
+    ]
+
+
+def test_exclusions_still_apply_alongside_an_allowed_list():
+    assert (
+        status(
+            clause("entity_type", {"allowed": ["small_business"]}),
+            clause("entity_type", {"excluded": ["for_profit"]}),
+        )
+        == "INELIGIBLE"
+    )
+
+
+def test_hits_report_the_clause_as_extracted():
+    v = decide(
+        [
+            clause("entity_type", {"allowed": ["university"]}),
+            clause("entity_type", {"allowed": ["small_business"]}),
+        ],
+        FACTS,
+    )
+    assert [h.clause.constraint for h in v.hits] == [
+        {"allowed": ["university"]},
+        {"allowed": ["small_business"]},
+    ]

@@ -132,8 +132,19 @@ def evaluate_cases(
             higher_is_better=False,
         ),
         MetricResult(
-            suite, "errors", float(len(cases) - len(ok)), 0.0, higher_is_better=False
+            suite,
+            "errors",
+            float(
+                sum(
+                    1
+                    for c in cases
+                    if c.get("error") and not c["error"].startswith("skipped")
+                )
+            ),
+            0.0,
+            higher_is_better=False,
         ),
+        MetricResult(suite, "cases_measured", float(len(ok)), None),
     ]
 
 
@@ -155,6 +166,8 @@ def case_from_result(opportunity_id: str, result, latency_s: float, pages: int) 
                 "document_id": str(c.citation.document_id),
                 "page": c.citation.page,
                 "text": c.citation.quote,
+                "category": c.category,
+                "constraint": c.constraint,
             }
             for c in b.eligibility
         ],
@@ -200,6 +213,30 @@ def run_cases(opp_ids: list[str], analyze_one, *, max_usd: float) -> list[dict]:
         spent, worst = spent + cost, max(worst, cost)
         cases.append(case)
     return cases
+
+
+def rescore(cases: list[dict], facts) -> list[dict]:
+    """Re-apply the eligibility rules to saved clauses: rule changes are re-measured with no model calls."""
+    from app.contracts import Citation, Clause
+    from app.rules.eligibility import decide
+
+    out = []
+    for case in cases:
+        if case.get("error"):
+            out.append(case)
+            continue
+        clauses = [
+            Clause(
+                category=c["category"],
+                constraint=c.get("constraint"),
+                citation=Citation(
+                    document_id=c["document_id"], page=c["page"], quote=c["text"]
+                ),
+            )
+            for c in case["clauses"]
+        ]
+        out.append({**case, "verdict": decide(clauses, facts).status})
+    return out
 
 
 def cases_to_rerun(cases: list[dict]) -> list[str]:

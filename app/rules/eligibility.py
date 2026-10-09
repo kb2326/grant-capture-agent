@@ -6,7 +6,7 @@ from pydantic import BaseModel, ConfigDict, ValidationError, model_validator
 
 from app.contracts import Clause, EligibilityVerdict, RuleHit
 
-RULES_VERSION = "2026-10-09.1"
+RULES_VERSION = "2026-10-09.2"
 ENTITY_TYPES = {
     "for_profit",
     "small_business",
@@ -229,8 +229,34 @@ def evaluate_clause(clause: Clause, f: CompanyFacts) -> RuleHit | None:
     return _hit("E7", "NEEDS_REVIEW", clause, "-", "cost share is a business decision")
 
 
+def _allowed_union(clauses: list[Clause]) -> set[str]:
+    """Solicitations list eligible applicant types as bullets, one clause each: together they mean ANY of them."""
+    union: set[str] = set()
+    for c in clauses:
+        if c.category == "entity_type":
+            parsed = validate_constraint(c.category, c.constraint)
+            if isinstance(parsed, EntityTypeC) and parsed.allowed:
+                union |= set(parsed.allowed)
+    return union
+
+
 def decide(clauses: list[Clause], facts: CompanyFacts) -> EligibilityVerdict:
-    hits = [h for h in (evaluate_clause(c, facts) for c in clauses) if h is not None]
+    union = _allowed_union(clauses)
+    hits = []
+    for original in clauses:
+        c = original
+        if (
+            union
+            and c.category == "entity_type"
+            and isinstance(validate_constraint(c.category, c.constraint), EntityTypeC)
+        ):
+            # judge each listed type against the whole list, keeping this clause's own exclusions
+            c = c.model_copy(
+                update={"constraint": {**c.constraint, "allowed": sorted(union)}}
+            )
+        hit = evaluate_clause(c, facts)
+        if hit is not None:
+            hits.append(hit.model_copy(update={"clause": original}))
     outcomes = {h.outcome for h in hits}
     status = (
         "INELIGIBLE"

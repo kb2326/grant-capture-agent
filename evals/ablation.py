@@ -55,6 +55,7 @@ def write_ablation(
     b1_cases: Path,
     out: Path,
     golden_dir: Path = Path("evals/data/golden"),
+    before: Path | None = None,
 ) -> Path:
     gk, gr = (
         load_golden(golden_dir / "knockout.jsonl"),
@@ -67,7 +68,9 @@ def write_ablation(
         "# M1 ablation: B0 (whole document) vs B1 (page windows)",
         "",
         "Labels are a **silver set**: written by an independent AI labeler (see `evals/LABELING.md`), not by a person.",
-        "Read every number as agreement with that labeler. Cases skipped by the eval budget cap are not errors.",
+        "Read every number as agreement with that labeler. The labeler is a different Gemini model with its own",
+        "prompt, but it reads the same document input, so some errors are correlated and agreement may be",
+        "overstated. Cases skipped by the eval budget cap are not errors; n/a means nothing to measure.",
         "",
         "## B0 on the full sample",
         "",
@@ -86,6 +89,24 @@ def write_ablation(
             ]
         ),
     ]
+    if before is not None and before.exists():
+        old = json.loads(before.read_text(encoding="utf-8"))
+        lines += [
+            "",
+            "## Effect of the rules fix",
+            "",
+            "Before: rules 2026-10-09.1 on the first B0 run. After: the cases B0 had called INELIGIBLE were re-run",
+            "and every case re-scored offline with the current rules (a bulleted list of eligible applicant types",
+            "means any of them, merged only within one list). Re-runs are fresh model calls, so a few verdicts",
+            "may differ for reasons other than the rules.",
+            "",
+            *_table(
+                [
+                    ("before", evaluate_cases("before", old, gk, gr)),
+                    ("after", evaluate_cases("after", b0, gk, gr)),
+                ]
+            ),
+        ]
     for name, cases in (("B0", b0), ("B1", s1)):
         misses = [
             c
@@ -110,5 +131,6 @@ if __name__ == "__main__":
             Path("reports/m1/B0-cases.json"),
             Path("reports/m1/B1-cases.json"),
             Path("reports/m1/ablation.md"),
+            before=Path("reports/m1/B0-cases-rules-2026-10-09.1.json"),
         )
     )

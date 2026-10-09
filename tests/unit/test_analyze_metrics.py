@@ -182,3 +182,73 @@ def test_budget_counts_the_cost_of_failed_cases():
         cases[0]["cost_usd"] == 0.6
         and cases[1]["error"] == "skipped: eval budget reached"
     )
+
+
+def test_rescore_keeps_cases_saved_before_constraints_were_recorded():
+    import json
+    from pathlib import Path
+
+    from app.rules.eligibility import CompanyFacts
+    from evals.suites.analyze import rescore
+
+    facts = CompanyFacts.from_profile(
+        json.loads(Path("data/company/profile.json").read_text(encoding="utf-8"))
+    )
+    old = {
+        "opportunity_id": "a",
+        "verdict": "NEEDS_REVIEW",
+        "error": None,
+        "clauses": [
+            {
+                "document_id": "11111111-1111-1111-1111-111111111111",
+                "page": 1,
+                "text": "x",
+            }
+        ],
+    }
+    assert rescore([old], facts)[0]["verdict"] == "NEEDS_REVIEW"
+
+
+def test_ablation_report_shows_before_and_after_the_rules_fix(tmp_path):
+    import json
+
+    from evals.ablation import write_ablation
+
+    gold = tmp_path / "golden"
+    gold.mkdir()
+    (gold / "knockout.jsonl").write_text(
+        json.dumps({"_meta": {}})
+        + "\n"
+        + json.dumps({"opportunity_id": "a", "verdict": "ELIGIBLE", "clauses": []})
+        + "\n"
+    )
+    case = {
+        "opportunity_id": "a",
+        "verdict": "ELIGIBLE",
+        "clauses": [],
+        "requirements": [],
+        "quotes_total": 0,
+        "quotes_verified": 0,
+        "cost_usd": 0.01,
+        "latency_s": 1.0,
+        "pages": 1,
+        "error": None,
+    }
+    for name, verdict in (
+        ("b0.json", "ELIGIBLE"),
+        ("b1.json", "ELIGIBLE"),
+        ("before.json", "INELIGIBLE"),
+    ):
+        (tmp_path / name).write_text(json.dumps([{**case, "verdict": verdict}]))
+    out = write_ablation(
+        tmp_path / "b0.json",
+        tmp_path / "b1.json",
+        tmp_path / "r.md",
+        gold,
+        before=tmp_path / "before.json",
+    )
+    text = out.read_text(encoding="utf-8")
+    assert (
+        "## Effect of the rules fix" in text
+        and "| verdict_accuracy | 0.000 | 1.000 |" in text
+    )

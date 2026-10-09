@@ -229,8 +229,10 @@ def rescore(cases: list[dict], facts) -> list[dict]:
 
     out = []
     for case in cases:
-        if case.get("error"):
-            out.append(case)
+        if case.get("error") or any("category" not in c for c in case["clauses"]):
+            out.append(
+                case
+            )  # nothing to re-apply (failed, or saved before constraints were recorded)
             continue
         clauses = [
             Clause(

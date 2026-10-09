@@ -66,3 +66,13 @@ For each section prompt, list:
 ## 8. File formats
 
 JSON Lines (one object per line), using the field names in `docs/design/system-design.md` §11. Each file starts with a header object `{"_meta": {...}}` recording the labeler, date, sampling query and seed.
+
+## 9. Using the labeling page (M1)
+
+1. `docker compose up -d db`, then `uv run python -m evals.label`. The page opens at http://127.0.0.1:8765 (local only).
+2. Pick an item from the list (✓ = verdict saved). The left side shows every document of the opportunity, page by page, exactly as the system stored it; **open file** shows the original PDF. SAM.gov notices show their description as `notice-description.html`.
+3. Read the eligibility section **and** every attachment. Choose the verdict, add one row per deciding clause (exact quote, document, page, category), and save.
+4. Items marked for requirements show a second form: one row per proposer "shall / must / will" statement.
+5. Labels append to `evals/data/golden/knockout.jsonl` and `requirements.jsonl`; saving again replaces your earlier label (last one wins). Stop and resume at any time.
+
+The page never shows what the model extracted, so the labels can't be anchored to it. A clause about **who may apply** that fits no category (e.g. "only current program initiatives may apply") still decides the verdict: use category `other` and the verdict it implies.

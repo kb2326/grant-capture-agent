@@ -3,16 +3,17 @@
 *Read this first in any new session (local or cloud).*
 
 ## Where we are
-- *Updated 2026-10-09.* **M0 Foundation complete and merged to `main`** (PR #6). 65 tests (unit + db), CI green. An independent whole-branch review found 2 Critical + 4 Important issues; all fixed test-first.
-- Local: 2,736 opportunities, 736 documents. Cloud: foundation live; Cloud SQL deleted (off by default, `enable_cloudsql=false`). The `ingest:m0` image predates the review fixes, so rebuild it before the next cloud run.
-- **Next: M1 Analyze.** Brainstorm, then spec update, then plan. Starts with hand-labeling 30+ solicitations (`evals/LABELING.md`).
+- *Updated 2026-10-09.* **M0 Foundation complete and merged to `main`** (PR #6).
+- **M1 Analyze in progress** on branch `m1-analyze`. Spec `docs/design/m1-analyze-spec.md`, plan `docs/plans/2026-10-09-m1-analyze.md`, ledger `.superpowers/sdd/2026-10-09-m1-analyze/progress.md` (git-ignored; `git log` is the backup).
+  - Built (Tasks 1-9): text layer + `python -m ingest parse`; contracts; quote verifier; rules E0-E7; Gemini extraction B0/B1; service, ADK 2 workflow, Q&A tool; SAM attachments on demand; SAM notice descriptions as documents; sample + labeling page; eval suites, offline smoke, ablation report.
+  - Live (Task 10): corpus parsed (533 parsed, 202 no text layer = 198 NIH redirect stubs behind a bot challenge + 4 scanned PDFs, 1 .doc). Golden sample drawn (40: 28 Grants.gov, 12 SAM.gov). Dev labels drafted by the model.
+  - **Waiting on you:** label the golden set: `uv run python -m evals.label` (see `evals/LABELING.md`). Then Task 11: full eval, B0 vs B1 ablation, ADR-0016 outcome, review, merge.
+  - SAM attachments: the first run spent the day's quota with no result; fixed (posted-date window, stop after first failure, archived responses). Retry with ONE notice first: `uv run python -m ingest sam-attachments --notice <id>`, then `python -m ingest parse`.
 
 ## Deferred minors from the M0 review (fix when the area is next touched)
 - The nightly job runs `--limit 500`, so cloud runs skip quality checks. Separate a safety cap from the partial-run flag.
 - SAM bulk archiving loads the 210 MB extract into memory. Stream it to GCS before the M2 cloud SAM job.
 - A fresh-but-yesterday SAM cache gets archived under today's date. Key the raw zone by extract date.
-- Generic mime (`application/octet-stream`) on a `.pdf` is skipped. Fall back to the suffix or check the response Content-Type.
-- SAM `resourceLinks` names have no suffix. Use Content-Disposition when M1 fetches SAM attachments.
 - A blank `SIMPLER_GRANTS_API_KEY=` skips the Secret Manager fallback. Treat empty as unset.
 - `estimated_award_count` accepts `bool`.
 - WIF trusts the repo name and every ref. Use repository_id/owner_id plus a ref condition before M4 grants deploy rights.

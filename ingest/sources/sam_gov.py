@@ -151,9 +151,14 @@ class SamGovAdapter:
             self.archive.put_json(f"search-{ptype}-{naics}-{offset}", payload)
         return payload
 
-    def fetch_notice(self, notice_id: str) -> dict | None:
-        """One notice by ID (one budgeted request). None if the budget is spent or the call fails."""
-        if self.requests_made >= self.request_budget:
+    def fetch_notice(
+        self, notice_id: str, posted_at: date | None = None
+    ) -> dict | None:
+        """One notice by ID (one budgeted request). None if the budget is spent or the call fails.
+
+        The API requires a posted-date range; searching a day either side of the notice's own posted
+        date finds notices that are older than a year (long-running BAAs)."""
+        if self.budget_exhausted or self.requests_made >= self.request_budget:
             self.budget_exhausted = True
             return None
         self.requests_made += 1
@@ -164,8 +169,14 @@ class SamGovAdapter:
             "noticeid": notice_id,
             "limit": "1",
             "offset": "0",
-            "postedFrom": (self.today - timedelta(days=364)).strftime("%m/%d/%Y"),
-            "postedTo": self.today.strftime("%m/%d/%Y"),
+            "postedFrom": (
+                posted_at - timedelta(days=1)
+                if posted_at
+                else self.today - timedelta(days=364)
+            ).strftime("%m/%d/%Y"),
+            "postedTo": (
+                posted_at + timedelta(days=1) if posted_at else self.today
+            ).strftime("%m/%d/%Y"),
         }
         try:
             payload = request_json(

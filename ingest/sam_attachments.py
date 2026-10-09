@@ -29,7 +29,9 @@ def attach_sam_documents(
                 OpportunityRow.source_id == notice_id,
             )
         )
-        record = adapter.fetch_notice(notice_id) if row is not None else None
+        record = (
+            adapter.fetch_notice(notice_id, row.posted_at) if row is not None else None
+        )
         if record is None:
             stats["unavailable"] += 1
             continue

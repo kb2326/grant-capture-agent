@@ -133,3 +133,33 @@ def test_fetch_notice_uses_noticeid_and_counts_quota(tmp_path):
         rec = adapter.fetch_notice("n-001")
     assert rec["noticeId"] == "n-001" and adapter.requests_made == 1
     assert dict(route.calls[0].request.url.params)["noticeid"] == "n-001"
+
+
+@respx.mock
+def test_fetch_notice_stops_after_first_failure_to_protect_quota(tmp_path):
+    route = respx.get(SAM_URL).mock(return_value=httpx.Response(500))
+    store, day = LocalBlobStore(tmp_path), date(2026, 10, 9)
+    with build_client() as c:
+        adapter = SamGovAdapter(
+            c, "k", request_budget=8, today=day, quota=SamQuota(store, day)
+        )
+        assert adapter.fetch_notice("n-001") is None
+        assert adapter.fetch_notice("n-002") is None
+    assert route.call_count == 1 and adapter.requests_made == 1
+
+
+@respx.mock
+def test_fetch_notice_searches_the_window_around_its_posted_date(tmp_path):
+    route = respx.get(SAM_URL).mock(
+        return_value=httpx.Response(
+            200, json={"totalRecords": 0, "opportunitiesData": []}
+        )
+    )
+    store, day = LocalBlobStore(tmp_path), date(2026, 10, 9)
+    with build_client() as c:
+        adapter = SamGovAdapter(
+            c, "k", request_budget=2, today=day, quota=SamQuota(store, day)
+        )
+        adapter.fetch_notice("old-1", posted_at=date(2023, 1, 5))
+    params = dict(route.calls[0].request.url.params)
+    assert params["postedFrom"] == "01/04/2023" and params["postedTo"] == "01/06/2023"

@@ -200,6 +200,7 @@ def sam_attachments(
             s.sam_api_key.get_secret_value(),
             request_budget=s.sam_daily_request_budget,
             quota=SamQuota(store, date.today()),
+            archive=RawArchive(store, "sam_gov_api", date.today()),
         )
         stats = attach_sam_documents(
             session, adapter, client, store, notice, max_bytes=s.max_attachment_bytes

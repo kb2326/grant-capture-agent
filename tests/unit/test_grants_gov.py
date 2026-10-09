@@ -114,3 +114,21 @@ def test_adapter_throttles_to_rate_limit():
         )
         list(adapter.iter_opportunities())
     assert sleeps == [1.1, 1.1]  # 3 requests (1 search + 2 details) → 2 waits
+
+
+@respx.mock
+def test_one_failed_detail_does_not_stop_the_adapter():
+    respx.post(f"{GRANTS_BASE}/v1/opportunities/search").mock(
+        return_value=httpx.Response(200, json=load("search_page1.json"))
+    )
+    respx.get(
+        f"{GRANTS_BASE}/v1/opportunities/11111111-1111-1111-1111-111111111111"
+    ).mock(return_value=httpx.Response(404))
+    respx.get(
+        f"{GRANTS_BASE}/v1/opportunities/22222222-2222-2222-2222-222222222222"
+    ).mock(return_value=httpx.Response(200, json=load("detail_sparse.json")))
+    with build_client() as c:
+        adapter = GrantsGovAdapter(c, "k", page_size=2, min_interval_s=0)
+        opps = list(adapter.iter_opportunities())
+    assert [o.source_id[:4] for o in opps] == ["2222"]
+    assert len(adapter.errors) == 1 and "11111111" in adapter.errors[0]

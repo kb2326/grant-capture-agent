@@ -70,6 +70,7 @@ class SamBulkAdapter:
         self.client, self.cache_path, self.url = client, cache_path, url
         self.max_age_s, self.naics = max_age_hours * 3600, frozenset(naics)
         self.archive = archive
+        self.errors: list[str] = []
 
     def _ensure_file(self) -> tuple[Path, bool]:
         """Return the cached extract and whether it was freshly downloaded."""
@@ -98,13 +99,25 @@ class SamBulkAdapter:
                 self.archive.put_bytes(SAM_CSV_NAME, path.read_bytes())
         # The extract is not strictly UTF-8; decode leniently so one bad byte can't stop the run.
         with path.open(encoding="utf-8", errors="replace", newline="") as fh:
-            for row in csv.DictReader(fh):
+            reader = csv.DictReader(fh)
+            for row in reader:
                 if (
                     _get(row, "NaicsCode") not in self.naics
                     or _get(row, "BaseType") not in BASE_TYPES
                 ):
                     continue
-                o = map_sam_csv_row(row)
+                if not _get(row, "NoticeId"):
+                    self.errors.append(f"sam_gov: line {reader.line_num}: no NoticeId")
+                    continue
+                try:
+                    o = map_sam_csv_row(row)
+                except Exception as exc:
+                    self.errors.append(
+                        f"sam_gov:{_get(row, 'NoticeId')}: {type(exc).__name__}: {exc}"[
+                            :300
+                        ]
+                    )
+                    continue
                 yield (
                     o.model_copy(update={"raw_uri": f"{csv_key}#{o.source_id}"})
                     if csv_key

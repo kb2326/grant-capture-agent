@@ -125,3 +125,25 @@ def test_full_run_records_quality_issues(db_session, tmp_path: Path):
         run.stats["quality_issues"][0]["check"] == "Q1_empty"
         and run.stats["limit"] is None
     )
+
+
+class ExplodingAdapter(FakeAdapter):
+    def iter_opportunities(self, limit=None) -> Iterator[Opportunity]:
+        yield opp("1")
+        raise RuntimeError("source went away")
+
+
+def test_adapter_crash_still_records_the_run(db_session, tmp_path: Path):
+    stats = run_ingest(
+        ExplodingAdapter([]), db_session, LocalBlobStore(tmp_path), FakeFetch({})
+    )
+    assert stats.new == 1 and stats.aborted
+    run = db_session.scalars(select(IngestRunRow)).one()
+    assert run.stats["aborted"] is True
+
+
+def test_adapter_item_errors_count_as_failed(db_session, tmp_path: Path):
+    adapter = FakeAdapter([opp("1")])
+    adapter.errors = ["grants_gov:x: HTTP 404"]
+    stats = run_ingest(adapter, db_session, LocalBlobStore(tmp_path), FakeFetch({}))
+    assert stats.failed == 1 and any("HTTP 404" in e for e in stats.errors)

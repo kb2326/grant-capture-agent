@@ -31,6 +31,7 @@ class IngestStats:
     attachments_duplicate: int = 0
     errors: list[str] = field(default_factory=list)
     quality_issues: list[dict] = field(default_factory=list)
+    aborted: bool = False
 
 
 def _apply(
@@ -102,18 +103,15 @@ def _store_attachments(
         stats.attachments_stored += 1
 
 
-def run_ingest(
+def _ingest_all(
     adapter: SourceAdapter,
     session: Session,
     store: BlobStore,
     fetch: Callable[[str], bytes | None],
-    *,
-    limit: int | None = None,
-    download_attachments: bool = True,
-) -> IngestStats:
-    stats = IngestStats()
-    started = datetime.now(UTC)
-    prev = previous_full_run_seen(session, adapter.name)
+    limit: int | None,
+    download_attachments: bool,
+    stats: IngestStats,
+) -> None:
     for o in adapter.iter_opportunities(limit=limit):
         stats.seen += 1
         try:
@@ -145,6 +143,31 @@ def run_ingest(
             stats.failed += 1
             stats.errors.append(f"{o.source}:{o.source_id}: {exc}")
             log.exception("failed to ingest %s:%s", o.source, o.source_id)
+
+
+def run_ingest(
+    adapter: SourceAdapter,
+    session: Session,
+    store: BlobStore,
+    fetch: Callable[[str], bytes | None],
+    *,
+    limit: int | None = None,
+    download_attachments: bool = True,
+) -> IngestStats:
+    stats = IngestStats()
+    started = datetime.now(UTC)
+    prev = previous_full_run_seen(session, adapter.name)
+    try:
+        _ingest_all(adapter, session, store, fetch, limit, download_attachments, stats)
+    # If the source itself fails mid-run, keep what was loaded and still record the run.
+    except Exception as exc:
+        session.rollback()
+        stats.aborted = True
+        stats.errors.append(f"{adapter.name}: run aborted: {type(exc).__name__}: {exc}")
+        log.exception("ingest run for %s aborted", adapter.name)
+    for err in getattr(adapter, "errors", []):  # per-item failures inside the adapter
+        stats.failed += 1
+        stats.errors.append(err)
     if limit is None:
         stats.quality_issues = [
             asdict(i)

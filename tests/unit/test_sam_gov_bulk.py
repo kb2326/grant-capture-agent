@@ -68,3 +68,17 @@ def test_fresh_cache_skips_download_and_stale_cache_refreshes(tmp_path: Path):
     with build_client() as c:
         list(SamBulkAdapter(c, cache_path=cache).iter_opportunities())
     assert route.call_count == 1
+
+
+@respx.mock
+def test_bad_row_is_skipped_and_reported(tmp_path: Path):
+    bad = (
+        SAMPLE
+        + b'"","No ID notice","","DEPT","","","2026-10-01","Solicitation","Solicitation","","","541715","Yes","","x","",""\n'
+    )
+    respx.get(SAM_BULK_URL).mock(return_value=httpx.Response(200, content=bad))
+    with build_client() as c:
+        adapter = SamBulkAdapter(c, cache_path=tmp_path / "sam.csv")
+        opps = list(adapter.iter_opportunities())
+    assert [o.source_id for o in opps] == ["n-101", "n-104"]
+    assert len(adapter.errors) == 1 and "NoticeId" in adapter.errors[0]

@@ -91,6 +91,12 @@ def map_grants_gov(d: dict[str, Any]) -> Opportunity:
     )
 
 
+def _describe(exc: Exception) -> str:
+    if isinstance(exc, httpx.HTTPStatusError):
+        return f"HTTP {exc.response.status_code}"
+    return f"{type(exc).__name__}: {str(exc)[:200]}"
+
+
 class GrantsGovAdapter:
     name = "grants_gov"
     version = "grants_gov/1"
@@ -110,6 +116,7 @@ class GrantsGovAdapter:
         self.min_interval_s, self._sleep, self._clock = min_interval_s, sleep, clock
         self._last: float | None = None
         self.archive = archive
+        self.errors: list[str] = []
 
     def _call(self, method: str, url: str, **kwargs):
         # Simpler Grants allows 60 requests/minute per key; stay just under it.
@@ -139,17 +146,23 @@ class GrantsGovAdapter:
             if self.archive:
                 self.archive.put_json(f"search-page-{page:04d}", payload)
             for item in payload.get("data") or []:
-                detail = self._call(
-                    "GET", f"{GRANTS_BASE}/v1/opportunities/{item['opportunity_id']}"
-                )
-                raw_key = (
-                    self.archive.put_json(f"detail-{item['opportunity_id']}", detail)
-                    if self.archive
-                    else None
-                )
-                yield map_grants_gov(detail["data"]).model_copy(
-                    update={"raw_uri": raw_key}
-                )
+                opp_id = item.get("opportunity_id")
+                try:  # one withdrawn or malformed opportunity must not end the run
+                    detail = self._call(
+                        "GET", f"{GRANTS_BASE}/v1/opportunities/{opp_id}"
+                    )
+                    raw_key = (
+                        self.archive.put_json(f"detail-{opp_id}", detail)
+                        if self.archive
+                        else None
+                    )
+                    opportunity = map_grants_gov(detail["data"]).model_copy(
+                        update={"raw_uri": raw_key}
+                    )
+                except Exception as exc:
+                    self.errors.append(f"grants_gov:{opp_id}: {_describe(exc)}")
+                    continue
+                yield opportunity
                 yielded += 1
                 if limit is not None and yielded >= limit:
                     return

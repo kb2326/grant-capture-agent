@@ -47,6 +47,9 @@ dev = [
     "codespell>=2.3",
     "fpdf2>=2.8",
 ]
+local-embed = [
+    "sentence-transformers>=5.1,<6.0",
+]
 
 [project.optional-dependencies]
 eval = [

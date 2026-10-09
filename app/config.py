@@ -66,7 +66,9 @@ class Settings(BaseSettings):
     )
     local_query_prompt: str = "SearchQuery"
     local_document_prompt: str = "Document"
-    embedding_batch_size: int = 1  # gemini-embedding-001 on Vertex: one input per request unless the live check allows more
+    embedding_batch_size: int = (
+        50  # live check 2026-10-09: gemini-embedding-001 accepts batched inputs
+    )
     price_embedding_per_m: float = 0.15  # gemini-embedding-001, per 1M input tokens
     price_grader_input_per_m: float = 0.25  # gemini-3.5-flash-lite (conservative; real spend checked in Cloud Monitoring)
     price_grader_output_per_m: float = 1.50

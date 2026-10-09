@@ -1,0 +1,6 @@
+{"_meta": {"labeler": "hand", "silver": false, "note": "smoke fixture"}}
+{"query_id": "s1", "opportunity_id": "o1", "grade": 2, "reason": "fixture"}
+{"query_id": "s1", "opportunity_id": "o2", "grade": 1, "reason": "fixture"}
+{"query_id": "s1", "opportunity_id": "o3", "grade": 0, "reason": "fixture"}
+{"query_id": "s2", "opportunity_id": "o4", "grade": 2, "reason": "fixture"}
+{"query_id": "s2", "opportunity_id": "o5", "grade": 0, "reason": "fixture"}

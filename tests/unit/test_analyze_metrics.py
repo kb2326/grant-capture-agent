@@ -40,3 +40,14 @@ def test_run_cases_records_failures_and_keeps_going():
 
     cases = run_cases(["bad", "ok"], analyze_one, max_usd=1.0)
     assert cases[0]["error"] == "RuntimeError: boom" and cases[1]["error"] is None
+
+
+def test_eval_ids_come_from_the_sample_manifest_not_the_labels(tmp_path):
+    import json
+
+    from evals.suites.analyze import eval_opportunity_ids
+
+    (tmp_path / "m1_sample.json").write_text(
+        json.dumps({"items": [{"opportunity_id": "b"}, {"opportunity_id": "a"}]})
+    )
+    assert eval_opportunity_ids(tmp_path) == ["a", "b"]

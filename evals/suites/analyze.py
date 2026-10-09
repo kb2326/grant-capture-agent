@@ -177,6 +177,12 @@ def case_from_result(opportunity_id: str, result, latency_s: float, pages: int) 
     }
 
 
+def eval_opportunity_ids(golden_dir: Path) -> list[str]:
+    """The sample's opportunities. Runs never need the labels, so they can start before labeling ends."""
+    manifest = json.loads((golden_dir / "m1_sample.json").read_text(encoding="utf-8"))
+    return sorted(i["opportunity_id"] for i in manifest["items"])
+
+
 def run_cases(opp_ids: list[str], analyze_one, *, max_usd: float) -> list[dict]:
     """Run cases in order; stop before one more case (as costly as the costliest so far) could exceed max_usd."""
     cases, spent, worst = [], 0.0, 0.0
@@ -231,7 +237,7 @@ def run_variant(
             )
 
         cases = run_cases(
-            sorted(set(gold_ko) | set(gold_req)),
+            eval_opportunity_ids(golden_dir),
             analyze_one,
             max_usd=settings.eval_budget_usd,
         )

@@ -3,12 +3,22 @@
 *Read this first in any new session (local or cloud).*
 
 ## Where we are
-- *Updated 2026-10-09.* **M0 Foundation complete and merged to `main`** (PR #6).
-- **M1 Analyze in progress** on branch `m1-analyze`. Spec `docs/design/m1-analyze-spec.md`, plan `docs/plans/2026-10-09-m1-analyze.md`, ledger `.superpowers/sdd/2026-10-09-m1-analyze/progress.md` (git-ignored; `git log` is the backup).
-  - Built (Tasks 1-9): text layer + `python -m ingest parse`; contracts; quote verifier; rules E0-E7; Gemini extraction B0/B1; service, ADK 2 workflow, Q&A tool; SAM attachments on demand; SAM notice descriptions as documents; sample + labeling page; eval suites, offline smoke, ablation report.
-  - Live (Task 10): corpus parsed (533 parsed, 202 no text layer = 198 NIH redirect stubs behind a bot challenge + 4 scanned PDFs, 1 .doc). Golden sample drawn (40: 28 Grants.gov, 12 SAM.gov). Dev labels drafted by the model.
-  - **Waiting on you:** label the golden set: `uv run python -m evals.label` (see `evals/LABELING.md`). Then Task 11: full eval, B0 vs B1 ablation, ADR-0016 outcome, review, merge.
-  - SAM attachments: the first run spent the day's quota with no result; fixed (posted-date window, stop after first failure, archived responses). Retry with ONE notice first: `uv run python -m ingest sam-attachments --notice <id>`, then `python -m ingest parse`.
+- *Updated 2026-10-09.* **M0 Foundation and M1 Analyze complete** (M1 merged from branch `m1-analyze`).
+- M1 results (`reports/m1/ablation.md`, AI-labeled silver set of 40): knockout recall 1.00 (10/10), strict precision 0.91 (0.45 before the bullet-list rules fix), requirement recall 0.15 whole-document vs 0.69 page windows (n=7), quote fidelity 0.93, $0.04 per solicitation. ADR-0016: B0 for eligibility; hybrid (windows for requirements) planned for M3.
+- Spend: M1 ~$8.60 of the $10/month budget (measured from Cloud Monitoring token counts). **From M2 on: cost-minimal** — small samples, Flash/Flash-Lite, local EmbeddingGemma 2, hard `eval_budget_usd` caps, estimate shown before any run > $0.50.
+- **Next: M2 Discover** (brainstorm → spec → plan).
+- Open data items: SAM.gov attachments for the 12 sampled notices were never fetched (quota spent on a failed run, since fixed); retry one notice first: `uv run python -m ingest sam-attachments --notice <id>`. NIH announcements sit behind a bot challenge and are not fetched.
+
+## Deferred minors from the M1 review
+- Quote normalization misses curly quotes and bullets; `MIN_QUOTE_CHARS` rejects "Phase II".
+- Prompt-injection: injected text can make the model omit a clause; escape delimiter look-alikes inside documents.
+- `analyze_opportunity` tool: validate `variant` and the UUID, return error dicts instead of raising.
+- ADK workflow (not wired to the agent): stop on no documents, write a RunRow, guard a missing company profile.
+- Labeling page "open file" downloads instead of showing the PDF inline.
+- Scanned PDFs estimate 0 tokens and are not sent in B1.
+- `app/agent.py` hard-codes the model ID (pre-existing).
+- `sam_attachments` file-name fallback picks the wrong URL segment for links not ending in `/download`.
+- The silver labeler shares input format and model family with the system (correlated errors).
 
 ## Deferred minors from the M0 review (fix when the area is next touched)
 - The nightly job runs `--limit 500`, so cloud runs skip quality checks. Separate a safety cap from the partial-run flag.

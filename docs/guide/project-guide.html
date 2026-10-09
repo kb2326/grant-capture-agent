@@ -109,7 +109,7 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
   <p class="lede">An AI system that finds federal funding a small R&amp;D company can actually win, rules out the ones it is not allowed to win, and drafts the proposal from the company's own evidence. It is an open, measured take on the workflow commercial GovCon platforms sell, built on Google ADK and Google Cloud, and run the way an AI product team would run it.</p>
   <div class="meta">
     <span>Owner: Karthick Balaje (kb2326)</span>
-    <span>Current phase: M1 Analyze built · waiting on golden labels</span>
+    <span>Current phase: M1 Analyze complete · M2 Discover next</span>
     <span>Last updated: 9 Oct 2026</span>
   </div>
 </header>
@@ -161,7 +161,7 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
 </section>
 
 <section id="m1">
-  <header><span class="eyebrow">Section 01·M1</span><h2>M1 Analyze: what's built and what's next</h2></header>
+  <header><span class="eyebrow">Section 01·M1</span><h2>M1 Analyze: built, measured, merged</h2></header>
   <p><b>The goal:</b> give the system one funding opportunity and get back (1) a <b>brief</b>: who may apply, what the proposal must contain, how it's scored, the deadlines, every item with an exact quote and page number; and (2) a <b>verdict</b>: can Lumen Grid Labs apply? Then <b>measure</b> how often both are right, on solicitations you label by hand.</p>
 
   <h3>How one analysis works</h3>
@@ -211,6 +211,34 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
         <tr><td>Verdict</td><td class="num">NEEDS_REVIEW (cost share)</td></tr>
         <tr><td>Cost / time</td><td class="num">$0.027 / 148 s</td></tr>
       </tbody></table></div></div>
+  </div>
+  <h3>M1 results: what the measurement showed</h3>
+  <p>The answer key is a <b>silver set</b>: Gemini 3.1 Pro labeled the 40 opportunities at your request, with a different model and prompt from the system and its own verdicts, never our rules. Read every number as "agrees with a stronger AI reviewer", not as accuracy checked by a person.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Measure (40 solicitations)</th><th>Target</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td>Real knockouts caught (flagged recall)</td><td class="num">95%</td><td class="num"><b>100%</b> (10 of 10)</td></tr>
+      <tr><td>"INELIGIBLE" calls that are right (precision)</td><td class="num">85%</td><td class="num"><b>91%</b> (was 45% before the bug fix)</td></tr>
+      <tr><td>Requirements found, whole document (B0)</td><td class="num">85%</td><td class="num"><b>15%</b>, not met</td></tr>
+      <tr><td>Requirements found, 5-page windows (B1, 7 cases)</td><td class="num">85%</td><td class="num">69%</td></tr>
+      <tr><td>Quotes that are really in the document</td><td class="num">100%</td><td class="num">93% (the rest are caught and dropped)</td></tr>
+      <tr><td>Cost per solicitation</td><td class="num">–</td><td class="num">B0 $0.04 · B1 $0.15</td></tr>
+    </tbody>
+  </table></div>
+  <div class="grid2">
+    <div class="panel"><h3>What we learned</h3>
+      <ul class="tight">
+        <li><b>The eval found a bug in our own code, not the model's.</b> "Eligible: universities · nonprofits · small businesses" was read as three separate "only X" rules. Fixing it took precision from 45% to 91%.</li>
+        <li><b>Whole-document reading is great for eligibility, poor for long requirement lists.</b> Page windows find 4× more requirements but cost 4× more. So the plan is a hybrid: windows only for solicitations you decide to pursue (M3).</li>
+        <li><b>The system leans cautious.</b> 13 eligible opportunities came back "needs review" instead of "eligible". That's the safe kind of mistake: it never told the company it could apply when it couldn't.</li>
+        <li><b>Costs need hard limits in code.</b> A budget alert only sends email. Every run now stops itself at a dollar cap, and real spend is checked in Google's own token counts.</li>
+      </ul></div>
+    <div class="panel"><h3>Final review</h3>
+      <ul class="tight">
+        <li>An independent reviewer found 0 critical and 6 important issues. All were fixed test-first: list merging limited to one list, failed calls counted toward the budget, expired Q&amp;A cache handled, honest quote-fidelity counting, empty metrics shown as n/a, labeling page escaping.</li>
+        <li>9 minor items are listed in <code>docs/plans/STATUS.md</code> for later.</li>
+        <li>M1 spend: about <b>$8.60</b>, measured.</li>
+      </ul></div>
   </div>
 </section>
 
@@ -273,32 +301,29 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
 
 <section id="next">
   <header><span class="eyebrow">Section 01b</span><h2>Your next steps</h2></header>
-  <p>M1's code is built and tested. The one thing only you can do is label the golden set: it's the answer key every M1 number is measured against.</p>
+  <p>M0 and M1 are merged. From here the project runs <b>cost-minimal</b>: it's a learning prototype, so every step uses the cheapest way that still teaches the idea.</p>
   <div class="grid2">
-    <div class="panel"><span class="eyebrow">Done</span><h3>M0 + M1 build</h3>
+    <div class="panel"><span class="eyebrow">Done</span><h3>M0 + M1</h3>
       <ul class="tight">
-        <li>M0 merged (2,736 opportunities, 736 documents)</li>
-        <li>M1 tasks 1–10: Analyze pipeline, workflow, rules, evals, labeling page</li>
-        <li>Corpus parsed; 40-item sample drawn</li>
+        <li>Data foundation: 2,736 opportunities, 736 documents</li>
+        <li>Analyze: brief + verdict with verified quotes; knockout recall 100%, precision 91% (silver set)</li>
       </ul></div>
-    <div class="panel"><span class="eyebrow">You</span><h3>Label the golden set</h3>
+    <div class="panel"><span class="eyebrow">You</span><h3>Before M2</h3>
       <ol class="tight">
-        <li>Read <code>evals/LABELING.md</code> (sections 2, 3, 4 and 9).</li>
-        <li>Run <code>docker compose up -d db</code>, then <code>uv run python -m evals.label</code>. The page opens in your browser.</li>
-        <li>Label all 40 verdicts, and the requirements for the 10 items marked for it. About 3–4 hours, in as many sittings as you like.</li>
-        <li>Say <b>"labels done"</b>.</li>
+        <li>Read the M1 section above and <code>reports/m1/ablation.md</code>.</li>
+        <li>Try it: <code>agents-cli playground</code>, then ask the agent to analyze an opportunity.</li>
+        <li>Say <b>"start M2"</b>.</li>
       </ol></div>
-    <div class="panel"><span class="eyebrow">Then (me)</span><h3>Measure and ship M1</h3>
+    <div class="panel"><span class="eyebrow">Next</span><h3>M2 Discover (cheap by design)</h3>
       <ul class="tight">
-        <li>Run B0 and B1 on all 40; write the ablation report</li>
-        <li>Record the winner in ADR-0016; put the numbers in the README</li>
-        <li>Independent whole-branch review, fixes, merge</li>
+        <li>Search built from scratch: keyword + meaning search, with EmbeddingGemma 2 running free on your laptop</li>
+        <li>PEV vs. a simple search baseline, on 10–20 queries</li>
+        <li>Target spend: about $1–3</li>
       </ul></div>
-    <div class="panel"><span class="eyebrow">Later</span><h3>After M1</h3>
+    <div class="panel"><span class="eyebrow">Later</span><h3>M3 · M4</h3>
       <ul class="tight">
-        <li><b>M2 Discover:</b> search (EmbeddingGemma 2 vs. Gemini embeddings), PEV ablation, time saved vs. manual search</li>
-        <li><b>M3 Draft:</b> Corrective RAG vs. plain RAG, Ragas</li>
-        <li><b>M4 Ship:</b> live on Google Cloud, README results, LinkedIn and Medium</li>
+        <li><b>M3 Draft:</b> Corrective RAG vs. plain RAG; hybrid requirement extraction</li>
+        <li><b>M4 Ship:</b> web app on Google Cloud (database started only for demos), README, LinkedIn, Medium</li>
       </ul></div>
   </div>
 </section>
@@ -359,7 +384,7 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
     <div class="phase"><span class="n">03</span><div><h3>Decision records (ADRs)</h3><p>One short file per big choice, with the options we turned down and why. Listed in the design; written in M0 Task 11. <code>docs/adr/</code></p></div><span class="pill todo">in M0</span></div>
     <div class="phase"><span class="n">04</span><div><h3>Evals first</h3><p>Decide what "correct" means and label test data before writing features. The harness and labeling guide come in M0; labeled sets in M1–M3. <code>evals/</code></p></div><span class="pill todo">in M0</span></div>
     <div class="phase"><span class="n">05</span><div><h3>Implementation plan</h3><p>Each milestone broken into small, testable tasks. M0 has 21 tasks. <code>docs/plans/2026-10-07-m0-foundation.md</code></p></div><span class="pill done">M0 done</span></div>
-    <div class="phase current"><span class="n">06</span><div><h3>Build</h3><p>Tests first, small pull requests, CI on every pull request. M0 done; M1 built, measuring next.</p></div><span class="pill now">in progress</span></div>
+    <div class="phase current"><span class="n">06</span><div><h3>Build</h3><p>Tests first, small pull requests, CI on every pull request. M0 and M1 done; M2 next.</p></div><span class="pill now">in progress</span></div>
     <div class="phase"><span class="n">07</span><div><h3>Ship</h3><p>Deploy to Google Cloud with a demo UI, tracing, and an eval gate that blocks a bad release.</p></div><span class="pill todo">to do</span></div>
     <div class="phase"><span class="n">08</span><div><h3>Operate and report</h3><p>Eval report, cost report, and a write-up of what went wrong and what you'd change.</p></div><span class="pill todo">to do</span></div>
   </div>
@@ -667,7 +692,7 @@ flowchart LR
     <thead><tr><th>Milestone</th><th>What gets built</th><th>What you learn</th><th>Status</th></tr></thead>
     <tbody>
       <tr><td><b>M0 Foundation</b></td><td>Part A (laptop): scaffold, settings, Postgres schema, Grants.gov + SAM.gov ingestion, fake company documents, eval harness, ADRs, CI. Part B (cloud): Terraform, Cloud Storage, Secret Manager, Cloud SQL, service accounts, keyless GitHub sign-in, ingestion as a Cloud Run Job.</td><td>Data pipelines, schema design, Terraform, IAM, CI</td><td><span class="pill done">done</span></td></tr>
-      <tr><td><b>M1 Analyze</b></td><td>Parsing and chunking, Solicitation agent, knockout rules, labeled set of 25+ solicitations</td><td>Document parsing, structured extraction, labeling, precision/recall</td><td><span class="pill now">built · labeling</span></td></tr>
+      <tr><td><b>M1 Analyze</b></td><td>Parsing and chunking, Solicitation agent, knockout rules, labeled set of 25+ solicitations</td><td>Document parsing, structured extraction, labeling, precision/recall</td><td><span class="pill done">done</span></td></tr>
       <tr><td><b>M2 Discover</b></td><td>Hybrid search, reranking, ADK 2 PEV workflow, approval step, timing benchmark</td><td>Retrieval engineering, agent graphs, human-in-the-loop</td><td><span class="pill todo">to do</span></td></tr>
       <tr><td><b>M3 Draft</b></td><td>Corrective RAG over company documents, faithfulness check, MCP server</td><td>CRAG, LLM judges, citation design, MCP</td><td><span class="pill todo">to do</span></td></tr>
       <tr><td><b>M4 Ship</b></td><td>Agent Runtime deploy, web UI, Terraform, tracing, CI eval gate, red-team set, eval report</td><td>Production deployment, LLMOps, AI security</td><td><span class="pill todo">to do</span></td></tr>
@@ -740,6 +765,8 @@ flowchart LR
       <tr><td class="num">2026-10-06</td><td>Added the Solicitation agent (Analyze) and a hand-built RAG library shared by all agents.</td></tr>
       <tr><td class="num">2026-10-06</td><td>Fictional test company "Lumen Grid Labs" replaces BESI's real capability document.</td></tr>
       <tr><td class="num">2026-10-06</td><td>Stack: ADK 2.x, Gemini 3.x, Cloud SQL Postgres + pgvector, Docling, Agent Runtime (pending your review).</td></tr>
+      <tr><td class="num">2026-10-09</td><td>M1 complete. Golden set labeled by AI (Gemini 3.1 Pro, a silver set) at your request. B0 (whole document) kept for eligibility; page windows find 4× more requirements at 4× the cost, so a hybrid is planned for M3 (ADR-0016). The eval found a rules bug (bullet lists judged item by item); fixing it took precision from 45% to 91%.</td></tr>
+      <tr><td class="num">2026-10-09</td><td>From M2 on the project runs cost-minimal: small samples, cheap or local models, hard dollar caps in code, cost estimate before any run over $0.50. M1 cost about $8.60.</td></tr>
       <tr><td class="num">2026-10-09</td><td>M1 parsing: Gemini reads PDFs natively; a free pypdf/HTML/Word text layer is used only to check quotes. Docling measured too slow (7 h for the corpus); Layout Parser too costly (about $107). ADR-0004 rewritten.</td></tr>
       <tr><td class="num">2026-10-09</td><td>M1 structured output: the clause constraint became a typed object after a live call showed a free-form one comes back empty.</td></tr>
       <tr><td class="num">2026-10-09</td><td>NIH announcements behind a bot challenge are not fetched; SAM.gov notice descriptions are stored as documents so notices without attachments can still be analyzed and labeled.</td></tr>

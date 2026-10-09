@@ -76,7 +76,7 @@ Card text = `title | agency | kind | status | close date | assistance listings |
 
 ### 3.2 Embeddings (`rag/embed.py`)
 - `GeminiEmbedder`: `gemini-embedding-001`, 768-d, `us-central1`, task types `RETRIEVAL_DOCUMENT` / `RETRIEVAL_QUERY`, batches of 100, retries on 429/5xx, records tokens and cost.
-- `LocalEmbedder`: EmbeddingGemma via `sentence-transformers` on CPU, 768-d, using the model's document/query prompts. The model ID lives in `app/config.py` (`model_embedding_local`); the first task of the plan verifies which EmbeddingGemma release is downloadable and pins it.
+- `LocalEmbedder`: EmbeddingGemma (`google/embeddinggemma-300m`) via `sentence-transformers` on CPU, 768-d, using the model's document/query prompts. It is an optional dependency group (`local-embed`), so CI and the container never install PyTorch. The model is gated on Hugging Face: the user accepts its license once and puts `HF_TOKEN` in `.env`.
 - One quick check that `gemini-embedding-2` still returns 404; if it now works it is noted in ADR-0020 but not added as an arm (cost).
 - Both vectors live in `opportunity_cards` (`emb_gemini vector(768)`, `emb_local vector(768)`), each with an HNSW cosine index. The model and dimension are recorded per column in a migration comment and in config.
 
@@ -104,12 +104,12 @@ V1 status open/forecasted · V2 days to close ≥ `min_days_to_close` · V3 rera
 ### 3.7 Workflows (`app/discover/service.py`, `workflow.py`)
 - **B0:** plan → execute → verify → present (top 10 that pass).
 - **B1:** plan → execute → verify → if fewer than K pass and iteration < 3: refine → execute → verify; stops early if the refined plan's queries equal an earlier plan's.
-- ADK 2 graph: `plan → approve_plan (interrupt; user may edit) → execute → verify → [refine | present]`. Evals call `service.discover()` directly with auto-approval.
+- ADK 2 graph: `plan → approve_plan (interrupt; user may edit) → search → present`. The `search` node calls `service.run_plan()`, which holds the execute → verify → refine loop, so the workflow and the evals share one code path. Evals call `service.discover()` directly with auto-approval.
 - Models: planning and refinement use `model_agent` (Flash). The `why` sentences for the top 10 come from one extra Flash call per request (in evals they are produced but not scored).
 
 ### 3.8 Preferences (`app/memory.py`)
 - Stored in a `preferences(company_id, kind, value, source, created_at)` table: `exclude_agency`, `min_award_usd`, `avoid_topic`, `prefer_topic`.
-- Written when the user edits a plan (removed agency → `exclude_agency`) or rejects a candidate with a reason; also loaded into ADK's `InMemoryMemoryService` so the agent can `load_memory` them in chat.
+- Written when the user edits a plan (removed agency → `exclude_agency`) or rejects a candidate with a reason; also loadable into ADK's `InMemoryMemoryService` (`preference_memory()`), and the chat agent gets a `remembered_preferences` tool. Vertex Memory Bank replaces the in-memory service in M4.
 - The planner prompt receives the current preferences; `exclude_agency` and `min_award_usd` are also applied as hard search filters.
 
 ### 3.9 Analyze over A2A (local), behind a switch
@@ -117,7 +117,7 @@ V4 asks for verdicts through one interface, `EligibilityChecker.check(opportunit
 - `direct` (default): calls `app.analyze.service.analyze_opportunity()` in-process.
 - `a2a`: `app/discover/a2a_client.py` sends the request to the Analyze A2A service and reads the verdict from the `analyze_opportunity` tool result carried in the returned A2A task. Timeout 120 s.
 
-`app/analyze/a2a_app.py` wraps the Analyze agent (an `LlmAgent` whose only tool is `analyze_opportunity`) with ADK's `to_a2a` and serves it with uvicorn on port 8001; its agent card is checked into `app/analyze/agent_card.json`. A test runs both transports against the same stubbed Analyze service and asserts the same verdict; another asserts that an unreachable service yields `unchecked`. The core workflow never requires the second server. Deploying the service on Agent Runtime is M4.
+`app/analyze/a2a_app.py` wraps the Analyze agent (an `LlmAgent` whose only tool is `analyze_opportunity`) with ADK's `to_a2a` and serves it with uvicorn on port 8001; its agent card is served at `/.well-known/agent-card.json` (a test reads it). A test runs both transports against the same stubbed Analyze service and asserts the same verdict; another asserts that an unreachable service yields `unchecked`. The core workflow never requires the second server. Deploying the service on Agent Runtime is M4.
 
 ## 4. Query set and labels
 
@@ -125,7 +125,8 @@ V4 asks for verdicts through one interface, `EligibilityChecker.check(opportunit
 20 queries drafted once by Flash from the company profile, then reviewed by the user: 10 specific, 5 vague ("funding for our power electronics work"), 5 dev. Fields: `id, text, slice (specific|vague), split (golden|dev)`. Committed after review; never edited after labeling.
 
 ### 4.2 Relevance labels (`evals/discover_label.py`)
-- Pool: union of the top 10 from every arm (2 embeddings × rerank on/off × B0/B1, B1 only for its final plan) per golden query, capped at 30 candidates per query.
+- Pool, in two stages: (1) the top 10 of the four retrieval arms (2 embeddings × rerank on/off) are labeled, which decides the embedding and rerank setting; (2) B0 and B1 run with the winners and only their not-yet-labeled top-10 results are labeled. Every scored top-10 item is therefore labeled. Dev queries are labeled the same way (used only to tune τ).
+- Labels are made in one call per query (up to 10 cards per call).
 - Labeler: `model_grader` (`gemini-3.5-flash-lite`), different from the system's planner, with its own prompt; judges each (query, company capabilities, card) as 2 relevant / 1 partly / 0 not relevant, with a short reason.
 - Unpooled results count as not relevant (standard pooling assumption, stated in the report).
 - File header `_meta: {labeler, silver: true}`.

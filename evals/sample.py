@@ -112,8 +112,12 @@ def draw_sample(
         ).all()
     )
     by_length = sorted(chosen_grants, key=lambda o: (pages.get(o.id) or 0, str(o.id)))
-    step = len(by_length) / n_requirements
-    req_ids = {by_length[int(i * step)].id for i in range(n_requirements)}
+    step = len(by_length) / n_requirements if n_requirements else 0
+    req_ids = (
+        {by_length[int(i * step)].id for i in range(n_requirements)}
+        if by_length
+        else set()
+    )
 
     items = [
         {

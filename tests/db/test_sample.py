@@ -85,3 +85,11 @@ def test_sample_is_deterministic_stratified_and_capped(db_session):
     assert sum(i["requirements"] for i in a["items"]) == 10
     assert all(i["source"] == "grants_gov" for i in a["items"] if i["requirements"])
     assert "prefilter" not in str(a["items"])
+
+
+def test_sample_without_requirements_set(db_session):
+    _corpus(db_session)
+    m = draw_sample(
+        db_session, seed=1, n_grants=10, n_sam=0, knockout_quota=5, n_requirements=0
+    )
+    assert len(m["items"]) == 10 and not any(i["requirements"] for i in m["items"])

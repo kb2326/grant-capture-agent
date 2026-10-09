@@ -108,3 +108,18 @@ def blob_store_from_root(root: str) -> BlobStore:
     if root.startswith("gs://"):
         return GCSBlobStore(root.removeprefix("gs://").split("/", 1)[0])
     return LocalBlobStore(Path(root))
+
+
+def read_uri(uri: str) -> bytes:
+    """Read a stored blob by the URI recorded in documents.gcs_uri."""
+    from urllib.parse import urlparse
+    from urllib.request import url2pathname
+
+    if uri.startswith("gs://"):
+        from google.cloud import storage
+
+        bucket, _, key = uri.removeprefix("gs://").partition("/")
+        return storage.Client().bucket(bucket).blob(key).download_as_bytes()
+    if uri.startswith("file:"):
+        return Path(url2pathname(urlparse(uri).path)).read_bytes()
+    return Path(uri).read_bytes()

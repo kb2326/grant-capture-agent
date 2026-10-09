@@ -161,5 +161,25 @@ def stats() -> None:
         )
 
 
+@cli.command()
+def parse(
+    limit: int | None = typer.Option(None), opportunity: str | None = typer.Option(None)
+) -> None:
+    """Build the page-tagged text layer for pending documents."""
+    import uuid as _uuid
+
+    from ingest.parsing import parse_documents
+    from ingest.storage import read_uri
+
+    with _session() as session:
+        stats = parse_documents(
+            session,
+            read_uri,
+            limit=limit,
+            opportunity_id=_uuid.UUID(opportunity) if opportunity else None,
+        )
+    typer.echo(json.dumps(stats, indent=2))
+
+
 if __name__ == "__main__":
     cli()

@@ -71,8 +71,8 @@ follow-up Q&A agent ─► same documents via context cache ─► answers with 
 ### 3.1 Text layer (`ingest/textlayer.py`)
 
 - **PDF:** pypdf, page by page. Text is normalized (NFKC, whitespace collapsed, line-break hyphens joined: `require-\nments` becomes `requirements`). A page with fewer than 30 non-whitespace characters is a *no-text page*. A document whose pages are all no-text gets `parse_status = no_text_layer`.
-- **HTML:** Docling's HTML converter (no ML models), producing Markdown. Treated as one logical "page" per heading-level-2 section, so citations name a section.
-- **DOCX:** Docling's DOCX converter, same treatment as HTML.
+- **HTML:** BeautifulSoup + markdownify, producing Markdown (scripts, styles and navigation removed). Treated as one logical "page" per level-1 or level-2 heading section, so citations name a section. The Docling package pulls PyTorch even for formats that do not use it; lightweight libraries give the same Markdown for HTML/DOCX.
+- **DOCX:** python-docx (headings and tables), same treatment as HTML.
 - **DOC (legacy Word):** `parse_status = unsupported`; counted, not processed.
 - **Storage:** one `chunks` row per page or section: `ord`, `page_start = page_end`, `section_path` (the heading, if known), `text`, `n_tokens` (characters / 4). `embedding` stays null until M2. `documents.page_count` and `parse_status` are set.
 - **Command:** `python -m ingest parse [--limit N] [--opportunity ID]`. It is idempotent and skips documents already `parsed`.
@@ -284,6 +284,6 @@ LLM output text is never asserted in pytest. Behavior is judged by the eval suit
 
 ## 11. Changes to existing decisions
 
-- **ADR-0004 (parsing):** updated. PDFs are read natively by Gemini for extraction, with pypdf providing the verifiable text layer. Docling is used for HTML and DOCX. Docling's PDF pipeline and Document AI Layout Parser are compared in M5. The update records the measurements in §2.
+- **ADR-0004 (parsing):** updated. PDFs are read natively by Gemini for extraction, with pypdf providing the verifiable text layer. HTML uses BeautifulSoup + markdownify and DOCX uses python-docx. Docling's PDF pipeline and Document AI Layout Parser are compared in M5. The update records the measurements in §2.
 - **ADR-0016 (long context vs. chunked):** the outcome is filled in from §7's ablation report.
 - **M0 review minors addressed here:** SAM attachment names via `Content-Disposition`; MIME-type suffix fallback.

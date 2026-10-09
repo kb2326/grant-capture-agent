@@ -48,7 +48,8 @@ dev = [
     "fpdf2>=2.8",
 ]
 local-embed = [
-    "sentence-transformers>=5.1,<6.0",
+    "sentence-transformers>=6.0,<7.0",  # EmbeddingGemma 2 modules need 6.x
+    "torchvision",  # EmbeddingGemma 2 processor imports it even for text-only use
 ]
 
 [project.optional-dependencies]

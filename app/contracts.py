@@ -1,6 +1,7 @@
 """Typed hand-offs for the Analyze module (M1 spec §3.2)."""
 
 import uuid
+from datetime import date
 from typing import Literal
 
 from pydantic import BaseModel, Field
@@ -197,3 +198,75 @@ def to_brief(
         prompt_version=prompt_version,
         **out,
     )
+
+
+# ---- M2 Discover (system design §6, M2 spec §3.5) ----
+
+Kind = Literal["grant", "sbir", "sttr", "contract"]
+
+
+class SearchQuery(BaseModel):
+    text: str
+    kinds: list[Kind] = []
+    agencies: list[str] = []
+    min_days_to_close: int = 14
+    award_min: float | None = None
+
+
+class SearchPlan(BaseModel):
+    intent: str  # the user's goal, restated
+    queries: list[SearchQuery]
+    must_have: list[str] = []
+    exclude: list[str] = []  # agency words to leave out, matched case-insensitively
+
+
+class Candidate(BaseModel):
+    opportunity_id: uuid.UUID
+    source_id: str
+    title: str
+    agency: str
+    status: str
+    close_at: date | None
+    score: float
+    reranked: bool = False
+    eligibility: Literal["ELIGIBLE", "INELIGIBLE", "NEEDS_REVIEW", "unchecked"] = (
+        "unchecked"
+    )
+    matched_chunks: list[uuid.UUID] = []  # empty in M2 (cards, not chunks)
+    why: str = ""
+
+
+class Rejection(BaseModel):
+    candidate: Candidate
+    rule_id: str
+    reason: str
+
+
+class VerificationReport(BaseModel):
+    passed: list[Candidate]
+    rejected: list[Rejection]
+    sufficient: bool
+    feedback: str
+
+
+class DiscoverResult(BaseModel):
+    request: str
+    variant: Literal["B0", "B1"]
+    plan: SearchPlan  # the first (approved) plan
+    plans: list[SearchPlan]  # every plan executed, in order
+    candidates: list[Candidate]
+    rejected: list[Rejection]
+    iterations: int
+    tokens_in: int = 0
+    tokens_out: int = 0
+    cost_usd: float = 0.0
+
+
+PreferenceKind = Literal[
+    "exclude_agency", "min_award_usd", "avoid_topic", "prefer_topic"
+]
+
+
+class Preference(BaseModel):
+    kind: PreferenceKind
+    value: str

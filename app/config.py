@@ -45,6 +45,12 @@ class Settings(BaseSettings):
     sam_daily_request_budget: int = 8
 
     max_attachment_bytes: int = 25 * 1024 * 1024
+    analyze_context_budget: int = 300_000
+    analyze_window_pages: int = 5
+    price_agent_input_per_m: float = (
+        0.75  # gemini-3.8-flash, launch pricing through 2026-12-31
+    )
+    price_agent_output_per_m: float = 3.75
 
     @model_validator(mode="after")
     def _secrets_from_secret_manager(self) -> "Settings":

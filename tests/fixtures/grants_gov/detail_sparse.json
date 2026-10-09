@@ -1,0 +1,14 @@
+{
+  "status_code": 200, "message": "Success",
+  "data": {
+    "opportunity_id": "22222222-2222-2222-2222-222222222222",
+    "opportunity_number": null,
+    "opportunity_title": "Forecast: Grid Modernization Lab Call",
+    "opportunity_status": "forecasted",
+    "agency_code": null, "agency_name": null, "top_level_agency_name": "Department of Energy",
+    "opportunity_assistance_listings": null,
+    "summary": {"is_forecast": true, "forecasted_post_date": "2026-12-01", "forecasted_close_date": null,
+                "summary_description": null, "applicant_types": null, "award_ceiling": null, "award_floor": null},
+    "attachments": null
+  }
+}

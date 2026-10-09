@@ -1,0 +1,32 @@
+{
+  "status_code": 200, "message": "Success",
+  "data": {
+    "opportunity_id": "11111111-1111-1111-1111-111111111111",
+    "legacy_opportunity_id": 360001,
+    "opportunity_number": "DE-FOA-0003500",
+    "opportunity_title": "DOE SBIR/STTR FY27 Phase I Release 1",
+    "opportunity_status": "posted",
+    "agency_code": "DOE-SC", "agency_name": "Office of Science", "top_level_agency_name": "Department of Energy",
+    "category": "discretionary",
+    "opportunity_assistance_listings": [{"assistance_listing_number": "81.049", "program_title": "Office of Science Financial Assistance Program"}],
+    "summary": {
+      "summary_description": "<p>Phase I awards for small businesses in energy storage.</p>",
+      "applicant_eligibility_description": "Only small business concerns as defined by SBA are eligible.",
+      "applicant_types": ["small_businesses"],
+      "funding_instruments": ["grant"],
+      "is_cost_sharing": false, "is_forecast": false,
+      "post_date": "2026-09-15", "close_date": "2026-11-03",
+      "award_floor": 50000, "award_ceiling": 200000,
+      "estimated_total_program_funding": 30000000, "expected_number_of_awards": 150
+    },
+    "attachments": [
+      {"opportunity_attachment_id": "a1", "file_name": "DE-FOA-0003500.pdf", "mime_type": "application/pdf",
+       "file_size_bytes": 2048000, "download_path": "https://files.simpler.grants.gov/a1/DE-FOA-0003500.pdf",
+       "file_description": "FOA", "created_at": "2026-09-15T12:00:00+00:00", "updated_at": "2026-09-15T12:00:00+00:00"},
+      {"opportunity_attachment_id": "a2", "file_name": "budget.xlsx",
+       "mime_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+       "file_size_bytes": 10000, "download_path": "https://files.simpler.grants.gov/a2/budget.xlsx",
+       "file_description": "Budget template", "created_at": "2026-09-15T12:00:00+00:00", "updated_at": "2026-09-15T12:00:00+00:00"}
+    ]
+  }
+}

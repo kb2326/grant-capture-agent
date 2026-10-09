@@ -1,0 +1,18 @@
+{
+  "totalRecords": 2, "limit": 1000, "offset": 0,
+  "opportunitiesData": [
+    {"noticeId": "n-001", "title": "SBIR Phase I: Solid-State Grid Battery Management",
+     "solicitationNumber": "W911NF-27-S-0001", "fullParentPathName": "DEPT OF DEFENSE.DEPT OF THE ARMY.ARL",
+     "postedDate": "2026-09-20", "type": "Solicitation", "baseType": "Solicitation",
+     "typeOfSetAside": "SBA", "typeOfSetAsideDescription": "Total Small Business Set-Aside (FAR 19.5)",
+     "responseDeadLine": "2026-11-15T17:00:00-05:00", "naicsCode": "541715", "classificationCode": "AJ12",
+     "active": "Yes", "description": "https://api.sam.gov/prod/opportunities/v1/noticedesc?noticeid=n-001",
+     "uiLink": "https://sam.gov/opp/n-001/view",
+     "resourceLinks": ["https://sam.gov/api/prod/opps/v3/opportunities/resources/files/f1/download"]},
+    {"noticeId": "n-002", "title": "Sources Sought for Power Electronics Testing",
+     "solicitationNumber": null, "fullParentPathName": "NATIONAL AERONAUTICS AND SPACE ADMINISTRATION",
+     "postedDate": "2026-09-18", "type": "Presolicitation", "baseType": "Presolicitation",
+     "typeOfSetAside": null, "responseDeadLine": null, "naicsCode": "541715",
+     "active": "Yes", "description": null, "uiLink": "https://sam.gov/opp/n-002/view", "resourceLinks": null}
+  ]
+}

@@ -241,15 +241,30 @@ docs/         PRD, system design, ADRs, plans, reports, guide
 legacy/       v0 prototype (Nov–Dec 2025)
 ```
 
-*Directories are added milestone by milestone. Today the repo contains `docs/` and `legacy/`.*
+*Directories are added milestone by milestone; `rag/`, `mcp_server/`, `api/` and `web/` arrive in M1–M4.*
 
 ## Getting started
 
-Setup instructions arrive with milestone **M0**. They'll cover local Postgres in Docker, `agents-cli playground`, the ingestion command and running the evals.
+Requirements: [uv](https://docs.astral.sh/uv/), Docker, [agents-cli](https://google.github.io/agents-cli/) 1.9+, and free API keys for [Simpler Grants](https://simpler.grants.gov/) and [SAM.gov](https://sam.gov/).
+
+```bash
+cp .env.example .env            # add SIMPLER_GRANTS_API_KEY and SAM_API_KEY
+docker compose up -d db         # Postgres 16 + pgvector on localhost:5433
+uv sync --extra lint
+uv run alembic upgrade head
+uv run python -m ingest seed-company
+uv run python -m ingest run --source grants_gov --limit 200   # Grants.gov (paced to 60 req/min)
+uv run python -m ingest run --source sam_gov                  # SAM.gov daily public extract (no key)
+uv run python -m ingest stats
+uv run python -m ingest replay --source grants_gov --date YYYY-MM-DD   # rebuild from the raw zone
+uv run pytest tests/unit tests/db
+uv run python -m evals.run --suite smoke
+agents-cli playground           # chat with the agent locally
+```
 
 ## Roadmap
 
-- [ ] **M0 Foundation:** scaffold, synthetic company data, Postgres schema, ingestion, CI, eval harness, ADRs
+- [x] **M0 Foundation:** scaffold, synthetic company data, Postgres schema, ingestion, CI, eval harness, ADRs
 - [ ] **M1 Analyze:** parsing and chunking, Solicitation agent, knockout rules, hand-labeled golden sets
 - [ ] **M2 Discover:** hybrid search + rerank, PEV workflow with approval, timing benchmark
 - [ ] **M3 Draft:** corrective RAG, calibrated grader, faithfulness check, MCP server

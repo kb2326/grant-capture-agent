@@ -23,3 +23,11 @@ def test_analyze_workflow_is_a_workflow():
     from app.analyze.workflow import analyze_workflow
 
     assert isinstance(analyze_workflow, Workflow)
+
+
+def test_root_agent_exposes_discover_tools_and_config_model():
+    from app.config import get_settings
+
+    names = {getattr(t, "__name__", "") for t in root_agent.tools}
+    assert {"find_opportunities", "remembered_preferences"} <= names
+    assert root_agent.model.model == get_settings().model_agent

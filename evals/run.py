@@ -21,6 +21,12 @@ def _discover_smoke():
     return run_smoke()
 
 
+def _draft_smoke():
+    from evals.suites.draft import run_smoke
+
+    return run_smoke()
+
+
 def _analyze(variant: str):
     def _run():
         from evals.suites.analyze import run_variant
@@ -33,10 +39,11 @@ def _analyze(variant: str):
 SUITES: dict[str, Callable[[], list[MetricResult]]] = {
     "analyze_smoke": _analyze_smoke,
     "discover_smoke": _discover_smoke,
+    "draft_smoke": _draft_smoke,
     "analyze_b0": _analyze("B0"),
     "analyze_b1": _analyze("B1"),
 }
-SMOKE: tuple[str, ...] = ("analyze_smoke", "discover_smoke")
+SMOKE: tuple[str, ...] = ("analyze_smoke", "discover_smoke", "draft_smoke")
 
 
 def main(argv: list[str] | None = None) -> int:

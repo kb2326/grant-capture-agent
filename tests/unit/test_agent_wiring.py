@@ -31,3 +31,8 @@ def test_root_agent_exposes_discover_tools_and_config_model():
     names = {getattr(t, "__name__", "") for t in root_agent.tools}
     assert {"find_opportunities", "remembered_preferences"} <= names
     assert root_agent.model.model == get_settings().model_agent
+
+
+def test_root_agent_exposes_draft_section():
+    names = {getattr(t, "__name__", "") for t in root_agent.tools}
+    assert "draft_section" in names

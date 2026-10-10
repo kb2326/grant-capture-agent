@@ -370,3 +370,4 @@ reports/*
 *.tfstate*
 data/cache/
 tfplan
+data/drafts/

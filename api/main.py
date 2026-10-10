@@ -43,7 +43,8 @@ def default_tools() -> Tools:
     def discover(request: str, variant: str = "B0") -> dict:
         from app.discover.tools import find_opportunities
 
-        return find_opportunities(request, variant)
+        # no paid eligibility checks on search: Analyze is an explicit, priced button in the UI
+        return find_opportunities(request, variant, check_eligibility=False)
 
     def analyze(opportunity_id: str) -> dict:
         from app.analyze.service import analyze_opportunity

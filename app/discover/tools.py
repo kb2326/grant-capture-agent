@@ -46,18 +46,21 @@ def open_session(settings: Settings) -> Session:
     return make_session_factory(make_engine(settings.database_url))()
 
 
-def find_opportunities(request: str, variant: str = "B0") -> dict:
+def find_opportunities(
+    request: str, variant: str = "B0", check_eligibility: bool = True
+) -> dict:
     """Find open funding opportunities that fit the company for a plain-English request.
 
     Args:
         request: What to look for, e.g. "SBIR work on grid-forming inverters".
         variant: "B0" (single pass, default) or "B1" (plan, execute, verify and refine).
+        check_eligibility: run Analyze on up to 5 unchecked results (about $0.04 each); False leaves them "unchecked".
     """
     if variant not in ("B0", "B1"):
         return {"error": "variant must be B0 or B1"}
     settings = get_settings()
     with open_session(settings) as session:
-        deps = default_deps(session, settings)
+        deps = default_deps(session, settings, with_checker=check_eligibility)
         company_id, profile = load_company(session)
         result = discover(
             deps,

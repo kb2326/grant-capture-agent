@@ -116,3 +116,18 @@ def test_no_documents_is_a_400_with_hint_not_a_success():
     assert (
         c.post("/api/analyze", json={"opportunity_id": OID}).status_code == 400
     )  # not cached
+
+
+def test_ui_search_skips_paid_eligibility_checks(monkeypatch):
+    import app.discover.tools as dt
+    from api.main import default_tools
+
+    seen = {}
+
+    def fake(request, variant="B0", check_eligibility=True):
+        seen.update(request=request, check=check_eligibility)
+        return {"plan": {}, "candidates": [], "cost_usd": 0.0}
+
+    monkeypatch.setattr(dt, "find_opportunities", fake)
+    default_tools().discover("inverters", "B0")
+    assert seen == {"request": "inverters", "check": False}

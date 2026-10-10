@@ -115,6 +115,12 @@ def create_app(tools: Tools | None = None, budget_usd: float | None = None) -> F
             out = call()
         except OperationalError:
             return err(503, "The database is not reachable.", DB_HINT)
+        if out.get("status") == "no_documents":  # analyze found nothing to read
+            return err(
+                400,
+                str(out.get("message") or "This opportunity has no stored documents."),
+                "This opportunity has no stored solicitation documents to analyze; open another one.",
+            )
         if "error" in out:
             return err(400, str(out["error"]), _hint(str(out["error"])))
         cost = float(out.get("cost_usd") or 0.0)

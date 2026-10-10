@@ -104,3 +104,15 @@ def test_bad_uuid_is_400():
         "/api/analyze", json={"opportunity_id": "nope"}
     )
     assert r.status_code == 400
+
+
+def test_no_documents_is_a_400_with_hint_not_a_success():
+    t, _ = tools(
+        analyze=lambda oid: {"status": "no_documents", "message": "no documents stored"}
+    )
+    c = TestClient(create_app(t, budget_usd=1.0))
+    r = c.post("/api/analyze", json={"opportunity_id": OID})
+    assert r.status_code == 400 and "documents" in r.json()["hint"].lower()
+    assert (
+        c.post("/api/analyze", json={"opportunity_id": OID}).status_code == 400
+    )  # not cached

@@ -37,6 +37,9 @@ export function OpportunityPage({ c, onDraft, onCost }: Props) {
     const r = await analyze(c.opportunity_id);
     setBusy(false);
     if (isError(r)) return setErr(r);
+    if (!r.verdict || !r.brief) {
+      return setErr({ error: "Analyze returned no verdict.", hint: "This opportunity may have no documents to read; open another one." });
+    }
     setVerdict(r);
     setBrief(r.brief);
     onCost(r.cost_usd, r.cached, r.session_spent_usd);

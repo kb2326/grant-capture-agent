@@ -176,7 +176,7 @@ The model-facing schema uses chunk labels (`"C12"`) and requirement ids. Code ma
 | Gap recall / precision | gold gap ids vs. `DraftSection.gaps` | code |
 | Evidence recall | supported requirement counts as covered if a cited chunk contains one of its support facts verbatim | code |
 | Citation validity | share of citations that map to real chunks | code |
-| Distractor-citation rate | share of citations pointing at outdated or off-topic docs | code + manifest |
+| Distractor-citation rate | share of citations pointing at outdated or off-topic docs | code + corpus plan |
 | Faithfulness | supported claims / claims | Flash judge (silver) |
 | Context precision (B1) | share of chunks passed to generation that the draft actually cites | code |
 | Latency, cost | p50/p95 s, $ per section | measured |
@@ -196,7 +196,7 @@ The model-facing schema uses chunk labels (`"C12"`) and requirement ids. Code ma
 ## 7. Testing
 - **Unit:**
   - heading chunker (split and merge);
-  - manifest check;
+  - corpus-plan check;
   - label ↔ UUID mapping and validation;
   - gap and rewrite-cap logic in B1, using a fake grader;
   - faithfulness aggregation;

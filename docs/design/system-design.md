@@ -347,18 +347,20 @@ An ADK `LlmAgent` routes chat requests to the right workflow ("find…" → Disc
 
 ## 10. API and UI
 
-- **`api/` (FastAPI, Cloud Run):**
-  - Session endpoints proxy to Agent Runtime through the `vertexai` SDK agent engine client, with streaming events.
-  - REST endpoints for the saved list, briefs, drafts and export.
-  - Serves the built `web/` static files.
-- **`web/` (React + Vite):** a single page with
-  - a chat pane,
-  - an approval card (edit or approve the plan or draft),
-  - opportunity cards with verdict pills,
-  - a brief view with clickable citations (page and quote),
-  - a draft view where unsupported sentences and gaps are highlighted,
-  - the saved list.
-- **Auth:** a shared demo access code, checked by the API. Requests are rate-limited (30 runs per day across all users) to cap cost. There are no user accounts (ADR-0008).
+*As built in M4 (local, live only; see [`m4-ship-spec.md`](m4-ship-spec.md)).*
+
+- **`api/` (FastAPI):** a small product API, separate from the agents-cli agent server (`app/fast_api_app.py`).
+  - Routes: `POST /api/discover`, `GET /api/brief/{id}` (free), `POST /api/analyze`, `POST /api/draft`, `GET /api/session`. They call the same tools as the agent and the MCP server.
+  - Every response carries `cost_usd`, `cached` and `session_spent_usd`. `SessionBudget` refuses live calls past `ui_session_budget_usd` ($0.50) with HTTP 402; `ResultCache` serves repeated analyze/draft requests at $0.
+  - Search never runs paid eligibility checks; Analyze is an explicit, priced action.
+  - Errors are `{error, hint}` with an actionable hint (database down → 503, no brief → 404, no documents → 400).
+  - Serves the built `web/` files; in production it would run on Cloud Run (designed in `deployment/terraform/prod/`, not deployed, ADR-0021).
+- **`web/` (React + Vite + TypeScript):** three pages, plain CSS, light and dark.
+  - Search: request box, the plan, opportunity cards with verdict pills.
+  - Opportunity: verdict with deciding clauses, AI-use warnings, requirements, criteria, sections and deadlines with page chips.
+  - Draft: section picker, AI-use notice first, cited paragraphs, unsupported paragraphs flagged, gaps panel, Markdown download.
+  - Every button shows its expected cost; a meter shows the last action's cost and the session total. Model text is rendered as text, never HTML.
+- **Not built (funded M4b):** chat pane with streaming approval cards, the saved list, a shared demo access code and rate limit (ADR-0008).
 
 ## 11. Evaluation
 

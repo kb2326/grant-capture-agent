@@ -3,18 +3,29 @@
 *Read this first in any new session (local or cloud).*
 
 ## Where we are
-- *Updated 2026-10-10.* **M0-M3 complete** (M3 merged from branch `m3-draft`).
+- *Updated 2026-10-10.* **M0-M4 (free part) complete** (M4 on branch `m4-ship`).
+- M4 (`docs/design/m4-ship-spec.md`, ADR-0021):
+  - Local live UI: FastAPI product API (`api/`) + React/Vite/TypeScript (`web/`), cost per action, $0.50 session cap, result cache. Live check: search, opportunity brief and one drafted section, screenshots in `docs/assets/`. Spend ≈ $0.23.
+  - Deployment designed, not executed: `deployment/terraform/prod/` validated and planned (9 to add, never applied); `Dockerfile.api` builds and serves; `deploy.yml` manual-only and disabled; teaching docs in `docs/deploy/`.
+  - Final README, `docs/writing/medium-article.md`, `docs/writing/linkedin-post.md`.
+  - Cloud spending stopped (see `docs/deploy/evidence/shutdown-inventory.txt`).
 - M3 results (`reports/m3/ablation.md`, 12 controlled draft tasks, 46 requirements, 10 true gaps, 75-doc corpus):
   - B0 long context (cached corpus) vs. B1 corrective RAG: both flagged 10/10 gaps and invented none; evidence recall 0.944 each; B0 more faithful (0.83 vs 0.78, silver), fewer outdated/off-topic citations (1.4% vs 3.5%), twice as fast (p50 41 s vs 84 s). ADR-0018: B0 is the default.
   - Grader calibration: κ 0.63 (binary) / 0.59 (3-class) vs. the user's 40 hand labels; the grader is stricter than the user.
   - Analyze now extracts quoted `ai_policy` clauses (`brief_v2`); every draft starts with the AI-use notice.
   - MCP server `grant-capture` (`.mcp.json`) verified from a real MCP client over stdio.
-- Spend: M3 ≈ $1.6-2.0 (corpus $0.57, drafting runs ≈ $1.0-1.4, mostly Flash thinking tokens). **October total ≈ $11.2-11.6, over the $10/month target**; drafting now caps thinking (`draft_thinking_budget=1024`). The real-solicitation demo was skipped for budget and moves to M4.
-- **Next: M4 Ship** (brainstorm -> spec -> plan); keep it cost-minimal and mostly free-tier.
+- Spend: M3 ≈ $1.6-2.0 (corpus $0.57, drafting runs ≈ $1.0-1.4, mostly Flash thinking tokens). M4 ≈ $0.23 (live UI session). **October total ≈ $11.4-11.8, over the $10/month target**; drafting now caps thinking (`draft_thinking_budget=1024`).
+- **Next (only if funded): M4b**, following `docs/deploy/03-runbook.md`; then M5 Specialize. Publish the LinkedIn and Medium drafts.
 
-## Open items from M3
-- Real-solicitation demo (draft one section for an analyzed opportunity) moved to M4 with the UI.
-- `draft_thinking_budget` was added after the measured runs; re-measure B0 cost with it in M4.
+## Open items
+- `draft_thinking_budget` was added after the measured M3 runs; re-measure B0 quality and cost with it (≈ $0.50). The one live UI draft cost $0.061.
+- Timing benchmark vs. manual work (README targets) not run.
+
+## Deferred minors from M4
+- Search shows separate SAM notices for one announcement (e.g. the same GRAPE BAA several times); cards are deduplicated only by notice id.
+- Every card shows "No quoted reason (weak match)" for UI searches, since eligibility checks are skipped; show a retrieval reason instead.
+- `Dockerfile.api` image is 2.14 GB: the full dependency set ships (google SDKs 313 MB, pyarrow 156, scipy 109, litellm 90, pandas 72, sklearn 49 MB); split eval/analysis deps into a group the runtime image skips.
+- A search that runs eligibility checks takes 60-80 s with no progress shown; the UI no longer triggers it, but the MCP/agent path still can.
 
 ## Deferred minors from the M3 review
 - Draft workflow: with no brief, "ok" at approval raises a KeyError in export; an empty reply counts as approval; a bad UUID raises in `draft_node`.

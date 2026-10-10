@@ -109,7 +109,7 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
   <p class="lede">An AI system that finds federal funding a small R&amp;D company can actually win, rules out the ones it is not allowed to win, and drafts the proposal from the company's own evidence. It is an open, measured take on the workflow commercial GovCon platforms sell, built on Google ADK and Google Cloud, and run the way an AI product team would run it.</p>
   <div class="meta">
     <span>Owner: Karthick Balaje (kb2326)</span>
-    <span>Current phase: M3 Draft complete · M4 Ship next</span>
+    <span>Current phase: M4 Ship (free part) complete · deployment designed, not deployed</span>
     <span>Last updated: 9 Oct 2026</span>
   </div>
 </header>
@@ -119,6 +119,7 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
   <span class="eyebrow">Sections</span>
   <ol>
     <li><a href="#status">Where we are</a></li>
+    <li><a href="#m4">M4 Ship</a></li>
     <li><a href="#m3">M3 Draft</a></li>
     <li><a href="#m2">M2 Discover</a></li>
     <li><a href="#m1">M1 Analyze</a></li>
@@ -157,9 +158,56 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
       <tr><td>Data</td><td>Calls Grants.gov, SBIR.gov and USAspending live on every search</td><td>Nightly ingestion into an index; live calls only as a fallback</td></tr>
       <tr><td>Eligibility screen</td><td>Looks for two fixed phrases on the web page</td><td>Reads the full solicitation, extracts each clause, rules decide, accuracy measured</td></tr>
       <tr><td>Proposal drafting</td><td>Not built</td><td>Corrective RAG over company documents with citations</td></tr>
-      <tr><td>Quality</td><td>One test file, no evals, no CI, not deployed</td><td>Eval sets, CI eval gate, tracing, live on Google Cloud</td></tr>
+      <tr><td>Quality</td><td>One test file, no evals, no CI, not deployed</td><td>Eval sets, smoke evals in CI, a local live UI; production deployment designed and validated with <code>terraform plan</code>, not deployed (to save money)</td></tr>
     </tbody>
   </table></div>
+</section>
+
+<section id="m4">
+  <header><span class="eyebrow">Section 01·M4</span><h2>M4 Ship: a working UI, a deployment designed but not run, and spending stopped</h2></header>
+  <p><b>The goal:</b> finish the project as something people can see and judge, <b>without spending on cloud infrastructure</b>. You chose to learn how products like this are taken to production, design it properly, prove the design without paying, and stop there. A funded "M4b" can deploy later by following the runbook.</p>
+
+  <h3>What was built</h3>
+  <div class="grid2">
+    <div class="panel"><span class="eyebrow">Product</span><h3>A local, live UI</h3>
+      <ul class="tight">
+        <li><b>FastAPI</b> product API (<code>api/</code>) over the same tools the agent and MCP server use</li>
+        <li><b>React + Vite + TypeScript</b> UI (<code>web/</code>): Search, Opportunity (brief and verdict), Draft (notice, citations, flags, gaps, Markdown download)</li>
+        <li>Every button shows its expected cost; a meter shows each action's real cost and the session total; a <b>$0.50 session cap</b> refuses further paid calls; repeated requests are served from a cache for free</li>
+      </ul></div>
+    <div class="panel"><span class="eyebrow">Deployment</span><h3>Designed, proven, not applied</h3>
+      <ul class="tight">
+        <li>Production Terraform (<code>deployment/terraform/prod/</code>): Cloud Run, one service account per agent, secret access, optional budget. <code>terraform plan</code>: 9 to add, <b>nothing created</b></li>
+        <li><code>Dockerfile.api</code>: the production image builds and serves the UI locally</li>
+        <li>A deploy workflow that exists but is switched off</li>
+        <li>Five teaching documents in <code>docs/deploy/</code> and ADR-0021</li>
+      </ul></div>
+  </div>
+
+  <h3>Prototype vs. production, in one table</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Concern</th><th>On the laptop</th><th>In production</th></tr></thead>
+    <tbody>
+      <tr><td>Who runs it</td><td>You, with owner rights</td><td>One service account per component, only the roles it needs</td></tr>
+      <tr><td>Secrets</td><td><code>.env</code></td><td>Secret Manager, read only by named identities</td></tr>
+      <tr><td>Database</td><td>Postgres in Docker</td><td>Cloud SQL + pgvector, backed up; billed hourly, so off until needed</td></tr>
+      <tr><td>Scaling</td><td>Runs while the terminal is open</td><td>Cloud Run scales to zero; Agent Runtime hosts the agents</td></tr>
+      <tr><td>Seeing problems</td><td>Prints and cost counters</td><td>Cloud Trace per request, structured logs, token charts</td></tr>
+      <tr><td>Quality</td><td>Ablations run by hand</td><td>Smoke evals block a release that regresses</td></tr>
+      <tr><td>Cost</td><td>Estimates and caps</td><td>Budget alert (emails only) + caps in code (actually stop spend)</td></tr>
+      <tr><td>Undo</td><td><code>git checkout</code></td><td>Shift traffic to the previous Cloud Run revision</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>What the live run taught</h3>
+  <ul class="tight">
+    <li><b>An expensive call hid inside a cheap one.</b> A search silently ran up to 5 eligibility analyses: $0.147 instead of $0.008. Now search never runs them; Analyze is a priced button. Test first, then the fix.</li>
+    <li><b>Unexpected responses must not crash the page.</b> Analyzing an opportunity with no stored documents returned an odd shape and blanked the page. Now the API returns a clear error with a hint, and the page shows it.</li>
+    <li>One live session: search, an opportunity brief and one drafted section with sources, flags and a gap. <b>M4 spend about $0.23.</b></li>
+  </ul>
+
+  <h3>Spending stopped</h3>
+  <p>After the live check, the leftovers that cost money while idle (container images, build files, raw downloads) are deleted once you approve the exact list. Kept: the Terraform state bucket, the secrets and the budget alert (cents a month), so the project can resume. Disabling billing is documented as the last resort.</p>
 </section>
 
 <section id="m3">
@@ -215,7 +263,7 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
         <li><b>RAG has to earn its place.</b> With 75 documents (about 54k tokens) the whole corpus fits in one cached prompt, and reading everything beat search-grade-retry on faithfulness, outdated citations and speed. Corrective RAG stays in the code for when the library grows about tenfold.</li>
         <li><b>Gaps are the safety feature.</b> Both designs flagged every requirement the company can't prove (hydrogen, cybersecurity, offshore wind) and never invented evidence.</li>
         <li><b>Your 40 labels calibrated the grader:</b> κ 0.63, above the 0.6 bar. When you disagreed, the grader was stricter than you, the safe direction for gap finding.</li>
-        <li><b>Thinking tokens cost money.</b> Flash "thinking" (billed as output, up to 13k per section) made the long-context run cost 2.7x its estimate. Drafting now caps thinking at 1,024 tokens.</li>
+        <li><b>Thinking tokens cost money.</b> Flash "thinking" (billed as output, up to 17k per section) made the long-context run cost 2.7x its estimate. Drafting now caps thinking at 1,024 tokens.</li>
       </ul></div>
     <div class="panel"><h3>Also built</h3>
       <ul class="tight">
@@ -405,30 +453,28 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
 
 <section id="next">
   <header><span class="eyebrow">Section 01b</span><h2>Your next steps</h2></header>
-  <p>M0, M1 and M2 are merged. The project stays <b>cost-minimal</b>: a learning prototype, so every step uses the cheapest way that still teaches the idea.</p>
+  <p>M0-M3 are merged and the free part of M4 is done. Nothing is running in the cloud.</p>
   <div class="grid2">
-    <div class="panel"><span class="eyebrow">Done</span><h3>M0 + M1 + M2</h3>
+    <div class="panel"><span class="eyebrow">Done</span><h3>M0-M4 (free)</h3>
       <ul class="tight">
-        <li>Data foundation: 2,737 opportunities, searchable cards with two kinds of embeddings</li>
-        <li>Analyze: brief + verdict with verified quotes; knockout recall 100%, precision 91% (silver set)</li>
-        <li>Discover: hybrid search, plan approval, A2A, preferences; three measured design decisions</li>
+        <li>Data: 2,737 opportunities; 75-document synthetic company</li>
+        <li>Analyze, Discover, Draft: each built twice and decided by measurement</li>
+        <li>Local live UI; deployment designed and validated, not deployed</li>
       </ul></div>
-    <div class="panel"><span class="eyebrow">You</span><h3>Before M3</h3>
+    <div class="panel"><span class="eyebrow">You</span><h3>Now</h3>
       <ol class="tight">
-        <li>Read the M2 section above and <code>reports/m2/ablation.md</code>.</li>
-        <li>Try it: <code>agents-cli playground</code>, then ask "find SBIR work on grid-forming inverters".</li>
-        <li>Optional: skim <code>reports/m2/label_spotcheck.md</code> and mark where you disagree with the AI labels.</li>
-        <li>Say <b>"start M3"</b>.</li>
+        <li>Read <code>docs/deploy/01-prototype-to-production.md</code>, then the runbook.</li>
+        <li>Edit and publish <code>docs/writing/linkedin-post.md</code> and <code>medium-article.md</code> (add the Medium link to the post).</li>
+        <li>Optional, about $0.50: re-measure drafting with thinking capped.</li>
       </ol></div>
-    <div class="panel"><span class="eyebrow">Next</span><h3>M3 Draft (cheap by design)</h3>
+    <div class="panel"><span class="eyebrow">If funded</span><h3>M4b</h3>
       <ul class="tight">
-        <li>Corrective RAG vs. plain long-context drafting over the company's documents</li>
-        <li>Hybrid requirement extraction (page windows only for chosen opportunities)</li>
-        <li>Target spend: about $1–3</li>
+        <li>Follow <code>docs/deploy/03-runbook.md</code> step by step, then tear down (costs in <code>docs/deploy/04-costs.md</code>)</li>
+        <li>Memory Bank, Model Armor, red-team run, CI eval gate on a live deployment</li>
       </ul></div>
-    <div class="panel"><span class="eyebrow">Later</span><h3>M4</h3>
+    <div class="panel"><span class="eyebrow">Later</span><h3>M5</h3>
       <ul class="tight">
-        <li><b>M4 Ship:</b> web app on Google Cloud, Analyze deployed as an A2A service, Memory Bank, README, LinkedIn, Medium</li>
+        <li>Tuned vs. prompted grader; multimodal parsing; managed retrieval comparison</li>
       </ul></div>
   </div>
 </section>

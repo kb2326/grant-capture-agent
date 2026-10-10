@@ -8,6 +8,19 @@
 | Branch | `m3-draft` |
 | Decisions | ADR-0018 (outcome recorded here) |
 
+## 0. How real products approach proposal drafting
+
+Commercial proposal tools for government contracting broadly follow the same workflow that proposal teams have used for decades. AI speeds up the slow steps, and people keep ownership of the text:
+
+1. **Content library.** A curated, versioned store of past proposals, past-performance write-ups, resumes, boilerplate and approved answers. Quality depends on this library more than on the model. *Here:* `data/company/` and its chunks.
+2. **RFP shredding and compliance matrix.** The solicitation is broken into "shall" statements, instructions to offerors (Section L), evaluation criteria (Section M), page limits and deadlines, and each one is mapped to a proposal section so nothing is missed. *Here:* Analyze (M1) produces the brief that feeds Draft.
+3. **Outline and storyboard.** Humans set win themes, discriminators and the section plan (the "pink team" review). *Here:* out of scope; sections come from the brief.
+4. **Section drafting.** For each section the tool retrieves relevant library content and writes a first draft in the company's voice, with links back to the sources. Many tools also reuse approved answers word for word. *Here:* Draft, which adds explicit gap flags and per-sentence support checks.
+5. **Review cycles.** Writers rewrite. A "red team" scores the full draft against the evaluation criteria, then a "gold team" does the final executive review. AI can check compliance against the matrix, but people own the text and its accuracy. *Here:* the `approve_draft` step, the AI-use notice on every export, and gap and unsupported-sentence flags that tell the writer where to look.
+6. **Governance.** A private tenant with no training on customer data, an audit trail, and careful handling of controlled unclassified information (CUI). Agency rules on AI use (for example NIH's 2025 policy on applications substantially developed by AI, and NSF's encouragement to disclose AI use) are checked for each solicitation. *Here:* Gemini runs on Vertex AI in the project's own Google Cloud project, and Analyze extracts AI-use clauses (§3.9).
+
+What M3 measures is step 4: does the drafter find the right evidence, admit what is missing, and cite only what supports each claim?
+
 ## 1. Goal
 
 Given one proposal section (title, instructions, the requirements it must answer and the evaluation criteria), write a draft that:
@@ -35,6 +48,8 @@ M3 runs **cost-minimal**: drafting and judging use Flash, grading uses Flash-Lit
 | A9 | MCP server | FastMCP server exposing `search_opportunities`, `get_brief`, `check_eligibility`, `draft_section`; registered in the project's `.mcp.json` and called once from Claude Code |
 | A10 | Demo | 2 real solicitations drafted end to end (not scored) |
 | A11 | Spend | M3 Gemini spend ≤ $2.50, measured |
+| A12 | AI-use notice | every exported draft starts with the notice in §3.9; a test checks it |
+| A13 | AI-use clauses | Analyze briefs carry `ai_policy` clauses (quoted, cited); `draft_section` returns them as warnings; eligibility rules and M1 metrics unchanged |
 
 ### Out of scope (moved to M4)
 Sensitive Data Protection redaction of bios, Gen AI evaluation service autoraters, DOCX export, hybrid requirement extraction (ADR-0016 follow-up), Gemini Pro drafting.
@@ -135,6 +150,12 @@ The model-facing schema uses chunk labels (`"C12"`) and requirement ids. Code ma
 - Each tool returns compact JSON.
 - `.mcp.json` at the repo root registers it as `grant-capture` (`uv run python -m mcp_server`).
 - Verified once by calling a tool from Claude Code.
+
+### 3.9 AI-use notice and AI-policy clauses
+- **Notice:** every Markdown export, and the `draft_section` result, starts with `> AI-assisted first draft. Human review and rewrite required before submission. Check the solicitation's rules on AI use.`
+- **Clauses:** Analyze's prompt (`brief_v2`, with `brief_v1` kept for reproducing M1) asks for a new list, `ai_policy`. It holds quoted statements about using AI or generative tools in preparing the application, or about originality, each with document and page. The list is verified like other quotes.
+  - It is a separate field, so the eligibility rules, verdicts and M1 metrics are unchanged.
+  - `draft_section` and the workflow return `ai_policy` as warnings next to the draft.
 
 ## 4. Draft task set and labels
 

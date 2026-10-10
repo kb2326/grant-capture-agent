@@ -33,6 +33,7 @@ def draft_node(node_input: DraftRequest) -> dict:
     from app.draft.tools import (
         ai_warnings,
         default_draft_deps,
+        draft_with_cleanup,
         load_brief,
         task_from_brief,
     )
@@ -51,10 +52,10 @@ def draft_node(node_input: DraftRequest) -> dict:
             node_input.sections or [sec.title for sec in brief.required_sections][:6]
         )
         tasks = [task_from_brief(brief, t) for t in titles]
-        sections = [
-            draft(deps, t, node_input.variant or settings.draft_variant)[0]
-            for t in tasks
-        ]
+        variant = node_input.variant or settings.draft_variant
+        sections = draft_with_cleanup(
+            deps, lambda d: [draft(d, t, variant)[0] for t in tasks]
+        )
         chunk_titles = {str(c.chunk_id): c.document_title for c in deps.chunks}
     return {
         "opportunity_id": node_input.opportunity_id,

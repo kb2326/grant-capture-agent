@@ -39,6 +39,13 @@ def task_from_brief(
 
 
 def ai_warnings(brief: SolicitationBrief) -> list[str]:
+    if (
+        brief.prompt_version < "brief_v2"
+    ):  # analyzed before AI-use clauses were extracted
+        return [
+            "AI-use rules were not checked for this solicitation (analyzed before brief_v2); "
+            "re-run analyze_opportunity and read the solicitation's rules before using AI-drafted text."
+        ]
     return [
         f'{p.text} ("{p.citation.quote}", p. {p.citation.page})'
         for p in brief.ai_policy
@@ -79,6 +86,15 @@ def default_draft_deps(session: Session, settings: Settings) -> DraftDeps:
     )
 
 
+def draft_with_cleanup(deps, run):
+    """Run drafting and always delete the paid context cache afterwards, even on errors."""
+    try:
+        return run(deps)
+    finally:
+        if getattr(deps, "cache", None) is not None:
+            deps.cache.delete()
+
+
 def load_brief(session: Session, opportunity_id: uuid.UUID) -> SolicitationBrief | None:
     from db.models import SolicitationBriefRow
 
@@ -112,7 +128,7 @@ def draft_section(opportunity_id: str, section_title: str, variant: str = "") ->
             }
         deps = default_draft_deps(session, settings)
         task = task_from_brief(brief, section_title)
-        section, _ = draft(deps, task, variant)
+        section, _ = draft_with_cleanup(deps, lambda d: draft(d, task, variant))
         titles = {c.chunk_id: c.document_title for c in deps.chunks}
     return {
         "notice": NOTICE,

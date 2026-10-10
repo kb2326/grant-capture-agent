@@ -67,6 +67,21 @@ def estimate_run_usd(
     return n_tasks * (4 * 3 * grade + 3 * (6_000 * inp + 1_500 * out))
 
 
+def seed_spent(rows: list[dict]) -> float:
+    """Spend already recorded in saved rows, so stopping and resuming cannot bypass the budget."""
+    return sum(float(r.get("stats", {}).get("cost_usd") or 0.0) for r in rows)
+
+
+def tokens_cost(deps, settings: Settings) -> float:
+    """Cost of every billed call so far (failed ones included), from the models' token counters."""
+    return (
+        deps.llm.total_tokens_in * settings.price_agent_input_per_m
+        + deps.llm.total_tokens_out * settings.price_agent_output_per_m
+        + deps.grader.total_tokens_in * settings.price_grader_input_per_m
+        + deps.grader.total_tokens_out * settings.price_grader_output_per_m
+    ) / 1e6
+
+
 def _runs(variant: str) -> list[dict]:
     p = OUT / f"runs-{variant}.json"
     return json.loads(p.read_text(encoding="utf-8")) if p.exists() else []
@@ -99,12 +114,16 @@ def cmd_run(variant: str, yes: bool) -> None:
         )
         if est > 0.5 and not yes:
             raise SystemExit("estimate above $0.50: re-run with --yes")
-        done = {r["task_id"]: r for r in _runs(variant) if not r.get("error")}
-        rows, spent = [], 0.0
+        saved = _runs(variant)
+        done = {r["task_id"]: r for r in saved if not r.get("error")}
+        rows: list[dict] = []
+        spent0, c0 = seed_spent(saved), tokens_cost(deps, settings)
+        spent = spent0
         for t in tasks:
             if t["id"] in done:
                 rows.append(done[t["id"]])
                 continue
+            spent = spent0 + tokens_cost(deps, settings) - c0  # failed calls count too
             if spent >= settings.draft_eval_budget_usd:
                 rows.append(
                     {"task_id": t["id"], "error": "skipped: eval budget reached"}
@@ -136,7 +155,6 @@ def cmd_run(variant: str, yes: bool) -> None:
                         },
                     }
                 )
-                spent += section.cost_usd
             except Exception as exc:  # recorded, never hidden
                 rows.append(
                     {
@@ -243,6 +261,11 @@ def cmd_report() -> None:
         f"ADR-0018: {'B1 (corrective RAG)' if b1 else 'B0 (long context)'} - B1 is kept only with a >= 0.05 "
         "gain in gap recall, evidence recall or faithfulness without doubling cost or p95."
     ]
+    lines.append(
+        "Measured with Flash thinking uncapped; the shipped default draft_thinking_budget=1024 "
+        "(added afterwards to cut cost) has not been measured, so quality, latency and cost at that "
+        "setting are unknown until re-run."
+    )
     print(
         write_draft_report(OUT, summaries, lines, _kappa()).read_text(encoding="utf-8")
     )

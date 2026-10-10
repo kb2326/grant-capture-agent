@@ -32,4 +32,4 @@ Full numbers: `reports/m3/ablation.md`. 12 controlled draft tasks (46 requiremen
 
 **Decision: B0.** Corrective RAG brought no quality gain on a corpus that fits in one cached context. Long context was slightly more faithful, cited outdated documents less often and ran twice as fast. Both caught every true gap and invented none. B1 stays in the code as the path for a corpus too large for the context window; the decision should be re-run when the company corpus grows by roughly 10x or when cost per section matters more than latency.
 
-**Cost note:** Flash's thinking tokens (billed as output, up to 13k per section) dominated spend; drafting now caps them (`draft_thinking_budget=1024`).
+**Cost note:** Flash's thinking tokens (billed as output, up to 17k per section) dominated spend; drafting now caps them (`draft_thinking_budget=1024`). These measurements were taken with thinking **uncapped**: the shipped default has not been measured, so faithfulness, latency and cost at 1,024 thinking tokens are unknown until B0 is re-run (about $0.50, planned for M4).

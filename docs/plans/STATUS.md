@@ -16,6 +16,17 @@
 - Real-solicitation demo (draft one section for an analyzed opportunity) moved to M4 with the UI.
 - `draft_thinking_budget` was added after the measured runs; re-measure B0 cost with it in M4.
 
+## Deferred minors from the M3 review
+- Draft workflow: with no brief, "ok" at approval raises a KeyError in export; an empty reply counts as approval; a bad UUID raises in `draft_node`.
+- Export filename uses the raw opportunity-id string (`urn:uuid:` forms break on Windows); use `str(uuid.UUID(...))`.
+- `task_from_brief` silently drops requirements past 8 and falls back to all requirements for an unknown section title.
+- Faithfulness splitter keeps `## Heading` lines; whether an uncited sentence is a claim is left to the judge.
+- No test for "every requirement is a gap / empty corpus" (works by reading the code).
+- `evals.draft pairs` overwrites `grader_pairs.json` and renumbers pairs; existing labels would then match the wrong pairs.
+- Reloading a changed company doc gives its chunks new ids, so re-scoring old runs undercounts validity and recall.
+- `draft_b0` retries uncached on any exception (paying twice on JSON failures); a judge API error discards an already-paid section.
+- Context-cache creation and storage cost is not included in a section's `cost_usd`.
+
 ## Deferred minors from the M2 review
 - A2A client: the thread pool's shutdown waits past the result timeout; the `httpx.AsyncClient` is never closed.
 - A negation-only query (`-solar`) gives every card an arbitrary sparse rank (`ts_rank_cd` = 0); skip sparse search when the query has no positive terms.

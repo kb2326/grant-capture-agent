@@ -33,7 +33,8 @@ def score_section(
         "true_gaps": len(flagged & gold_gaps),
         "covered": covered,
         "supported_reqs": len(task["requirements"]) - len(gold_gaps),
-        "citations": len(cited),
+        # labels the model invented were removed by validation; they still count against validity
+        "citations": len(cited) + int(section.get("invalid_citations", 0)),
         "valid_citations": len(valid),
         "distractor_citations": sum(
             chunk_kind.get(c) in ("outdated", "off_topic") for c in valid

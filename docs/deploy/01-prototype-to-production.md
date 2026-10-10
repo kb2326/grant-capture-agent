@@ -13,7 +13,7 @@ Everything in this project so far runs on one laptop: Postgres in Docker, Python
 **Why it matters:** secrets never sit in images, logs or repositories, and access to each one is listed and auditable.
 
 ## Data: the database and its schema
-**Laptop:** Postgres 17 + pgvector in Docker, migrated with Alembic by hand.
+**Laptop:** Postgres 16 + pgvector in Docker, migrated with Alembic by hand.
 **Production:** **Cloud SQL** for Postgres with pgvector, the smallest shared-core tier, private by default and reached through the Cloud SQL connector. Migrations become a **deploy step** that runs before the new version takes traffic, and automated backups are on.
 **Why it matters:** a managed database survives restarts, is backed up, and is patched for you. The catch is cost: Cloud SQL bills every hour it exists, even idle (see [costs](04-costs.md)), which is why our foundation Terraform keeps it switched off (`enable_cloudsql=false`) unless a demo needs it.
 

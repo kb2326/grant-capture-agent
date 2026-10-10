@@ -31,7 +31,7 @@ flowchart LR
 | `uv run uvicorn api.main:app` + `npm run dev` | Cloud Run service `grant-capture-app` serving API and built UI from one image (`Dockerfile.api`), min 0 / max 2 instances | `prod/main.tf` |
 | `agents-cli playground` (root agent) | Agent Runtime deployment of the root agent, identity `root-agent` | `prod/main.tf` (identity, roles); `agents-cli deploy` (runtime) |
 | `uvicorn app.analyze.a2a_app:a2a_app` (local A2A) | Agent Runtime deployment of Analyze as its own A2A service, identity `analyze-agent` | same |
-| Docker Postgres 17 + pgvector | Cloud SQL Postgres + pgvector, smallest tier, `enable_cloudsql=false` until needed | `foundation/cloudsql.tf` |
+| Docker Postgres 16 + pgvector | Cloud SQL Postgres + pgvector, smallest tier, `enable_cloudsql=false` until needed | `foundation/cloudsql.tf` |
 | `.env` | Secret Manager (`db-app-password`, `sam-api-key`, `simpler-grants-api-key`) | `foundation/main.tf` |
 | `python -m ingest` by hand | Cloud Run job + Cloud Scheduler (paused by default) | `foundation/ingest_job.tf` |
 | Our cost counters + Cloud Monitoring | Cloud Trace, Logging, token-count charts, budget alert | built in; `prod/main.tf` (`create_budget`) |

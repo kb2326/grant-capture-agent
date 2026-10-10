@@ -81,7 +81,7 @@ README.md                    final
 - All model text is rendered as text, never as HTML.
 
 ### 3.3 Deployment design (validated, not executed)
-- **Target:** Cloud Run service for API+UI (min instances 0), Agent Runtime for the root agent and for Analyze as a separate A2A service, Cloud SQL Postgres 17 + pgvector (smallest shared-core tier, `enable_cloudsql=false` by default), Secret Manager, one service account per agent with least-privilege roles, Cloud Trace, budget alert at $10 with 50/90/100% thresholds.
+- **Target:** Cloud Run service for API+UI (min instances 0), Agent Runtime for the root agent and for Analyze as a separate A2A service, Cloud SQL Postgres 16 + pgvector (smallest shared-core tier, `enable_cloudsql=false` by default), Secret Manager, one service account per agent with least-privilege roles, Cloud Trace, budget alert at $10 with 50/90/100% thresholds.
 - **Terraform:** `deployment/terraform/prod/` reuses the foundation's state bucket with a separate prefix. Proven with `terraform init` + `validate` + `plan -out` (plan output saved to `docs/deploy/evidence/terraform-plan.txt`, secrets redacted). `apply` is never run.
 - **CI:** `deploy.yml` runs on `workflow_dispatch` only and its jobs have `if: false`; the file documents each step and how to enable it (Workload Identity Federation, already set up in M0).
 - **Docs** teach: what changes between prototype and production (identity, secrets, data, scaling, observability, evals as a release gate, cost guardrails, rollback), the architecture with a diagram, a numbered runbook (command → what it does → how to check → how to undo), a monthly cost table (idle vs light use), and teardown.

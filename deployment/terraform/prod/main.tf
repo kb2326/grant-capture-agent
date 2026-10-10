@@ -7,6 +7,8 @@ data "terraform_remote_state" "foundation" {
 
 locals {
   f = data.terraform_remote_state.foundation.outputs
+  # null outputs are omitted from state, so read the optional one with a default
+  sql_conn = lookup(local.f, "cloudsql_connection_name", null)
   agents = {
     "root-agent"    = "Root chat agent (Discover, Analyze, Draft tools)"
     "analyze-agent" = "Analyze agent served as its own A2A service"
@@ -41,7 +43,30 @@ resource "google_secret_manager_secret_iam_member" "agent_db" {
   member    = "serviceAccount:${google_service_account.agent[each.key].email}"
 }
 
+# The API (gca-api from the foundation) runs the tools in-process: it calls Gemini,
+# reads the database through the Cloud SQL connector and reads documents from the raw bucket.
+resource "google_project_iam_member" "api_roles" {
+  for_each = toset(["roles/aiplatform.user", "roles/cloudsql.client", "roles/cloudtrace.agent"])
+  project  = var.project_id
+  role     = each.value
+  member   = "serviceAccount:${local.f.api_sa_email}"
+}
+
+resource "google_secret_manager_secret_iam_member" "api_db" {
+  secret_id = "db-app-password"
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${local.f.api_sa_email}"
+}
+
+resource "google_storage_bucket_iam_member" "api_raw_read" {
+  bucket = local.f.raw_bucket
+  role   = "roles/storage.objectViewer"
+  member = "serviceAccount:${local.f.api_sa_email}"
+}
+
 # API + built UI on Cloud Run, scaled to zero when idle.
+# Needs Cloud SQL on (foundation enable_cloudsql=true, runbook step 2) before apply;
+# with it off the connector volume is omitted and the service has no database.
 resource "google_cloud_run_v2_service" "app" {
   name     = "grant-capture-app"
   location = var.region
@@ -53,9 +78,23 @@ resource "google_cloud_run_v2_service" "app" {
       min_instance_count = 0
       max_instance_count = 2
     }
+    dynamic "volumes" {
+      for_each = local.sql_conn == null ? [] : [local.sql_conn]
+      content {
+        name = "cloudsql"
+        cloud_sql_instance { instances = [volumes.value] }
+      }
+    }
     containers {
       image = var.image
       ports { container_port = 8080 }
+      dynamic "volume_mounts" {
+        for_each = local.sql_conn == null ? [] : [1]
+        content {
+          name       = "cloudsql"
+          mount_path = "/cloudsql"
+        }
+      }
       resources {
         limits   = { cpu = "1", memory = "1Gi" }
         cpu_idle = true
@@ -63,6 +102,19 @@ resource "google_cloud_run_v2_service" "app" {
       env {
         name  = "GOOGLE_CLOUD_PROJECT"
         value = var.project_id
+      }
+      env {
+        name  = "GOOGLE_GENAI_USE_ENTERPRISE"
+        value = "true"
+      }
+      env {
+        name  = "BLOB_ROOT"
+        value = "gs://${local.f.raw_bucket}"
+      }
+      env {
+        # app/config.py substitutes $(DB_PASSWORD) from the secret below
+        name  = "DATABASE_URL"
+        value = "postgresql+psycopg://grant_app:$(DB_PASSWORD)@/grant_capture?host=/cloudsql/${coalesce(local.sql_conn, "cloudsql-off")}"
       }
       env {
         name = "DB_PASSWORD"

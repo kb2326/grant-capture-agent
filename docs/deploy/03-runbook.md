@@ -29,7 +29,7 @@ Before starting: read [costs](04-costs.md), confirm the month's budget has room,
 
 ## 4. Plan, review, then apply the runtime layer 💲 (Cloud Run: cents unless used heavily)
 - **Command:** `cd deployment/terraform/prod && terraform init && terraform plan -var image=<tag from step 3> -out tfplan` → **a human reads the plan** → `terraform apply tfplan`
-- **Does:** creates the per-agent service accounts and their roles, and the Cloud Run service `grant-capture-app` (scale to zero). The M4 plan output shows exactly this: 9 resources ([evidence](evidence/terraform-plan.txt)).
+- **Does:** creates the per-agent service accounts and their roles, the API's roles (Gemini, Cloud SQL client, trace, the DB password, read access to the raw bucket), and the Cloud Run service `grant-capture-app` (scale to zero) with the Cloud SQL connector. The M4 plan output shows exactly this: 14 resources ([evidence](evidence/terraform-plan.txt)).
 - **Check:** `gcloud run services describe grant-capture-app --region us-central1 --format='value(status.url)'` returns a URL; `curl <url>/api/session` returns `{"spent_usd":0.0,...}`.
 - **Undo:** `terraform destroy` in `prod/` (removes the service and identities), or roll back to the previous revision: `gcloud run services update-traffic grant-capture-app --to-revisions <previous>=100`.
 

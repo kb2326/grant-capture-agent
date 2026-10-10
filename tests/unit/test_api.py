@@ -53,15 +53,16 @@ def test_repeat_analyze_is_cached_and_free():
 
 def test_budget_blocks_live_calls_but_serves_cache():
     t, calls = tools()
-    c = TestClient(create_app(t, budget_usd=0.05))
-    c.post("/api/analyze", json={"opportunity_id": OID})  # 0.04
+    c = TestClient(create_app(t, budget_usd=0.10))
     c.post(
+        "/api/analyze", json={"opportunity_id": OID}
+    )  # reserves 0.05, settles at 0.04
+    blocked = c.post(
         "/api/draft", json={"opportunity_id": OID, "section_title": "Approach"}
-    )  # 0.06 total
-    blocked = c.post("/api/discover", json={"request": "x"})
+    )  # 0.04 + 0.10 estimate > 0.10: refused before calling
     assert (
         blocked.status_code == 402
-        and calls["discover"] == 0
+        and calls["draft"] == 0
         and "budget" in blocked.json()["error"].lower()
     )
     assert c.post("/api/analyze", json={"opportunity_id": OID}).json()["cached"] is True
@@ -131,3 +132,29 @@ def test_ui_search_skips_paid_eligibility_checks(monkeypatch):
     monkeypatch.setattr(dt, "find_opportunities", fake)
     default_tools().discover("inverters", "B0")
     assert seen == {"request": "inverters", "check": False}
+
+
+def test_unexpected_tool_error_is_json_500_and_still_counts_the_estimate():
+    def boom(oid):
+        raise RuntimeError("429 from Gemini")
+
+    t, _ = tools(analyze=boom)
+    c = TestClient(create_app(t, budget_usd=1.0), raise_server_exceptions=False)
+    r = c.post("/api/analyze", json={"opportunity_id": OID})
+    assert r.status_code == 500 and r.json()["hint"]
+    assert c.get("/api/session").json()["spent_usd"] > 0  # may have paid before failing
+
+
+def test_cache_key_normalizes_uuid_spelling():
+    t, calls = tools()
+    c = TestClient(create_app(t, budget_usd=1.0))
+    c.post("/api/analyze", json={"opportunity_id": OID})
+    r = c.post("/api/analyze", json={"opportunity_id": OID.upper()}).json()
+    assert r["cached"] is True and calls["analyze"] == 1
+
+
+def test_oversized_request_is_rejected_before_any_call():
+    t, calls = tools()
+    c = TestClient(create_app(t, budget_usd=1.0))
+    r = c.post("/api/discover", json={"request": "x" * 5000})
+    assert r.status_code == 422 and calls["discover"] == 0

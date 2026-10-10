@@ -11,14 +11,20 @@ export type DraftOut = { notice: string; ai_policy_warnings: string[]; paragraph
 export const isError = (x: unknown): x is ApiError => typeof x === "object" && x !== null && "error" in x;
 
 async function call<T>(path: string, body?: unknown): Promise<T | ApiError> {
+  let res: Response;
   try {
-    const res = await fetch(path, body === undefined ? undefined : {
+    res = await fetch(path, body === undefined ? undefined : {
       method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
     });
-    return (await res.json()) as T | ApiError;
   } catch {
     return { error: "The API is not running.", hint: "Start it: uv run uvicorn api.main:app --host 127.0.0.1 --port 8080" };
   }
+  const data: unknown = (res.headers.get("Content-Type") ?? "").includes("json") ? await res.json().catch(() => null) : null;
+  if (res.ok && data !== null) return data as T;
+  if (isError(data)) return data;
+  const detail = (data as { detail?: { msg?: string }[] | string } | null)?.detail;
+  const msg = Array.isArray(detail) ? detail.map((d) => d.msg).join("; ") : detail;
+  return { error: msg || `The API returned an error (HTTP ${res.status}).`, hint: "Check the API log for details." };
 }
 
 export const discover = (request: string) => call<Live<DiscoverOut>>("/api/discover", { request });

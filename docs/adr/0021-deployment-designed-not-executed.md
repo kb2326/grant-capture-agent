@@ -9,7 +9,7 @@ M4 was planned as "ship": Terraform-provisioned production, agents on Agent Runt
 
 ## Decision
 Design the production deployment to the standard a team would review, prove it without spending, and stop there:
-- the runtime layer is written in Terraform (`deployment/terraform/prod/`) and proven with `terraform validate` and `terraform plan` (9 resources to add; nothing created; output saved in `docs/deploy/evidence/`);
+- the runtime layer is written in Terraform (`deployment/terraform/prod/`) and proven with `terraform validate` and `terraform plan` (14 resources to add; nothing created; output saved in `docs/deploy/evidence/`);
 - the production image (`Dockerfile.api`) is built and run locally;
 - the deploy workflow exists but every job is disabled (`if: false`) and there is no apply step;
 - the "how this ships" documents (`docs/deploy/`) teach the prototype-to-production changes, the architecture, a runbook with costs per step, and teardown;

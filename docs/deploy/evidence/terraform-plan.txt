@@ -1,5 +1,5 @@
 data.terraform_remote_state.foundation: Reading...
-data.terraform_remote_state.foundation: Read complete after 4s
+data.terraform_remote_state.foundation: Read complete after 3s
 
 Terraform used the selected providers to generate the following execution
 plan. Resource actions are indicated with the following symbols:
@@ -52,6 +52,14 @@ Terraform will perform the following actions:
               + image      = "us-central1-docker.pkg.dev/grant-capture-agent/grant-capture/app:latest"
 
               + env {
+                  + name  = "BLOB_ROOT"
+                  + value = "gs://grant-capture-agent-raw"
+                }
+              + env {
+                  + name  = "DATABASE_URL"
+                  + value = "postgresql+psycopg://grant_app:$(DB_PASSWORD)@/grant_capture?host=/cloudsql/cloudsql-off"
+                }
+              + env {
                   + name  = "DB_PASSWORD"
                     # (1 unchanged attribute hidden)
 
@@ -65,6 +73,10 @@ Terraform will perform the following actions:
               + env {
                   + name  = "GOOGLE_CLOUD_PROJECT"
                   + value = "grant-capture-agent"
+                }
+              + env {
+                  + name  = "GOOGLE_GENAI_USE_ENTERPRISE"
+                  + value = "true"
                 }
 
               + ports {
@@ -128,6 +140,33 @@ Terraform will perform the following actions:
       + role    = "roles/aiplatform.user"
     }
 
+  # google_project_iam_member.api_roles["roles/aiplatform.user"] will be created
+  + resource "google_project_iam_member" "api_roles" {
+      + etag    = (known after apply)
+      + id      = (known after apply)
+      + member  = "serviceAccount:gca-api@grant-capture-agent.iam.gserviceaccount.com"
+      + project = "grant-capture-agent"
+      + role    = "roles/aiplatform.user"
+    }
+
+  # google_project_iam_member.api_roles["roles/cloudsql.client"] will be created
+  + resource "google_project_iam_member" "api_roles" {
+      + etag    = (known after apply)
+      + id      = (known after apply)
+      + member  = "serviceAccount:gca-api@grant-capture-agent.iam.gserviceaccount.com"
+      + project = "grant-capture-agent"
+      + role    = "roles/cloudsql.client"
+    }
+
+  # google_project_iam_member.api_roles["roles/cloudtrace.agent"] will be created
+  + resource "google_project_iam_member" "api_roles" {
+      + etag    = (known after apply)
+      + id      = (known after apply)
+      + member  = "serviceAccount:gca-api@grant-capture-agent.iam.gserviceaccount.com"
+      + project = "grant-capture-agent"
+      + role    = "roles/cloudtrace.agent"
+    }
+
   # google_secret_manager_secret_iam_member.agent_db["analyze-agent"] will be created
   + resource "google_secret_manager_secret_iam_member" "agent_db" {
       + etag      = (known after apply)
@@ -143,6 +182,16 @@ Terraform will perform the following actions:
       + etag      = (known after apply)
       + id        = (known after apply)
       + member    = "serviceAccount:root-agent@grant-capture-agent.iam.gserviceaccount.com"
+      + project   = (known after apply)
+      + role      = "roles/secretmanager.secretAccessor"
+      + secret_id = "db-app-password"
+    }
+
+  # google_secret_manager_secret_iam_member.api_db will be created
+  + resource "google_secret_manager_secret_iam_member" "api_db" {
+      + etag      = (known after apply)
+      + id        = (known after apply)
+      + member    = "serviceAccount:gca-api@grant-capture-agent.iam.gserviceaccount.com"
       + project   = (known after apply)
       + role      = "roles/secretmanager.secretAccessor"
       + secret_id = "db-app-password"
@@ -174,7 +223,16 @@ Terraform will perform the following actions:
       + unique_id    = (known after apply)
     }
 
-Plan: 9 to add, 0 to change, 0 to destroy.
+  # google_storage_bucket_iam_member.api_raw_read will be created
+  + resource "google_storage_bucket_iam_member" "api_raw_read" {
+      + bucket = "grant-capture-agent-raw"
+      + etag   = (known after apply)
+      + id     = (known after apply)
+      + member = "serviceAccount:gca-api@grant-capture-agent.iam.gserviceaccount.com"
+      + role   = "roles/storage.objectViewer"
+    }
+
+Plan: 14 to add, 0 to change, 0 to destroy.
 
 Changes to Outputs:
   + agent_service_accounts = {

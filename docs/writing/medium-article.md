@@ -23,7 +23,7 @@ Then the evaluation caught something I did not expect: **a bug in my own rules, 
 
 ## Discover: what should we even look at?
 
-Search runs over 2,737 open opportunities from Grants.gov and SAM.gov. Each becomes a "card" (title, agency, dates, listings, summary) indexed twice: as embeddings in pgvector and as Postgres full text. One SQL statement runs both searches and blends them with Reciprocal Rank Fusion.
+Search runs over 2,737 opportunities from Grants.gov and SAM.gov. Each becomes a "card" (title, agency, dates, listings, summary) indexed twice: as embeddings in pgvector and as Postgres full text. One SQL statement runs both searches and blends them with Reciprocal Rank Fusion.
 
 Three small ablations, each cheap:
 
@@ -52,11 +52,11 @@ At 75 documents, retrieval did not earn its place. It stays in the code for the 
 
 The budget was $10 a month. Analyze cost about $8.60, mostly from using a large model to label the evaluation set; Discover about $1; Draft about $2. October went over the target, and the reason was instructive: **thinking tokens**. Modern models reason before answering and those tokens are billed as output; a single drafted section used up to 17,000 of them. Drafting now caps them.
 
-The bigger lesson was about guardrails. A budget alert sends an email; it does not stop anything. What stops spend is code that refuses the next call: dollar caps on every evaluation run (counting failed calls too), a session cap in the UI, and expensive operations as explicit, priced buttons. The UI taught that last one: a search silently ran five eligibility analyses as a side effect and cost about eighteen times a plain search ($0.147 instead of $0.008), until the checks became a button.
+The bigger lesson was about guardrails. A budget alert sends an email; it does not stop anything. What stops spend is code that refuses the next call: dollar caps on every evaluation run (counting failed calls too), a session cap in the UI, and expensive operations as explicit, priced buttons. The UI taught that last one: a search silently ran five eligibility analyses as a side effect and cost about eighteen times a plain search ($0.147 instead of under a cent), until the checks became a button.
 
 ## Shipping without spending
 
-The last milestone was deployment, and I chose not to deploy. Instead I designed it the way a team would review it: Cloud Run for the API and UI (scaling to zero), Agent Runtime for the agents with the Analyze agent as its own A2A service, Cloud SQL with pgvector switched off until needed, one service account per agent, secrets in Secret Manager. The Terraform passes `terraform plan` (nine resources to add, nothing created), the production container builds and serves the UI locally, and a runbook lists every step with its cost and how to undo it. A funded deployment is a day's work from here.
+The last milestone was deployment, and I chose not to deploy. Instead I designed it the way a team would review it: Cloud Run for the API and UI (scaling to zero), Agent Runtime for the agents with the Analyze agent as its own A2A service, Cloud SQL with pgvector switched off until needed, one service account per agent, secrets in Secret Manager. The Terraform passes `terraform plan` (fourteen resources to add, nothing created), the production container builds and serves the UI locally, and a runbook lists every step with its cost and how to undo it. An independent review of the design found the API's service account had no permissions and no database connection; both are fixed, which is exactly what a plan-only review can catch. What it cannot catch is what only a real deployment shows, so the runbook ends with smoke tests.
 
 ## What I would tell another builder
 

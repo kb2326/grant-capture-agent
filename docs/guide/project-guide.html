@@ -177,7 +177,7 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
       </ul></div>
     <div class="panel"><span class="eyebrow">Deployment</span><h3>Designed, proven, not applied</h3>
       <ul class="tight">
-        <li>Production Terraform (<code>deployment/terraform/prod/</code>): Cloud Run, one service account per agent, secret access, optional budget. <code>terraform plan</code>: 9 to add, <b>nothing created</b></li>
+        <li>Production Terraform (<code>deployment/terraform/prod/</code>): Cloud Run, one service account per agent, secret access, optional budget. <code>terraform plan</code>: 14 to add, <b>nothing created</b></li>
         <li><code>Dockerfile.api</code>: the production image builds and serves the UI locally</li>
         <li>A deploy workflow that exists but is switched off</li>
         <li>Five teaching documents in <code>docs/deploy/</code> and ADR-0021</li>
@@ -201,7 +201,7 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
 
   <h3>What the live run taught</h3>
   <ul class="tight">
-    <li><b>An expensive call hid inside a cheap one.</b> A search silently ran up to 5 eligibility analyses: $0.147 instead of $0.008. Now search never runs them; Analyze is a priced button. Test first, then the fix.</li>
+    <li><b>An expensive call hid inside a cheap one.</b> A search silently ran up to 5 eligibility analyses: $0.147 instead of under a cent. Now search never runs them; Analyze is a priced button. Test first, then the fix.</li>
     <li><b>Unexpected responses must not crash the page.</b> Analyzing an opportunity with no stored documents returned an odd shape and blanked the page. Now the API returns a clear error with a hint, and the page shows it.</li>
     <li>One live session: search, an opportunity brief and one drafted section with sources, flags and a gap. <b>M4 spend about $0.23.</b></li>
   </ul>

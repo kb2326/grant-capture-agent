@@ -12,7 +12,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sqlalchemy.exc import OperationalError
 
 from api.budget import SessionBudget
@@ -21,6 +21,9 @@ from app.config import get_settings
 
 DB_HINT = "Start the local database: docker compose up -d db"
 WEB_DIST = Path(__file__).resolve().parent.parent / "web" / "dist"
+# upper-end cost per action, reserved before a live call (measured: search $0.003-0.008,
+# analyze $0.04, draft $0.04-0.08); the real cost replaces it afterwards
+ESTIMATE_USD = {"discover": 0.01, "analyze": 0.05, "draft": 0.10}
 
 
 @dataclass
@@ -60,7 +63,7 @@ def default_tools() -> Tools:
 
 
 class DiscoverBody(BaseModel):
-    request: str
+    request: str = Field(min_length=1, max_length=1000)
 
 
 class AnalyzeBody(BaseModel):
@@ -69,7 +72,7 @@ class AnalyzeBody(BaseModel):
 
 class DraftBody(BaseModel):
     opportunity_id: str
-    section_title: str
+    section_title: str = Field(min_length=1, max_length=200)
 
 
 def _hint(error: str) -> str:
@@ -98,7 +101,15 @@ def create_app(tools: Tools | None = None, budget_usd: float | None = None) -> F
     def err(status: int, error: str, hint: str) -> JSONResponse:
         return JSONResponse(status_code=status, content={"error": error, "hint": hint})
 
-    def live(key: tuple | None, call: Callable[[], dict]):
+    @app.exception_handler(Exception)
+    def unexpected(_request, exc: Exception) -> JSONResponse:
+        return err(
+            500,
+            f"The action failed: {type(exc).__name__}.",
+            "Check the API log for details; try again in a minute.",
+        )
+
+    def live(action: str, key: tuple | None, call: Callable[[], dict]):
         if key is not None and (hit := cache.get(key)) is not None:
             return {
                 **hit,
@@ -106,7 +117,8 @@ def create_app(tools: Tools | None = None, budget_usd: float | None = None) -> F
                 "cached": True,
                 "session_spent_usd": round(budget.spent_usd, 4),
             }
-        if not budget.allows():
+        estimate = ESTIMATE_USD[action]
+        if not budget.reserve(estimate):
             return err(
                 402,
                 f"Session budget of ${budget.limit_usd:.2f} reached; live calls are paused.",
@@ -115,7 +127,11 @@ def create_app(tools: Tools | None = None, budget_usd: float | None = None) -> F
         try:
             out = call()
         except OperationalError:
+            budget.settle(estimate, 0.0)  # failed before any model call
             return err(503, "The database is not reachable.", DB_HINT)
+        # any other exception keeps the estimate charged: it may have paid before failing
+        cost = float(out.get("cost_usd") or 0.0)
+        budget.settle(estimate, cost)
         if out.get("status") == "no_documents":  # analyze found nothing to read
             return err(
                 400,
@@ -124,8 +140,6 @@ def create_app(tools: Tools | None = None, budget_usd: float | None = None) -> F
             )
         if "error" in out:
             return err(400, str(out["error"]), _hint(str(out["error"])))
-        cost = float(out.get("cost_usd") or 0.0)
-        budget.add(cost)
         if key is not None:
             cache.put(key, out)
         return {
@@ -148,7 +162,7 @@ def create_app(tools: Tools | None = None, budget_usd: float | None = None) -> F
 
     @app.post("/api/discover")
     def discover(body: DiscoverBody):
-        return live(None, lambda: t.discover(body.request, "B0"))
+        return live("discover", None, lambda: t.discover(body.request, "B0"))
 
     @app.get("/api/brief/{opportunity_id}")
     def brief(opportunity_id: str):
@@ -168,16 +182,16 @@ def create_app(tools: Tools | None = None, budget_usd: float | None = None) -> F
     def analyze(body: AnalyzeBody):
         if not valid(body.opportunity_id):
             return err(400, "opportunity_id must be a UUID", _hint("uuid"))
-        return live(
-            ("analyze", body.opportunity_id), lambda: t.analyze(body.opportunity_id)
-        )
+        oid = str(uuid.UUID(body.opportunity_id))
+        return live("analyze", ("analyze", oid), lambda: t.analyze(oid))
 
     @app.post("/api/draft")
     def draft(body: DraftBody):
         if not valid(body.opportunity_id):
             return err(400, "opportunity_id must be a UUID", _hint("uuid"))
-        key = ("draft", body.opportunity_id, body.section_title.strip().lower())
-        return live(key, lambda: t.draft(body.opportunity_id, body.section_title))
+        oid = str(uuid.UUID(body.opportunity_id))
+        key = ("draft", oid, body.section_title.strip().lower())
+        return live("draft", key, lambda: t.draft(oid, body.section_title))
 
     if WEB_DIST.exists():  # the built UI, served by the same process (production image)
         app.mount("/", StaticFiles(directory=WEB_DIST, html=True), name="web")

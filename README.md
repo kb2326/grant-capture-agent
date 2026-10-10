@@ -118,8 +118,8 @@ Full reports: [M1 Analyze](reports/m1/ablation.md) · [M2 Discover](reports/m2/a
 
 Designed to production standard, proven without spending, and stopped there ([ADR-0021](docs/adr/0021-deployment-designed-not-executed.md)):
 
-- **Target:** Cloud Run (API + UI, scale to zero) → Agent Runtime (root agent, and Analyze as its own A2A service) → Cloud SQL Postgres + pgvector (off until needed); Secret Manager; one service account per agent; Cloud Trace; a budget alert.
-- **Proven:** the production Terraform passes `validate` and `plan` (9 resources to add, nothing created; [evidence](docs/deploy/evidence/terraform-plan.txt)); the production image builds and serves the UI locally ([`Dockerfile.api`](Dockerfile.api)); the deploy workflow exists but is disabled.
+- **Target:** Cloud Run (API + UI, scale to zero) → Agent Runtime (root agent, and Analyze as its own A2A service) → Cloud SQL Postgres + pgvector (off until needed); Secret Manager; one service account per agent; Cloud Trace; a budget alert. The Terraform covers Cloud Run, identities and roles; the agents themselves would be deployed to Agent Runtime with `agents-cli deploy` (runbook).
+- **Proven:** the production Terraform passes `validate` and `plan` (14 resources to add, nothing created; [evidence](docs/deploy/evidence/terraform-plan.txt)); the production image builds and serves the UI locally ([`Dockerfile.api`](Dockerfile.api)); the deploy workflow exists but is disabled.
 - **Learn it:** [prototype to production](docs/deploy/01-prototype-to-production.md) · [architecture](docs/deploy/02-architecture.md) · [runbook](docs/deploy/03-runbook.md) · [costs](docs/deploy/04-costs.md) · [teardown](docs/deploy/05-teardown.md).
 
 ## Cost honesty

@@ -41,7 +41,7 @@ flowchart LR
 
 | Identity | Roles | Why |
 |---|---|---|
-| `api` (foundation) | Cloud SQL client; read `db-app-password` | serves the UI and calls the agents |
+| `api` (foundation account, roles granted in `prod/main.tf`) | Vertex AI user; Cloud SQL client; Cloud Trace agent; read `db-app-password`; read the raw bucket | serves the UI and runs the tools in-process (Gemini, database, documents) |
 | `root-agent` | Vertex AI user; Cloud Trace agent; read `db-app-password` | runs the chat agent and its tools |
 | `analyze-agent` | Vertex AI user; Cloud Trace agent; read `db-app-password` | Analyze as an independent service (ADR-0013, ADR-0014) |
 | `ingest` (foundation) | Cloud SQL client; write the raw bucket; read the source API keys | nightly data load |

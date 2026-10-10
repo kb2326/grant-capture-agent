@@ -47,4 +47,4 @@ Everything in this project so far runs on one laptop: Postgres in Docker, Python
 **Why it matters:** the fastest fix for a bad release is to undo it, then investigate.
 
 ## What we actually did in M4
-We designed all of the above, wrote the Terraform and the container, and **proved** them without spending: `terraform validate` and `terraform plan` (9 resources to add, nothing created; see [`evidence/terraform-plan.txt`](evidence/terraform-plan.txt)), a local `docker build` and run of the production image ([`evidence/docker-build.txt`](evidence/docker-build.txt)), and a deploy workflow that exists but is disabled. ADR-0021 records why we stopped there.
+We designed all of the above, wrote the Terraform and the container, and **proved** them without spending: `terraform validate` and `terraform plan` (14 resources to add, nothing created; see [`evidence/terraform-plan.txt`](evidence/terraform-plan.txt)), a local `docker build` and run of the production image ([`evidence/docker-build.txt`](evidence/docker-build.txt)), and a deploy workflow that exists but is disabled. ADR-0021 records why we stopped there.

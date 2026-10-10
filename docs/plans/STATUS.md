@@ -6,7 +6,7 @@
 - *Updated 2026-10-10.* **M0-M4 (free part) complete** (M4 on branch `m4-ship`).
 - M4 (`docs/design/m4-ship-spec.md`, ADR-0021):
   - Local live UI: FastAPI product API (`api/`) + React/Vite/TypeScript (`web/`), cost per action, $0.50 session cap, result cache. Live check: search, opportunity brief and one drafted section, screenshots in `docs/assets/`. Spend ≈ $0.23.
-  - Deployment designed, not executed: `deployment/terraform/prod/` validated and planned (9 to add, never applied); `Dockerfile.api` builds and serves; `deploy.yml` manual-only and disabled; teaching docs in `docs/deploy/`.
+  - Deployment designed, not executed: `deployment/terraform/prod/` validated and planned (14 to add, never applied); `Dockerfile.api` builds and serves; `deploy.yml` manual-only and disabled; teaching docs in `docs/deploy/`.
   - Final README, `docs/writing/medium-article.md`, `docs/writing/linkedin-post.md`.
   - Cloud spending stopped (see `docs/deploy/evidence/shutdown-inventory.txt`).
 - M3 results (`reports/m3/ablation.md`, 12 controlled draft tasks, 46 requirements, 10 true gaps, 75-doc corpus):
@@ -22,6 +22,9 @@
 - Timing benchmark vs. manual work (README targets) not run.
 
 ## Deferred minors from M4
+- The UI session cap is per API process: on Cloud Run (scale to zero, up to 2 instances) it resets on cold start and is not shared; M4b needs persistent spend tracking.
+- `deploy.yml` would fail if enabled: `gcloud builds submit` needs a cloudbuild config for `Dockerfile.api`, and the plan job lacks a `google-github-actions/auth` step.
+- Prod Terraform creates the `root-agent`/`analyze-agent` identities but no Agent Runtime resources (those come from `agents-cli deploy`); the identities are unused until then.
 - Search shows separate SAM notices for one announcement (e.g. the same GRAPE BAA several times); cards are deduplicated only by notice id.
 - Every card shows "No quoted reason (weak match)" for UI searches, since eligibility checks are skipped; show a retrieval reason instead.
 - `Dockerfile.api` image is 2.14 GB: the full dependency set ships (google SDKs 313 MB, pyarrow 156, scipy 109, litellm 90, pandas 72, sklearn 49 MB); split eval/analysis deps into a group the runtime image skips.

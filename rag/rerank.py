@@ -1,10 +1,14 @@
 """Rerank fused hits with the Vertex AI Ranking API; any failure falls back to fused order. M2 spec §3.4."""
 
+from __future__ import annotations
+
 import logging
 from dataclasses import dataclass
-from typing import Protocol
+from typing import TYPE_CHECKING, Protocol
 
-from app.config import Settings
+if TYPE_CHECKING:  # rag/ never imports the app at runtime (no ADK, no import cycle)
+    from app.config import Settings
+
 
 log = logging.getLogger(__name__)
 MAX_RECORD_CHARS = 2_000  # the ranker reads ~512 tokens per record

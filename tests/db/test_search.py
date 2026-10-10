@@ -99,3 +99,8 @@ def test_unknown_column_is_rejected(db_session):
             column="text; drop table x",
             filters=Filters(),
         )
+
+
+def test_wildcard_and_blank_exclusions_do_not_remove_everything(db_session, cards):
+    ids = _ids(_search(db_session, "inverter", _vec(0), exclude_agencies=["%", "_"]))
+    assert cards["a"] in ids  # escaped: no agency literally contains "%" or "_"

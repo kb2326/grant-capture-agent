@@ -66,12 +66,17 @@ def apply_preferences(plan: SearchPlan, prefs: list[Preference]) -> SearchPlan:
     return plan.model_copy(update={"exclude": exclude, "queries": queries})
 
 
-def _repair(plan: SearchPlan, request: str) -> SearchPlan:
+def repair_plan(plan: SearchPlan, request: str) -> SearchPlan:
     queries = [q for q in plan.queries if q.text.strip()][:MAX_QUERIES] or [
         SearchQuery(text=request)
     ]
+    exclude = [e.strip() for e in plan.exclude if e.strip()]
     return plan.model_copy(
-        update={"queries": queries, "intent": plan.intent.strip() or request}
+        update={
+            "queries": queries,
+            "intent": plan.intent.strip() or request,
+            "exclude": exclude,
+        }
     )
 
 
@@ -85,7 +90,7 @@ def make_plan(
         plan = llm.generate(SearchPlan, instruction, request)
     except JsonError:
         plan = SearchPlan(intent=request, queries=[SearchQuery(text=request)])
-    return apply_preferences(_repair(plan, request), prefs)
+    return apply_preferences(repair_plan(plan, request), prefs)
 
 
 def refine_plan(
@@ -107,7 +112,7 @@ def refine_plan(
         plan = llm.generate(SearchPlan, instruction, request)
     except JsonError:
         return previous
-    return apply_preferences(_repair(plan, request), prefs)
+    return apply_preferences(repair_plan(plan, request), prefs)
 
 
 def explain(

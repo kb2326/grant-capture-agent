@@ -44,7 +44,10 @@ WITH f AS (
     AND (CAST(:min_close AS date) IS NULL OR o.close_at IS NULL OR o.close_at >= CAST(:min_close AS date))
     AND (CAST(:award_min AS numeric) IS NULL OR o.award_ceiling IS NULL
          OR o.award_ceiling >= CAST(:award_min AS numeric))
-    AND NOT EXISTS (SELECT 1 FROM unnest(CAST(:exclude AS text[])) x WHERE o.agency ILIKE '%' || x || '%')
+    AND NOT EXISTS (
+      SELECT 1 FROM unnest(CAST(:exclude AS text[])) x
+      WHERE o.agency ILIKE '%' || replace(replace(replace(x, '\\', '\\\\'), '%', '\\%'), '_', '\\_') || '%'
+    )
 ),
 dense AS (
   SELECT opportunity_id, row_number() OVER (ORDER BY emb <=> CAST(:qvec AS vector)) AS r

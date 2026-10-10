@@ -20,7 +20,13 @@ from app.contracts import (
 )
 from app.discover.checker import EligibilityChecker, cached_verdicts
 from app.discover.llm import JsonModel
-from app.discover.plan import explain, make_plan, refine_plan
+from app.discover.plan import (
+    apply_preferences,
+    explain,
+    make_plan,
+    refine_plan,
+    repair_plan,
+)
 from app.rules.verify import verify
 from db.models import OpportunityCardRow, OpportunityRow
 from rag.embed import Embedder
@@ -29,6 +35,30 @@ from rag.search import Filters, hybrid_search
 
 RERANK_DEPTH = 30
 PRESENT = 10
+# Agency names people and the planner type, mapped to words that appear in the data's agency
+# paths (e.g. "DEPT OF DEFENSE > ...", "HEALTH AND HUMAN SERVICES, DEPARTMENT OF > ...").
+AGENCY_ALIASES = {
+    "dod": "defense",
+    "department of defense": "defense",
+    "dept of defense": "defense",
+    "hhs": "health and human services",
+    "department of health and human services": "health and human services",
+    "doe": "energy",
+    "department of energy": "energy",
+    "usda": "agriculture",
+    "dhs": "homeland security",
+    "nasa": "aeronautics and space",
+    "nsf": "national science foundation",
+}
+
+
+def normalize_exclusions(terms: list[str]) -> list[str]:
+    out: list[str] = []
+    for t in terms:
+        term = AGENCY_ALIASES.get(t.strip().lower(), t.strip())
+        if term and term.lower() not in {o.lower() for o in out}:
+            out.append(term)
+    return out
 
 
 def load_rows(
@@ -66,7 +96,7 @@ def filters_for(query: SearchQuery, plan: SearchPlan, today: date) -> Filters:
     return Filters(
         kinds=list(query.kinds),
         min_close=today + timedelta(days=query.min_days_to_close),
-        exclude_agencies=list(plan.exclude),
+        exclude_agencies=normalize_exclusions(plan.exclude),
         award_min=query.award_min,
     )
 
@@ -110,20 +140,26 @@ def execute(deps: DiscoverDeps, plan: SearchPlan) -> list[Candidate]:
     ]
 
 
-def _check_eligibility(deps: DiscoverDeps, cands: list[Candidate]) -> None:
-    if deps.company_id is None or deps.session is None:
-        return
-    cached = cached_verdicts(
-        deps.session, deps.company_id, [c.opportunity_id for c in cands]
+def _check_eligibility(deps: DiscoverDeps, cands: list[Candidate], budget: int) -> int:
+    """Fill eligibility from cached verdicts, then check up to `budget` more. Returns checks used."""
+    if deps.company_id is None:
+        return 0
+    cached = (
+        cached_verdicts(
+            deps.session, deps.company_id, [c.opportunity_id for c in cands]
+        )
+        if deps.session is not None
+        else {}
     )
     for c in cands:
         if c.opportunity_id in cached:
             c.eligibility = cached[c.opportunity_id]  # type: ignore[assignment]
     if deps.checker is None:
-        return
-    unchecked = [c for c in cands if c.eligibility == "unchecked"]
-    for c in unchecked[: deps.settings.discover_v4_max_checks]:
+        return 0
+    unchecked = [c for c in cands if c.eligibility == "unchecked"][: max(0, budget)]
+    for c in unchecked:
         c.eligibility = deps.checker.check(c.opportunity_id)  # type: ignore[assignment]
+    return len(unchecked)
 
 
 def _key(plan: SearchPlan) -> tuple:
@@ -141,6 +177,10 @@ def run_plan(
     explain_top: bool = True,
 ) -> DiscoverResult:
     s = deps.settings
+    # an approved or edited plan may be malformed: repair it and re-apply preferences
+    plan = apply_preferences(repair_plan(plan, request), prefs)
+    checks_left = s.discover_v4_max_checks  # per run, not per iteration
+    check0 = deps.checker.cost_usd if deps.checker else 0.0
     llm_in0 = deps.llm.total_tokens_in if deps.llm else 0
     llm_out0 = deps.llm.total_tokens_out if deps.llm else 0
     emb0, rank0 = deps.embedder.tokens, deps.reranker.calls
@@ -151,7 +191,7 @@ def run_plan(
     while True:
         iterations += 1
         cands = execute(deps, current)
-        _check_eligibility(deps, cands)
+        checks_left -= _check_eligibility(deps, cands, checks_left)
         report = verify(
             cands,
             today=deps.today,
@@ -188,6 +228,7 @@ def run_plan(
         + tout * s.price_agent_output_per_m / 1e6
         + emb_tokens * s.price_embedding_per_m / 1e6
         + (deps.reranker.calls - rank0) * s.price_rank_per_1k / 1000
+        + ((deps.checker.cost_usd - check0) if deps.checker else 0.0)
     )
     return DiscoverResult(
         request=request,

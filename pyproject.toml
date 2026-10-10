@@ -107,7 +107,7 @@ not-subscriptable = "ignore"
 deprecated = "ignore"
 
 [tool.codespell]
-ignore-words-list = "rouge,opps,unparseable"
+ignore-words-list = "rouge,opps,unparseable,afe"
 skip = "./locust_env/*,uv.lock,.venv,./frontend,**/package-lock.json,*.json,./legacy/*,legacy/*,./data/cache/*,./reports/*,*.jsonl"
 
 

@@ -136,6 +136,18 @@ def _retrieval_one(deps, q: dict) -> dict:
     }
 
 
+def warm_up(deps) -> None:
+    """One untimed call per component, so client setup and sign-in are not billed to the first query's latency."""
+    from rag.rerank import RerankDoc
+
+    deps.embedder.embed_query("warm up")
+    deps.reranker.rerank("warm up", [RerankDoc("w", "warm up", "warm up")])
+    if (
+        deps.llm is not None
+    ):  # count_tokens is free and opens the same client connection
+        deps.llm.client.models.count_tokens(model=deps.llm.model_id, contents="warm up")
+
+
 def cmd_retrieval() -> None:
     from app.discover.service import DiscoverDeps
     from rag.embed import COLUMNS, make_embedder
@@ -153,6 +165,7 @@ def cmd_retrieval() -> None:
                 column=COLUMNS[emb],
                 reranker=make_reranker(rr, settings),
             )
+            warm_up(deps)
             runs = run_arm(
                 queries,
                 lambda q, d=deps: _retrieval_one(d, q),
@@ -248,6 +261,7 @@ def cmd_workflow(yes: bool) -> None:
                 company_id=company_id,
                 tau=tau,
             )
+            warm_up(deps)
 
             def one(q: dict, d=deps, v=variant) -> dict:
                 r = discover(

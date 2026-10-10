@@ -27,3 +27,27 @@ def test_decide_retrieval_picks_embedding_then_rerank():
     }
     emb, rerank, notes = decide_retrieval(runs, qrels, queries)
     assert emb == "local" and rerank is False and len(notes) == 2
+
+
+def test_warm_up_touches_embedder_ranker_and_llm_once():
+    from types import SimpleNamespace
+
+    from evals.discover import warm_up
+
+    calls = []
+    deps = SimpleNamespace(
+        embedder=SimpleNamespace(embed_query=lambda t: calls.append("embed")),
+        reranker=SimpleNamespace(rerank=lambda q, docs: calls.append("rerank")),
+        llm=SimpleNamespace(
+            client=SimpleNamespace(
+                models=SimpleNamespace(
+                    count_tokens=lambda model, contents: calls.append("llm")
+                )
+            ),
+            model_id="m",
+        ),
+    )
+    warm_up(deps)
+    assert calls == ["embed", "rerank", "llm"]
+    warm_up(SimpleNamespace(embedder=deps.embedder, reranker=deps.reranker, llm=None))
+    assert calls[-2:] == ["embed", "rerank"]

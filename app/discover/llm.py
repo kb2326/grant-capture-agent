@@ -19,7 +19,13 @@ class JsonModel(Protocol):
     total_tokens_in: int
     total_tokens_out: int
 
-    def generate(self, schema: type[T], instruction: str, content: str) -> T: ...
+    def generate(
+        self,
+        schema: type[T],
+        instruction: str,
+        content: str,
+        cached_content: str | None = None,
+    ) -> T: ...
 
 
 class GeminiJson:
@@ -34,12 +40,20 @@ class GeminiJson:
         self.total_tokens_in = 0
         self.total_tokens_out = 0
 
-    def generate(self, schema: type[T], instruction: str, content: str) -> T:
+    def generate(
+        self,
+        schema: type[T],
+        instruction: str,
+        content: str,
+        cached_content: str | None = None,
+    ) -> T:
         config = types.GenerateContentConfig(
-            system_instruction=instruction,
+            # with a context cache the instruction lives in the cache
+            system_instruction=None if cached_content else instruction,
             temperature=0,
             response_mime_type="application/json",
             response_schema=schema,
+            cached_content=cached_content,
         )
         error = ""
         for attempt in range(2):  # one retry with the validation error appended

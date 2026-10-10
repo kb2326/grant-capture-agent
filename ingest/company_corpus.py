@@ -1,9 +1,17 @@
 """Company corpus for M3 Draft: plan, ground-truth checks, generation and loading (M3 spec §3.1-3.2)."""
 
+import argparse
+import hashlib
 import json
+import re
 from pathlib import Path
 
 from pydantic import BaseModel
+from sqlalchemy import delete, select
+from sqlalchemy.orm import Session
+
+from db.models import ChunkRow, DocumentRow
+from ingest.storage import BlobStore, safe_key
 
 BANNER = "> Synthetic document for grant-capture-agent evaluation. All people, numbers and results are fictional."
 GAP_TERMS = [
@@ -185,3 +193,198 @@ def generate_missing(
             stats["failed"] += 1
         stats["cost_usd"] = spent()
     return stats
+
+
+_HEADING = re.compile(r"^(#{1,3})\s+(.*)$", re.M)
+
+
+def chunk_markdown(
+    text: str, title: str, max_chars: int = 3200, min_chars: int = 320
+) -> list[tuple[str, str]]:
+    """Split on ## / ### headings; merge sections under min_chars into the next; split long ones on paragraphs."""
+    body = "\n".join(
+        line for line in text.splitlines() if not line.startswith(BANNER[:20])
+    )
+    parts: list[tuple[str, str]] = []
+    marks = list(_HEADING.finditer(body))
+    for i, m in enumerate(marks):
+        if len(m.group(1)) == 1:  # the document title
+            continue
+        end = marks[i + 1].start() if i + 1 < len(marks) else len(body)
+        parts.append((f"{title} > {m.group(2).strip()}", body[m.end() : end].strip()))
+    if not parts:
+        parts = [(title, body.strip())]
+    merged: list[tuple[str, str]] = []
+    carry = ""
+    for path, txt in parts:
+        txt = (carry + "\n\n" + txt).strip() if carry else txt
+        if len(txt) < min_chars and path is not parts[-1][0]:
+            carry = txt
+            continue
+        carry = ""
+        merged.append((path, txt))
+    if carry:
+        merged.append((parts[-1][0], carry))
+    out: list[tuple[str, str]] = []
+    for path, txt in merged:
+        buf = ""
+        for para in [p for p in txt.split("\n\n") if p.strip()]:
+            if buf and len(buf) + len(para) > max_chars:
+                out.append((path, buf.strip()))
+                buf = ""
+            buf += para + "\n\n"
+        if buf.strip():
+            out.append((path, buf.strip()))
+    return out
+
+
+def load_company_docs(
+    session: Session, store: BlobStore, docs_dir: Path, plan: dict
+) -> dict:
+    stats = {"stored": 0, "unchanged": 0, "chunks": 0}
+    for file in kinds(plan):
+        path = docs_dir / file
+        if not path.exists():
+            continue
+        data = path.read_bytes()
+        sha = hashlib.sha256(data).hexdigest()
+        row = session.scalar(
+            select(DocumentRow).where(
+                DocumentRow.corpus == "company", DocumentRow.title == file
+            )
+        )
+        if row is not None and row.sha256 == sha:
+            stats["unchanged"] += 1
+            continue
+        uri = store.put(safe_key("company", "lumen-grid-labs", file), data)
+        if row is None:
+            row = DocumentRow(
+                corpus="company",
+                gcs_uri=uri,
+                mime="text/markdown",
+                title=file,
+                sha256=sha,
+            )
+            session.add(row)
+            session.flush()
+        else:
+            row.gcs_uri, row.sha256 = uri, sha
+            session.execute(delete(ChunkRow).where(ChunkRow.document_id == row.id))
+        chunks = chunk_markdown(data.decode("utf-8"), file)
+        for i, (section_path, txt) in enumerate(chunks):
+            session.add(
+                ChunkRow(
+                    document_id=row.id,
+                    ord=i,
+                    section_path=section_path,
+                    text=txt,
+                    n_tokens=len(txt) // 4,
+                )
+            )
+        row.page_count, row.parse_status = 1, "parsed"
+        session.commit()
+        stats["stored"] += 1
+        stats["chunks"] += len(chunks)
+    return stats
+
+
+def embed_company_chunks(
+    session: Session, embedder, *, price_per_m: float, max_usd: float, batch: int = 50
+) -> dict:
+    ids = list(
+        session.scalars(
+            select(ChunkRow.id)
+            .join(DocumentRow, DocumentRow.id == ChunkRow.document_id)
+            .where(DocumentRow.corpus == "company", ChunkRow.embedding.is_(None))
+        )
+    )
+    start, stats = embedder.tokens, {"embedded": 0, "cost_usd": 0.0, "stopped": None}
+    for i in range(0, len(ids), batch):
+        if stats["cost_usd"] >= max_usd:
+            stats["stopped"] = "budget"
+            break
+        rows = session.scalars(
+            select(ChunkRow).where(ChunkRow.id.in_(ids[i : i + batch]))
+        ).all()
+        vecs = embedder.embed_documents([f"{r.section_path}\n{r.text}" for r in rows])
+        for r, v in zip(rows, vecs, strict=True):
+            r.embedding = v
+        session.commit()
+        stats["embedded"] += len(rows)
+        stats["cost_usd"] = (embedder.tokens - start) * price_per_m / 1e6
+    return stats
+
+
+def main(argv: list[str] | None = None) -> int:
+    from app.config import get_settings
+    from app.discover.llm import GeminiJson
+    from db.session import make_engine, make_session_factory
+    from ingest.storage import LocalBlobStore
+    from rag.embed import GeminiEmbedder
+
+    parser = argparse.ArgumentParser(prog="python -m ingest.company_corpus")
+    parser.add_argument("cmd", choices=["check", "generate", "load"])
+    parser.add_argument("--yes", action="store_true")
+    args = parser.parse_args(argv)
+    root = Path("data/company")
+    plan = load_plan(root / "corpus_plan.json")
+    settings = get_settings()
+    if args.cmd == "check":
+        problems = check_corpus(root / "docs", plan)
+        print("\n".join(problems) or "corpus OK")
+        return 1 if problems else 0
+    if args.cmd == "generate":
+        missing = [e for e in plan["new"] if not (root / "docs" / e["file"]).exists()]
+        est = (
+            len(missing)
+            * (
+                2500 * settings.price_agent_input_per_m
+                + 2500 * settings.price_agent_output_per_m
+            )
+            / 1e6
+        )
+        print(f"{len(missing)} docs to write, estimated <= ${est:.2f}")
+        if est > 0.5 and not args.yes:
+            raise SystemExit("estimate above $0.50: re-run with --yes")
+        facts = _facts_table()
+        out = generate_missing(
+            plan,
+            root / "docs",
+            GeminiJson(settings),
+            facts,
+            price_in_per_m=settings.price_agent_input_per_m,
+            price_out_per_m=settings.price_agent_output_per_m,
+            max_usd=1.0,
+        )
+        print(json.dumps(out, indent=2))
+        return 0
+    with make_session_factory(make_engine(settings.database_url))() as s:
+        print(
+            json.dumps(
+                load_company_docs(
+                    s, LocalBlobStore(Path(settings.blob_root)), root / "docs", plan
+                )
+            )
+        )
+        print(
+            json.dumps(
+                embed_company_chunks(
+                    s,
+                    GeminiEmbedder(settings),
+                    price_per_m=settings.price_embedding_per_m,
+                    max_usd=0.2,
+                )
+            )
+        )
+    return 0
+
+
+def _facts_table() -> str:
+    """The authoritative facts table from the M0 plan (Task 9)."""
+    text = Path("docs/plans/2026-10-07-m0-foundation.md").read_text(encoding="utf-8")
+    start = text.index("**Facts every document must agree with**")
+    return text[start : text.index("**Documents to write**", start)].strip()
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

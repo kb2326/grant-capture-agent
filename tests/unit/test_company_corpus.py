@@ -147,3 +147,25 @@ def test_generate_stops_at_budget(tmp_path):
         max_usd=1.5,
     )
     assert out["written"] == 2 and out["stopped"] == "budget"
+
+
+from ingest.company_corpus import chunk_markdown  # noqa: E402
+
+
+def test_chunker_splits_by_heading_merges_tiny_and_splits_long():
+    text = (
+        f"{REAL_BANNER}\n# Report\n## Results\n"
+        + "Balanced cells. " * 30
+        + "\n## Note\nShort.\n## Long\n"
+        + ("A paragraph of findings. " * 40 + "\n\n") * 6
+    )
+    chunks = chunk_markdown(text, "report.md", max_chars=1200, min_chars=100)
+    paths = [p for p, _ in chunks]
+    assert paths[0] == "report.md > Results" and any(
+        "Short." in t for _, t in chunks[:2]
+    )
+    assert (
+        all(len(t) <= 1200 + 200 for _, t in chunks)
+        and sum(p.endswith("Long") for p in paths) >= 2
+    )
+    assert REAL_BANNER not in "".join(t for _, t in chunks)

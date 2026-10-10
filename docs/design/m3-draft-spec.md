@@ -37,12 +37,12 @@ M3 runs **cost-minimal**: drafting and judging use Flash, grading uses Flash-Lit
 
 | # | Criterion | Target / evidence |
 |---|---|---|
-| A1 | Corpus expanded | ≥ 75 company docs: the 13 originals + ≈ 35 on-topic, ≈ 15 outdated, ≈ 15 off-topic; `data/company/manifest.json` lists each doc's kind, topics and facts; a test checks every manifest fact appears verbatim in its doc and the facts table is never contradicted by an on-topic doc |
+| A1 | Corpus expanded | ≥ 75 company docs: the 13 originals + 35 on-topic, 15 outdated, 12 off-topic; `data/company/corpus_plan.json` lists each doc's kind and required phrases; a test checks every required phrase appears verbatim in its doc and the facts table is never contradicted by an on-topic doc |
 | A2 | Corpus indexed | every company doc stored (`corpus='company'`), chunked by heading, chunks embedded with `gemini-embedding-001` |
-| A3 | Draft task set | 12 controlled tasks (≈ 45 requirements, ≈ 15 deliberate gaps) in `evals/data/golden/draft_tasks.jsonl`, each supported requirement linked to manifest fact ids; reviewed by the user |
+| A3 | Draft task set | 12 controlled tasks (46 requirements, 10 deliberate gaps) in `evals/data/golden/draft_tasks.jsonl`; each supported requirement lists evidence phrases promised by `corpus_plan.json`, each gap lists banned gap terms; reviewed by the user |
 | A4 | Grader calibrated | the user labels 40 (requirement, chunk) pairs; Cohen's κ between the user and the Flash-Lite grader reported (target ≥ 0.6; one prompt revision allowed if below) |
 | A5 | B0 and B1 drafting | both produce `DraftSection` with valid citations and requirement-id gaps on all 12 tasks |
-| A6 | Metrics | gap recall/precision, evidence recall, citation validity, distractor-citation rate (code, from the manifest); faithfulness (Flash judge, silver) and B1 context precision; p50/p95 latency; $ per section; in `reports/m3/ablation.md` |
+| A6 | Metrics | gap recall/precision, evidence recall, citation validity, distractor-citation rate (code, from the corpus plan); faithfulness (Flash judge, silver) and B1 context precision; p50/p95 latency; $ per section; in `reports/m3/ablation.md` |
 | A7 | Decision | ADR-0018 outcome written |
 | A8 | Workflow | ADK 2 workflow: select sections → draft → `approve_draft` interrupt → Markdown export; `draft_section` agent tool |
 | A9 | MCP server | FastMCP server exposing `search_opportunities`, `get_brief`, `check_eligibility`, `draft_section`; registered in the project's `.mcp.json` and called once from Claude Code |
@@ -64,7 +64,6 @@ Sensitive Data Protection redaction of bios, Gen AI evaluation service autorater
 data/company/
   docs/                     13 originals + ≈ 67 generated (.md)
   corpus_plan.json          the topic plan the generator follows (checked in)
-  manifest.json             doc -> {kind, topics, facts:[{id, text}]}
 ingest/company_corpus.py    generate (Flash) | check | load (documents + heading chunks + embeddings)
 rag/chunks.py               search_chunks(): hybrid search over chunks of one corpus (same RRF pattern as rag/search.py)
 app/draft/
@@ -80,7 +79,7 @@ app/draft/
   tools.py                  draft_section(opportunity_id, section_title, variant="B0")
 mcp_server/                 FastMCP server (stdio), .mcp.json at repo root
 evals/
-  draft_tasks.py            draft the task set (Flash) from the manifest; user reviews
+  data/golden/draft_tasks.jsonl  12 hand-written tasks (evidence phrases or gap terms); user reviews
   grader_label.py           local page: user labels 40 pairs -> evals/data/golden/grader_pairs.jsonl
   suites/draft.py           code metrics + judge metrics + decision rule
   draft.py                  CLI stages: tasks | run | judge | kappa | report
@@ -94,7 +93,7 @@ evals/
   - The gap topics (hydrogen, cybersecurity, offshore wind) appear in no document.
 - Flash writes one doc per call in the existing style (synthetic-data banner line, plain English, concrete numbers), given the facts table and that doc's plan entry.
 - `check` (code, also a unit test over the checked-in files) verifies:
-  - every manifest fact appears verbatim in its doc;
+  - every required phrase appears verbatim in its doc;
   - no on-topic doc contains an outdated value from a deny-list;
   - no doc mentions a gap topic.
 - Generated docs are checked in. The generator never overwrites an existing file.
@@ -160,7 +159,7 @@ The model-facing schema uses chunk labels (`"C12"`) and requirement ids. Code ma
 ## 4. Draft task set and labels
 
 ### 4.1 Tasks (`evals/draft_tasks.py`)
-- Flash drafts 12 tasks from the manifest: section types such as technical approach, past performance, key personnel, facilities, commercialization and relevant experience.
+- The 12 tasks are written by hand in the implementation plan from the corpus plan's required phrases (exact ground truth at no cost; refined while planning). The section types are: section types such as technical approach, past performance, key personnel, facilities, commercialization and relevant experience.
 - Each task has 3–5 requirements. ≈ 15 of the ≈ 45 are gaps, drawn from the gap topics or from capabilities the company lacks.
 - Each supported requirement lists `support` fact ids. Code checks those ids exist and that gap requirements share no topic with any on-topic doc.
 - The user reviews the tasks once. The file is then frozen.
@@ -188,7 +187,7 @@ The model-facing schema uses chunk labels (`"C12"`) and requirement ids. Code ma
 - Ties go to B0, the simpler design.
 
 ## 6. Error handling
-- **Unknown citation label:** one retry with the error, then the paragraph is dropped and the requirement is listed as a gap with the note "drafting failed".
+- **Unknown citation label:** one retry with the error; labels still unknown are removed from the paragraph and counted in `invalid_citations` (a sentence left without support is then judged unsupported).
 - **Grader call fails:** those chunks count as not graded and are never used as evidence.
 - **Context cache:** if it has expired or can't be created, the call runs uncached.
 - **Budget:** every stage stops at `draft_eval_budget_usd` (default $1.00), counts failed calls, and can resume from saved results.

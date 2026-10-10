@@ -33,6 +33,7 @@ def test_contact_details_are_obviously_fake():
     for path in DOCS.glob("*.md"):
         text = path.read_text(encoding="utf-8")
         for email in re.findall(r"[\w.+-]+@[\w-]+\.[\w.]+", text):
+            email = email.rstrip(".")  # a sentence may end right after the address
             assert email.endswith("@example.com"), (path.name, email)
         for phone in re.findall(r"\b\d{3}-\d{3}-\d{4}\b", text):
             assert phone.split("-")[1] == "555", (path.name, phone)

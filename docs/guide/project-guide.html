@@ -109,7 +109,7 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
   <p class="lede">An AI system that finds federal funding a small R&amp;D company can actually win, rules out the ones it is not allowed to win, and drafts the proposal from the company's own evidence. It is an open, measured take on the workflow commercial GovCon platforms sell, built on Google ADK and Google Cloud, and run the way an AI product team would run it.</p>
   <div class="meta">
     <span>Owner: Karthick Balaje (kb2326)</span>
-    <span>Current phase: M2 Discover complete · M3 Draft next</span>
+    <span>Current phase: M3 Draft complete · M4 Ship next</span>
     <span>Last updated: 9 Oct 2026</span>
   </div>
 </header>
@@ -119,6 +119,7 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
   <span class="eyebrow">Sections</span>
   <ol>
     <li><a href="#status">Where we are</a></li>
+    <li><a href="#m3">M3 Draft</a></li>
     <li><a href="#m2">M2 Discover</a></li>
     <li><a href="#m1">M1 Analyze</a></li>
     <li><a href="#built">What we've built</a></li>
@@ -159,6 +160,71 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
       <tr><td>Quality</td><td>One test file, no evals, no CI, not deployed</td><td>Eval sets, CI eval gate, tracing, live on Google Cloud</td></tr>
     </tbody>
   </table></div>
+</section>
+
+<section id="m3">
+  <header><span class="eyebrow">Section 01·M3</span><h2>M3 Draft: built, measured, merged</h2></header>
+  <p><b>The goal:</b> pick an analyzed opportunity and a section ("Technical Approach"). Get back a <b>first draft</b> where every claim cites a company document, a list of <b>gaps</b> (requirements with no evidence, so nothing gets invented), and <b>flags</b> on any sentence its own sources don't support. It is a starting point for a human writer, not something to submit.</p>
+
+  <h3>How real proposal teams and tools do it</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Step</th><th>What people do</th><th>What AI tools do today</th><th>Our system</th></tr></thead>
+    <tbody>
+      <tr><td>1. Go / no-go</td><td>Read the call, check fit and eligibility, decide to bid</td><td>Summarize, score fit</td><td>Discover (M2) + Analyze verdict (M1)</td></tr>
+      <tr><td>2. Shred the RFP</td><td>Copy every "shall", the instructions and the scoring criteria into a <b>compliance matrix</b></td><td>Extract them automatically (the most-used AI feature)</td><td>Analyze brief, every item quoted with its page</td></tr>
+      <tr><td>3. Outline, win themes</td><td>Kickoff; the pink team checks the outline</td><td>Suggest an outline; people decide</td><td>Sections come from the brief</td></tr>
+      <tr><td>4. Find evidence</td><td>Dig through old proposals, reports, CVs (days)</td><td>A searchable <b>content library</b></td><td><b>Company corpus + retrieval (what M3 measures)</b></td></tr>
+      <tr><td>5. First draft</td><td>Writers draft each section</td><td>Draft from library content, linked to sources</td><td><b>Cited draft + gaps + unsupported-sentence flags</b></td></tr>
+      <tr><td>6. Reviews</td><td>Red team scores against the criteria; gold team signs off</td><td>Compliance checks; people rewrite</td><td>Approval step + AI-use notice on every export</td></tr>
+      <tr><td>7. Submit</td><td>A person certifies the content is true</td><td>Not automated</td><td>Not automated</td></tr>
+    </tbody>
+  </table></div>
+  <p><b>Why evidence and gaps matter more than nice prose:</b> evaluators score what you have proven (results, past performance, named people), and false statements to the government are a legal risk. Agencies also have rules about AI: NIH (2025) won't consider applications substantially developed by AI; NSF encourages disclosing AI use. So Analyze now quotes any <b>AI-use clause</b> it finds, and every draft starts with "AI-assisted first draft. Human review and rewrite required before submission."</p>
+
+  <h3>The two designs being compared (ADR-0018)</h3>
+  <div class="grid2">
+    <div class="panel"><span class="eyebrow">B0</span><h3>Long context: read everything</h3>
+      <p>All 345 company passages (≈ 54k tokens) go into one <b>Gemini context cache</b>, built once. Each section is one Flash call that cites passages by label ([C12]) and lists unsupported requirements as gaps. Simple; it relies on the model to notice that a 2021 document is outdated.</p></div>
+    <div class="panel"><span class="eyebrow">B1</span><h3>Corrective RAG: search, check, retry</h3>
+      <p>For each requirement: write search queries, run hybrid search over the passages, have a cheap model (Flash-Lite) <b>grade</b> each hit relevant / partly / not, and if fewer than 2 are relevant, rewrite the query (at most twice). Whatever is still unsupported becomes a gap. Then Flash drafts from the relevant passages only.</p></div>
+  </div>
+
+  <h3>How we know which is better (without trusting an AI's opinion)</h3>
+  <ul class="tight">
+    <li><b>The corpus was built to a plan.</b> 75 documents: the 13 originals, 35 current ones, 15 <b>outdated</b> traps (2020–22: "18 employees", "LGL-BMS2", "900 sq ft"), 12 <b>off-topic</b> ones (lease, travel policy). Each new document had to contain specific phrases, checked by code.</li>
+    <li><b>12 draft tasks, 46 requirements.</b> 36 can be proven with an exact phrase ("32 employees", "99.2%", "UL 1741 SB"); <b>10 are deliberate gaps</b> (hydrogen, cybersecurity, offshore wind, Phase III, CMMC) that no document mentions.</li>
+    <li><b>Scored by code:</b> gaps caught (gap recall/precision), evidence found (evidence recall), citations that point at outdated or off-topic documents (distractor rate).</li>
+    <li><b>Scored by an AI judge (silver):</b> faithfulness, the share of claims their cited passages support.</li>
+    <li><b>Checked by you:</b> 40 (requirement, passage) pairs you label on a local page; Cohen's κ says how far to trust the Flash-Lite grader.</li>
+  </ul>
+
+  <h3>What the measurement showed</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>12 controlled tasks (46 requirements, 10 true gaps)</th><th>B0 long context</th><th>B1 corrective RAG</th></tr></thead>
+    <tbody>
+      <tr><td>True gaps flagged / gaps invented</td><td class="num"><b>10 of 10 / 0</b></td><td class="num">10 of 10 / 0</td></tr>
+      <tr><td>Evidence found for supported requirements</td><td class="num">94%</td><td class="num">94%</td></tr>
+      <tr><td>Citations to outdated or off-topic documents</td><td class="num"><b>1.4%</b></td><td class="num">3.5%</td></tr>
+      <tr><td>Faithfulness (claims their sources support; AI judge)</td><td class="num"><b>0.83</b></td><td class="num">0.78</td></tr>
+      <tr><td>Time per section (median)</td><td class="num"><b>41 s</b></td><td class="num">84 s</td></tr>
+    </tbody>
+  </table></div>
+  <div class="grid2">
+    <div class="panel"><h3>What we learned</h3>
+      <ul class="tight">
+        <li><b>RAG has to earn its place.</b> With 75 documents (about 54k tokens) the whole corpus fits in one cached prompt, and reading everything beat search-grade-retry on faithfulness, outdated citations and speed. Corrective RAG stays in the code for when the library grows about tenfold.</li>
+        <li><b>Gaps are the safety feature.</b> Both designs flagged every requirement the company can't prove (hydrogen, cybersecurity, offshore wind) and never invented evidence.</li>
+        <li><b>Your 40 labels calibrated the grader:</b> κ 0.63, above the 0.6 bar. When you disagreed, the grader was stricter than you, the safe direction for gap finding.</li>
+        <li><b>Thinking tokens cost money.</b> Flash "thinking" (billed as output, up to 13k per section) made the long-context run cost 2.7x its estimate. Drafting now caps thinking at 1,024 tokens.</li>
+      </ul></div>
+    <div class="panel"><h3>Also built</h3>
+      <ul class="tight">
+        <li>Analyze quotes any <b>AI-use clause</b>; every draft starts with an AI-use notice</li>
+        <li>ADK 2 workflow with a draft-approval step and Markdown export; <code>draft_section</code> agent tool</li>
+        <li><b>MCP server</b> <code>grant-capture</code> in <code>.mcp.json</code>, verified from a real MCP client</li>
+        <li>M3 spend about $1.6-2.0; October total about $11.2-11.6, over the $10 target, so the paid demo moved to M4</li>
+      </ul></div>
+  </div>
 </section>
 
 <section id="m2">
@@ -733,7 +799,7 @@ flowchart LR
       <tr><td><b>M0 Foundation</b></td><td>Part A (laptop): scaffold, settings, Postgres schema, Grants.gov + SAM.gov ingestion, fake company documents, eval harness, ADRs, CI. Part B (cloud): Terraform, Cloud Storage, Secret Manager, Cloud SQL, service accounts, keyless GitHub sign-in, ingestion as a Cloud Run Job.</td><td>Data pipelines, schema design, Terraform, IAM, CI</td><td><span class="pill done">done</span></td></tr>
       <tr><td><b>M1 Analyze</b></td><td>Parsing and chunking, Solicitation agent, knockout rules, labeled set of 25+ solicitations</td><td>Document parsing, structured extraction, labeling, precision/recall</td><td><span class="pill done">done</span></td></tr>
       <tr><td><b>M2 Discover</b></td><td>Hybrid search, reranking, ADK 2 workflow with approval step, three ablations, local A2A, preferences</td><td>Retrieval engineering, agent graphs, human-in-the-loop</td><td><span class="pill done">done</span></td></tr>
-      <tr><td><b>M3 Draft</b></td><td>Corrective RAG over company documents, faithfulness check, MCP server</td><td>CRAG, LLM judges, citation design, MCP</td><td><span class="pill todo">to do</span></td></tr>
+      <tr><td><b>M3 Draft</b></td><td>Long context vs. corrective RAG over a 75-doc corpus, gap flags, faithfulness check, grader calibration, MCP server</td><td>CRAG, LLM judges, citation design, MCP</td><td><span class="pill done">done</span></td></tr>
       <tr><td><b>M4 Ship</b></td><td>Agent Runtime deploy, web UI, Terraform, tracing, CI eval gate, red-team set, eval report</td><td>Production deployment, LLMOps, AI security</td><td><span class="pill todo">to do</span></td></tr>
       <tr><td><b>M5 Specialize</b></td><td>Fine-tune the grader and compare it with the prompted version; Gemini reads scanned PDF pages directly, compared with Docling</td><td>Fine-tuning and multimodal, two skills that show up often in AI engineer job postings</td><td><span class="pill todo">to do</span></td></tr>
     </tbody>
@@ -812,6 +878,7 @@ flowchart LR
       <tr><td class="num">2026-10-09</td><td>OKF deferred to M3; EmbeddingGemma 2 joins the M2 embedding comparison.</td></tr>
       <tr><td class="num">2026-10-10</td><td>M2 measured: Gemini embeddings over EmbeddingGemma 2 (ADR-0020, directional), reranker off, Plan-Execute-Verify inconclusive because its loop never ran, single pass stays default (ADR-0017). M2 cost about $1.02.</td></tr>
       <tr><td class="num">2026-10-10</td><td>Local embeddings run on Kaggle's free T4 GPU instead of the laptop CPU (6 min vs ~9 h).</td></tr>
+      <tr><td class="num">2026-10-10</td><td>M3 measured: long-context drafting (B0) kept over corrective RAG (ADR-0018); grader κ 0.63 against hand labels; thinking tokens capped for drafting; October spend over the $10 target, paid demo moved to M4.</td></tr>
       <tr><td class="num">2026-10-09</td><td>Independent review of the whole M0 branch found 2 critical issues (the SAM.gov key could appear in logs; the SAM.gov daily cap could be exceeded) and 4 important ones (one bad record could end a run; attachment names could collide; failed downloads weren't retried; two SAM sources overwrote each other). All six fixed test-first (65 tests), 11 minor items noted for later. M0 merged into main.</td></tr>
       <tr><td class="num">2026-10-08</td><td>M0 Part B done: Terraform created 41 cloud resources; the loader ran as a Cloud Run Job (500 grants, 0 failures); teardown fixes added; Cloud SQL deleted and off by default. M0 complete.</td></tr>
       <tr><td class="num">2026-10-08</td><td>ADR-0019 written: Docker for local development, tests and CI; Terraform-managed Google Cloud for anything shared or deployed.</td></tr>

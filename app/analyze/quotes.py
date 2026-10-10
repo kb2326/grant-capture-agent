@@ -56,6 +56,7 @@ def apply_verification(brief: SolicitationBrief, pages: PageIndex) -> Solicitati
         "evaluation_criteria",
         "required_sections",
         "deadlines",
+        "ai_policy",
     ):
         items = getattr(brief, field)
         good = [i for i in items if verify(i.citation, pages)]

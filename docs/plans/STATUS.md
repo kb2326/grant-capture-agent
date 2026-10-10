@@ -3,17 +3,29 @@
 *Read this first in any new session (local or cloud).*
 
 ## Where we are
-- *Updated 2026-10-10.* **M0 Foundation, M1 Analyze and M2 Discover complete** (M2 merged from branch `m2-discover`).
-- M2 results (`reports/m2/ablation.md`, 15 golden queries, AI-labeled silver set of 719 judgments):
-  - Embeddings (ADR-0020): `gemini-embedding-001` nDCG@10 0.514 vs EmbeddingGemma 2 0.472 (local was better on the 5 vague queries, 0.499 vs 0.441). Gemini chosen; the `emb_local` column stays for a later re-test. `gemini-embedding-2` works in location `global` (unmeasured).
-  - Rerank: Vertex Ranking API gave no gain (0.512 vs 0.514); built but off (`discover_rerank=False`).
-  - Workflow (ADR-0017): inconclusive. B1 never refined (0 of 15 golden queries) because the verifier only counts passing candidates, so B0 and B1 ran the same code; B0 stays the default. Planner run-to-run variation is ~0.04 nDCG@10. Next idea: an LLM-graded sufficiency check.
-  - Discover P@10 0.50 (target 0.70, not met); one request ~$0.003, p50 11 s (the Flash planner dominates).
-  - Analyze over local A2A works behind `discover_v4_transport` (direct by default); preferences persist in `preferences` and an ADK memory service.
-- Spend: M2 ≈ $1.02 (Flash $0.58, Flash-Lite labels $0.13, embeddings $0.22, ranker ≈ $0.09; Cloud Monitoring token counts + our own counters). The project stays **cost-minimal**.
-- EmbeddingGemma 2 on CPU would take ~9 h for 2,737 cards; it was run on Kaggle's free T4 (6 min) from a private dataset and notebook. Kaggle token lives in `.env` (`KAGGLE_API_TOKEN`).
-- **Next: M3 Draft** (brainstorm → spec → plan).
-- Open data items: SAM.gov attachments for the 12 sampled notices were never fetched (quota spent on a failed run, since fixed); retry one notice first: `uv run python -m ingest sam-attachments --notice <id>`. NIH announcements sit behind a bot challenge and are not fetched.
+- *Updated 2026-10-10.* **M0-M3 complete** (M3 merged from branch `m3-draft`).
+- M3 results (`reports/m3/ablation.md`, 12 controlled draft tasks, 46 requirements, 10 true gaps, 75-doc corpus):
+  - B0 long context (cached corpus) vs. B1 corrective RAG: both flagged 10/10 gaps and invented none; evidence recall 0.944 each; B0 more faithful (0.83 vs 0.78, silver), fewer outdated/off-topic citations (1.4% vs 3.5%), twice as fast (p50 41 s vs 84 s). ADR-0018: B0 is the default.
+  - Grader calibration: κ 0.63 (binary) / 0.59 (3-class) vs. the user's 40 hand labels; the grader is stricter than the user.
+  - Analyze now extracts quoted `ai_policy` clauses (`brief_v2`); every draft starts with the AI-use notice.
+  - MCP server `grant-capture` (`.mcp.json`) verified from a real MCP client over stdio.
+- Spend: M3 ≈ $1.6-2.0 (corpus $0.57, drafting runs ≈ $1.0-1.4, mostly Flash thinking tokens). **October total ≈ $11.2-11.6, over the $10/month target**; drafting now caps thinking (`draft_thinking_budget=1024`). The real-solicitation demo was skipped for budget and moves to M4.
+- **Next: M4 Ship** (brainstorm -> spec -> plan); keep it cost-minimal and mostly free-tier.
+
+## Open items from M3
+- Real-solicitation demo (draft one section for an analyzed opportunity) moved to M4 with the UI.
+- `draft_thinking_budget` was added after the measured runs; re-measure B0 cost with it in M4.
+
+## Deferred minors from the M3 review
+- Draft workflow: with no brief, "ok" at approval raises a KeyError in export; an empty reply counts as approval; a bad UUID raises in `draft_node`.
+- Export filename uses the raw opportunity-id string (`urn:uuid:` forms break on Windows); use `str(uuid.UUID(...))`.
+- `task_from_brief` silently drops requirements past 8 and falls back to all requirements for an unknown section title.
+- Faithfulness splitter keeps `## Heading` lines; whether an uncited sentence is a claim is left to the judge.
+- No test for "every requirement is a gap / empty corpus" (works by reading the code).
+- `evals.draft pairs` overwrites `grader_pairs.json` and renumbers pairs; existing labels would then match the wrong pairs.
+- Reloading a changed company doc gives its chunks new ids, so re-scoring old runs undercounts validity and recall.
+- `draft_b0` retries uncached on any exception (paying twice on JSON failures); a judge API error discards an already-paid section.
+- Context-cache creation and storage cost is not included in a section's `cost_usd`.
 
 ## Deferred minors from the M2 review
 - A2A client: the thread pool's shutdown waits past the result timeout; the `httpx.AsyncClient` is never closed.

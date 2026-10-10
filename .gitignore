@@ -366,7 +366,9 @@ data/blobs/
 reports/*
 !reports/m1/
 !reports/m2/
+!reports/m3/
 .terraform/
 *.tfstate*
 data/cache/
 tfplan
+data/drafts/

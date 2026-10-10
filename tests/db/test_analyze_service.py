@@ -128,7 +128,7 @@ def test_analyze_verifies_quotes_decides_and_persists(db_session, tmp_path: Path
     assert result.verdict.status == "INELIGIBLE"
     assert len(result.brief.requirements) == 1 and result.brief.dropped_quotes == 1
     stored = db_session.scalars(select(SolicitationBriefRow)).one()
-    assert stored.prompt_version == "brief_v1" and stored.brief["variant"] == "B0"
+    assert stored.prompt_version == "brief_v2" and stored.brief["variant"] == "B0"
     assert (
         db_session.scalars(select(EligibilityVerdictRow)).one().verdict == "INELIGIBLE"
     )

@@ -193,8 +193,8 @@ flowchart LR
 | Requirement extraction recall | ≥ 0.85 | **0.15** whole-document; **0.69** page windows (n=7) · not met, see [ADR-0016](docs/adr/0016-analyze-long-context.md) |
 | Discover precision@10 | ≥ 0.70 | **0.50** single-pass workflow; nDCG@10 0.46 · 15 queries, AI-labeled silver set · not met, see [ADR-0017](docs/adr/0017-discover-architecture-by-ablation.md) |
 | Time to qualified shortlist vs. manual | ≥ 50% faster | *moved to M4* (needs the UI); one Discover request: p50 11 s, $0.003 |
-| Draft context relevance / faithfulness | ≥ 0.60 / ≥ 0.90 | *pending (M3)* |
-| Time to first draft vs. manual | ≥ 40% faster | *pending (M3)* |
+| Draft gap detection / faithfulness | — / ≥ 0.90 | **10/10 gaps flagged, 0 invented**; faithfulness **0.83** (silver) · 12 controlled tasks · grader κ 0.63 vs. hand labels · see [ADR-0018](docs/adr/0018-draft-architecture-by-ablation.md) |
+| Time to first draft vs. manual | ≥ 40% faster | *moved to M4* (needs the UI); one cited section: p50 41 s |
 | Cost per full run · p95 latency | < $0.25 · < 90 s | Analyze alone: $0.04 · p50 61 s, p95 561 s · full run *pending (M4)* |
 
 ---
@@ -267,7 +267,7 @@ agents-cli playground           # chat with the agent locally
 - [x] **M0 Foundation:** scaffold, synthetic company data, Postgres schema, ingestion, CI, eval harness, ADRs
 - [x] **M1 Analyze:** page-tagged text layer, brief extraction (whole-document vs. page-window ablation), quote verification, knockout rules E0–E7, AI-labeled silver set ([report](reports/m1/ablation.md))
 - [x] **M2 Discover:** opportunity cards, hybrid search (pgvector + full text, RRF), three ablations (embeddings, rerank, single pass vs. Plan-Execute-Verify, the last inconclusive), ADK 2 workflow with plan approval, Analyze over local A2A, remembered preferences ([report](reports/m2/ablation.md))
-- [ ] **M3 Draft:** corrective RAG, calibrated grader, faithfulness check, MCP server
+- [x] **M3 Draft:** 75-doc synthetic corpus with outdated and off-topic traps, long context vs. corrective RAG ablation (long context kept), grader calibrated against hand labels, faithfulness check, AI-use notice and clauses, MCP server ([report](reports/m3/ablation.md))
 - [ ] **M4 Ship:** Agent Runtime + Cloud Run, Terraform, tracing, CI eval gate, red team, eval report
 - [ ] **M5 Specialize:** fine-tuned grader vs. prompted grader; multimodal parsing vs. Docling
 

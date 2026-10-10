@@ -19,27 +19,49 @@ class JsonModel(Protocol):
     total_tokens_in: int
     total_tokens_out: int
 
-    def generate(self, schema: type[T], instruction: str, content: str) -> T: ...
+    def generate(
+        self,
+        schema: type[T],
+        instruction: str,
+        content: str,
+        cached_content: str | None = None,
+    ) -> T: ...
 
 
 class GeminiJson:
     def __init__(
-        self, settings: Settings, model_id: str | None = None, client=None
+        self,
+        settings: Settings,
+        model_id: str | None = None,
+        client=None,
+        thinking_budget: int | None = None,
     ) -> None:
         from app.analyze.llm import make_client
 
         self.model_id = model_id or settings.model_agent
+        self.thinking_budget = thinking_budget  # None: the model's default thinking
         self.client = client or make_client(settings)
         # every billed call, failed attempts included (budget caps)
         self.total_tokens_in = 0
         self.total_tokens_out = 0
 
-    def generate(self, schema: type[T], instruction: str, content: str) -> T:
+    def generate(
+        self,
+        schema: type[T],
+        instruction: str,
+        content: str,
+        cached_content: str | None = None,
+    ) -> T:
         config = types.GenerateContentConfig(
-            system_instruction=instruction,
+            # with a context cache the instruction lives in the cache
+            system_instruction=None if cached_content else instruction,
             temperature=0,
             response_mime_type="application/json",
             response_schema=schema,
+            cached_content=cached_content,
+            thinking_config=types.ThinkingConfig(thinking_budget=self.thinking_budget)
+            if self.thinking_budget is not None
+            else None,
         )
         error = ""
         for attempt in range(2):  # one retry with the validation error appended

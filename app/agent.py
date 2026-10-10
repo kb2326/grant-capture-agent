@@ -28,6 +28,7 @@ from app.analyze.qa import ask_solicitation
 from app.analyze.service import analyze_opportunity
 from app.config import get_settings
 from app.discover.tools import find_opportunities, remembered_preferences
+from app.draft.tools import draft_section
 
 
 MODEL = get_settings().model_agent
@@ -51,12 +52,14 @@ root_agent = Agent(
         "with the opportunity ID. For follow-up questions about a solicitation, call ask_solicitation. "
         "To see what the company asked you to remember, call remembered_preferences. "
         "Report verdicts exactly as returned, quote deciding clauses with their pages, and never invent "
-        "eligibility rules. Draft arrives in M3."
+        "eligibility rules. To draft a proposal section for an analyzed opportunity, call draft_section; "
+        "always show its notice, its AI-use warnings and its gaps."
     ),
     tools=[
         find_opportunities,
         analyze_opportunity,
         ask_solicitation,
+        draft_section,
         remembered_preferences,
     ],
 )

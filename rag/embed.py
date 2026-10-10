@@ -1,14 +1,18 @@
 """Embedders for cards and queries: Gemini (cloud) and EmbeddingGemma 2 (local CPU). M2 spec §3.2."""
 
+from __future__ import annotations
+
 import logging
-from typing import Protocol
+from typing import TYPE_CHECKING, Protocol
 
 from google.genai import types
 from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 
-from app.config import Settings
 from db.models import OpportunityCardRow
+
+if TYPE_CHECKING:  # rag/ never imports the app at runtime (no ADK, no import cycle)
+    from app.config import Settings
 
 log = logging.getLogger(__name__)
 COLUMNS = {"gemini": "emb_gemini", "local": "emb_local"}

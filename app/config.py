@@ -85,6 +85,14 @@ class Settings(BaseSettings):
     discover_v4_max_checks: int = 5
     analyze_a2a_url: str = "http://127.0.0.1:8001"
     discover_eval_budget_usd: float = 1.0  # hard cap per Discover eval stage
+    # ---- M3 Draft ----
+    draft_eval_budget_usd: float = 1.0  # hard cap per Draft eval stage
+    draft_cache_ttl_s: int = 1800
+    draft_top_k: int = 8
+    draft_min_relevant: int = 2
+    draft_max_rewrites: int = 2
+    draft_variant: Literal["B0", "B1"] = "B0"  # set by the M3 ablation (ADR-0018)
+    draft_thinking_budget: int = 1024  # thinking tokens are billed as output; M3 runs showed up to 13k per section
 
     @model_validator(mode="after")
     def _secrets_from_secret_manager(self) -> "Settings":

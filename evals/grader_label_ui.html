@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Grader calibration</title>
+<style>
+  :root { --bg: #f7f7f5; --card: #fff; --ink: #1d1d1f; --muted: #6b6b70; --line: #e2e2e0; --accent: #2f5d8a; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #161618; --card: #1f1f22; --ink: #ececee; --muted: #a0a0a8; --line: #333338; --accent: #7fb0e0; } }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 system-ui, sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 24px 16px; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  .muted { color: var(--muted); font-size: 14px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 16px; margin: 16px 0; }
+  .req { font-weight: 600; }
+  .excerpt { white-space: pre-wrap; border-left: 3px solid var(--line); padding-left: 12px; margin-top: 8px; }
+  .buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+  button { font: inherit; padding: 10px 16px; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer; }
+  button:hover { border-color: var(--accent); }
+  .done { font-size: 18px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Does this excerpt support the requirement?</h1>
+  <p class="muted">Relevant = it states facts that directly answer the requirement. Partly = related but does not answer it. Not = unrelated. Keys: 1 / 2 / 3.</p>
+  <p class="muted" id="progress"></p>
+  <div class="card" id="pair">
+    <div class="muted">Requirement</div>
+    <div class="req" id="req"></div>
+    <div class="muted" style="margin-top:12px">Company excerpt</div>
+    <div class="excerpt" id="text"></div>
+  </div>
+  <div class="buttons" id="buttons">
+    <button data-label="relevant">1 · Relevant</button>
+    <button data-label="partly">2 · Partly</button>
+    <button data-label="not">3 · Not</button>
+  </div>
+  <p class="done" id="done" hidden>Done. Thank you. You can close this tab.</p>
+</main>
+<script>
+  let pairs = [], i = 0, busy = false;
+  const $ = (id) => document.getElementById(id);
+  function show() {
+    if (i >= pairs.length) {
+      $("pair").hidden = true; $("buttons").hidden = true; $("done").hidden = false;
+      $("progress").textContent = pairs.length + " of " + pairs.length + " labeled";
+      return;
+    }
+    $("progress").textContent = "Pair " + (i + 1) + " of " + pairs.length;
+    $("req").textContent = pairs[i].requirement;
+    $("text").textContent = pairs[i].text;
+  }
+  async function label(value) {
+    if (busy || i >= pairs.length) return;
+    busy = true;
+    const res = await fetch("/api/label", { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ pair_id: pairs[i].pair_id, label: value }) });
+    busy = false;
+    if (res.ok) { i += 1; show(); } else { $("progress").textContent = "Save failed (" + res.status + "), try again."; }
+  }
+  document.querySelectorAll("button[data-label]").forEach((b) => b.addEventListener("click", () => label(b.dataset.label)));
+  document.addEventListener("keydown", (e) => {
+    const map = { "1": "relevant", "2": "partly", "3": "not" };
+    if (map[e.key]) label(map[e.key]);
+  });
+  fetch("/api/pairs").then((r) => r.json()).then((p) => { pairs = p; show(); });
+</script>
+</body>
+</html>

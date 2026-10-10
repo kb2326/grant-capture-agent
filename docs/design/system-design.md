@@ -321,6 +321,8 @@ Clauses are extracted by the LLM, which also proposes `constraint`. The constrai
 
 **B0 (long context).** The whole company corpus (page-tagged) plus the section's requirements in one call; the same citation rules and faithfulness check apply.
 
+**As built in M3** (spec `docs/design/m3-draft-spec.md`): drafting uses Flash during the prototype (Pro revisited in M4); B0 keeps the labeled corpus in a Gemini context cache; `DraftSection` carries `task_id`, `variant`, requirement-id gaps, invalid-citation count, tokens, cost and latency. Measured outcome: ADR-0018 (B0).
+
 **B1 (corrective RAG):**
 
 ```

@@ -1,0 +1,2569 @@
+[
+ {
+  "task_id": "T01",
+  "variant": "B1",
+  "paragraphs": [
+   {
+    "text": "Prior validation work on second-life battery modules was established during the Department of Energy Phase I project evaluating the LGL-BMS3 platform with retired electric-vehicle packs. Initial characterization examined 32 retired cells, identifying and rejecting two outliers while advancing the remaining thirty cells to pack assembly. During cycling trials of two 16-cell packs subjected to 300 cycles with a mixed charge, discharge, and rest duty cycle, degradation-aware balancing reduced the spread in capacity fade by 27 percent compared to standard voltage balancing, constraining cell capacity divergence to 4.7 percentage points versus 6.4 percentage points in the baseline pack. The platform executed these balancing routines in real time at 10 Hz and resolved deliberate voltage offsets of up to 80 mV to a maximum residual imbalance of 1.8 mV across 50 balancing events.",
+    "citations": [
+     "ca445065-aaa3-45ea-9dbc-1c4a5f34ae57",
+     "57c4c81b-f2be-434b-bb1b-67ffa462fdef",
+     "c5664828-e082-4683-9eb8-1cebec622666"
+    ],
+    "supported": false
+   },
+   {
+    "text": "Measured state-of-charge estimation accuracy shows continuous improvement across hardware iterations and harsh thermal operating regimes. Early characterization of the LGL-BMS1 architecture demonstrated an error band within 3.8 percent, while the LGL-BMS2 iteration yielded a mean absolute tracking error of 2.1 percent and a maximum error of 3.4 percent over an 80-hour cycle sequence. In Phase I testing on retired cells, the LGL-BMS3 firmware maintained state-of-charge estimation error at or below 1.5 percent across all runs, achieving a 1.3 percent root-mean-square error over dynamic duty cycles even when initialized with a 20 percentage point error offset. Subsequent thermal chamber evaluations confirmed tracking fidelity across an operating envelope of -20 degrees Celsius to 55 degrees Celsius, recording state-of-charge errors of 1.41 percent at -20 degrees Celsius, 0.62 percent at 25 degrees Celsius, and 1.18 percent at 55 degrees Celsius.",
+    "citations": [
+     "6cb699d7-ca95-4c7d-a33c-6b9758815b68",
+     "f6a4dd02-c12f-4765-9186-172adff44e7e",
+     "ca445065-aaa3-45ea-9dbc-1c4a5f34ae57",
+     "57c4c81b-f2be-434b-bb1b-67ffa462fdef",
+     "dada6070-820d-4708-80e2-c4bd5dac902b"
+    ],
+    "supported": false
+   },
+   {
+    "text": "Future validation activities will expand upon these outcomes through a planned accelerated aging campaign conducted in the Golden, Colorado facility. Between project months 7 and 16, twelve prototype sub-strings will undergo a 1,000-cycle accelerated aging stress protocol across temperature ranges spanning 15 degrees Celsius to 45 degrees Celsius. The resulting aging data and degradation curves will quantitatively verify long-term capacity preservation and control algorithm efficacy under elevated thermal and operational stress.",
+    "citations": [
+     "9ae08fff-4f81-45f0-b202-f16c637832c3"
+    ],
+    "supported": false
+   }
+  ],
+  "gaps": [
+   "R4"
+  ],
+  "retrieval_trace": [
+   {
+    "requirement_id": "R1",
+    "query": "state of charge accuracy SOC estimation error measured SOC accuracy battery management system",
+    "chunk_ids": [
+     "6cb699d7-ca95-4c7d-a33c-6b9758815b68",
+     "ef84b1c8-e753-48e3-a0bf-3534711d53d8",
+     "f6a4dd02-c12f-4765-9186-172adff44e7e",
+     "a91cefe5-f44b-41fb-878b-7d5935c62dc8",
+     "ca445065-aaa3-45ea-9dbc-1c4a5f34ae57",
+     "57c4c81b-f2be-434b-bb1b-67ffa462fdef",
+     "dada6070-820d-4708-80e2-c4bd5dac902b",
+     "8926842d-9962-4efc-9f9d-9f72dad90f53"
+    ],
+    "grades": [
+     "relevant",
+     "partly",
+     "relevant",
+     "partly",
+     "relevant",
+     "relevant",
+     "relevant",
+     "relevant"
+    ]
+   },
+   {
+    "requirement_id": "R2",
+    "query": "second-life battery modules reuse repurposed retired EV battery packs",
+    "chunk_ids": [
+     "6a05a938-b43c-4167-b153-bc2e751e970e",
+     "14469fc1-e421-4214-acf7-02fdfd1f0e88",
+     "a6f614bb-a957-46f6-adc2-0cfce52eea6e",
+     "cb84fb7a-5d9d-4310-a797-7d4237ae7388",
+     "14caea04-8a2b-474e-b958-af3af4952345",
+     "0009b7c0-b2e2-4de7-ba58-82510d376399",
+     "f0d15a7c-fefc-4245-a945-db83d153a444",
+     "b1734bb0-bc70-414d-8ca7-eaa2d5b29572"
+    ],
+    "grades": [
+     "partly",
+     "partly",
+     "not",
+     "partly",
+     "partly",
+     "relevant",
+     "partly",
+     "partly"
+    ]
+   },
+   {
+    "requirement_id": "R2",
+    "query": "DOE SBIR Phase I prior work second-life battery",
+    "chunk_ids": [
+     "1e3580f0-572a-49d9-9d70-2d2c06dd4946",
+     "ba93adb8-ef00-4493-8531-f690f0a6854e",
+     "8926842d-9962-4efc-9f9d-9f72dad90f53",
+     "a546c59c-c1ca-4fdf-ba77-633a650b4dbf",
+     "c5664828-e082-4683-9eb8-1cebec622666",
+     "36049354-2680-4565-a888-6fe82f00d79d",
+     "e7581c4a-52c3-4a39-8261-47a0248cc2d1",
+     "0009b7c0-b2e2-4de7-ba58-82510d376399"
+    ],
+    "grades": [
+     "partly",
+     "partly",
+     "relevant",
+     "relevant",
+     "relevant",
+     "partly",
+     "not",
+     "relevant"
+    ]
+   },
+   {
+    "requirement_id": "R3",
+    "query": "accelerated aging testing protocol battery accelerated life test cycle degradation",
+    "chunk_ids": [
+     "346116b2-690f-4cc5-908d-4c94ffbe64ef",
+     "4941d957-3790-492a-9058-b2f96efb466f",
+     "9ae08fff-4f81-45f0-b202-f16c637832c3",
+     "dca3738a-3512-4d50-873f-de34a88862ac",
+     "9f7e2f1e-ca5f-4327-8350-d6854c8f5a92",
+     "3fdf6e6e-4153-4717-a614-4834bcef90e9",
+     "22f13572-cff1-40d3-baa5-e42f52952c56",
+     "57c4c81b-f2be-434b-bb1b-67ffa462fdef"
+    ],
+    "grades": [
+     "relevant",
+     "partly",
+     "relevant",
+     "partly",
+     "partly",
+     "partly",
+     "not",
+     "partly"
+    ]
+   },
+   {
+    "requirement_id": "R4",
+    "query": "hydrogen fuel cell battery integration hybrid fuel cell battery hybridization power system",
+    "chunk_ids": [
+     "54306052-937b-4eb1-88b0-40f3bd31bed0",
+     "639dd669-c740-4d7a-83f7-59c7da98980b",
+     "b5c2f29c-1ba9-44ce-b087-3ae73245956d",
+     "8d8f3ab5-8ec1-4295-8962-d184dcf2fe08",
+     "27d0b9c1-5f81-4ec3-bee1-c91fd3223417",
+     "9ae08fff-4f81-45f0-b202-f16c637832c3",
+     "b1734bb0-bc70-414d-8ca7-eaa2d5b29572",
+     "2a892e32-6202-452b-ba4f-40e410489971"
+    ],
+    "grades": [
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not"
+    ]
+   },
+   {
+    "requirement_id": "R4",
+    "query": "\"hydrogen fuel cell\" battery integration",
+    "chunk_ids": [
+     "639dd669-c740-4d7a-83f7-59c7da98980b",
+     "e14a3421-9d20-47d4-b89b-aea7d09d6d5a",
+     "27d0b9c1-5f81-4ec3-bee1-c91fd3223417",
+     "b5c2f29c-1ba9-44ce-b087-3ae73245956d",
+     "d9b318eb-dc2d-4df6-b261-6fad08816db6",
+     "b1734bb0-bc70-414d-8ca7-eaa2d5b29572",
+     "8d8f3ab5-8ec1-4295-8962-d184dcf2fe08",
+     "54306052-937b-4eb1-88b0-40f3bd31bed0"
+    ],
+    "grades": [
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not"
+    ]
+   },
+   {
+    "requirement_id": "R4",
+    "query": "\"fuel cell\" battery",
+    "chunk_ids": [
+     "db8893f9-4a38-4f8e-8b36-286c32a7bad8",
+     "d69b7367-5030-4b4e-8602-5d3f85308c1e",
+     "b5c2f29c-1ba9-44ce-b087-3ae73245956d",
+     "d1aff2b9-5e2c-4fca-9b6e-40a6dbac9b99",
+     "c5664828-e082-4683-9eb8-1cebec622666",
+     "9fc57276-9bfa-43a9-9fac-0d145d60991f",
+     "7bbafafc-314a-4738-b821-8e940dfc80a8",
+     "98863e82-a213-4fcd-aae0-96b8ab8dd994"
+    ],
+    "grades": [
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not"
+    ]
+   }
+  ],
+  "invalid_citations": 0,
+  "tokens_in": 24629,
+  "tokens_out": 12536,
+  "cost_usd": 0.0521165,
+  "latency_s": 118.14100000006147,
+  "given": [
+   "0009b7c0-b2e2-4de7-ba58-82510d376399",
+   "346116b2-690f-4cc5-908d-4c94ffbe64ef",
+   "57c4c81b-f2be-434b-bb1b-67ffa462fdef",
+   "6cb699d7-ca95-4c7d-a33c-6b9758815b68",
+   "8926842d-9962-4efc-9f9d-9f72dad90f53",
+   "9ae08fff-4f81-45f0-b202-f16c637832c3",
+   "a546c59c-c1ca-4fdf-ba77-633a650b4dbf",
+   "c5664828-e082-4683-9eb8-1cebec622666",
+   "ca445065-aaa3-45ea-9dbc-1c4a5f34ae57",
+   "dada6070-820d-4708-80e2-c4bd5dac902b",
+   "f6a4dd02-c12f-4765-9186-172adff44e7e"
+  ],
+  "stats": {
+   "claims": 11,
+   "supported": 5,
+   "latency_s": 118.14100000006147,
+   "cost_usd": 0.0521165
+  }
+ },
+ {
+  "task_id": "T02",
+  "variant": "B1",
+  "paragraphs": [
+   {
+    "text": "During field deployments on active rural distribution feeders, the HelioLink 250 grid-forming inverter demonstrated strong operational availability and reliability. An initial six-week pilot conducted with Front Range Utility Cooperative recorded 99.2% availability, 98.6% peak efficiency, and voltage deviation maintained within 2% of nominal during cloud transients. A subsequent 92-day continuous test totaling 2,208 scheduled operating hours demonstrated zero unplanned trips, a peak conversion efficiency of 98.7% under 200 kW to 250 kW loads, and seamless voltage regulation through 19 transient grid disturbances.",
+    "citations": [
+     "e37899d6-049d-42e4-8dc9-2cbaee9d1aee",
+     "82dd68a1-158a-4be5-b14f-00f8544fb48f",
+     "9ad2f399-36c1-4d67-a724-d2bca8090df6"
+    ],
+    "supported": true
+   },
+   {
+    "text": "The inverter system delivers stable voltage-source performance under severe weak-grid conditions, maintaining stability across short-circuit ratios ranging from 1.1 to 5. Laboratory and hardware-in-the-loop evaluations verified that the control architecture achieves grid-strength estimator convergence within an 82 ms median time and accelerates fault ride-through recovery by 14% compared to baseline droop controls. Under extreme conditions with a short-circuit ratio of 1.5, the adaptive control avoided tripping during full-load fault events, restricted peak fault currents below 1.5 times rated current, and restored point-of-common-coupling voltage to within 1.0% of nominal in less than 65 ms across 1,200 test scenarios.",
+    "citations": [
+     "8e938470-94e7-4828-9770-b7d13adfca2f",
+     "a24983fa-e8ff-4af4-bdac-b3b7426883fc",
+     "4f3e40b1-367f-4b9b-94e4-21e79b71b036",
+     "dd3f2693-f5ea-437f-bfc2-9a7966a4ebd1"
+    ],
+    "supported": false
+   },
+   {
+    "text": "For isolated distribution networks and dead feeders, black-start capabilities enable feeder restoration without relying on external bulk-grid reference signals. Decentralized voltage-building algorithms ramp unenergized 12.47 kV distribution lines to nominal voltage within 3.5 seconds while mitigating transformer inrush currents. The control system coordinates parallel HelioLink 250 units to balance active and reactive power sharing via active droop controls and integrates with the LGL-BMS3 platform to maintain safe operational boundaries during cold-load pickup transients.",
+    "citations": [
+     "408ed71c-7790-4efd-9a8a-3fe26009ce95"
+    ],
+    "supported": false
+   }
+  ],
+  "gaps": [
+   "R4"
+  ],
+  "retrieval_trace": [
+   {
+    "requirement_id": "R1",
+    "query": "inverter availability reliability MTBF deployed inverters uptime performance",
+    "chunk_ids": [
+     "e37899d6-049d-42e4-8dc9-2cbaee9d1aee",
+     "82dd68a1-158a-4be5-b14f-00f8544fb48f",
+     "ff6935f5-7e43-4a7b-aa5b-96a063fe1e93",
+     "f0542fd5-ee95-415b-97e4-d0c2dbcde432",
+     "9ad2f399-36c1-4d67-a724-d2bca8090df6",
+     "68822dbe-a922-47c9-810d-d59a5b40fd08",
+     "965c75b9-2429-447e-b23f-36ab5ab294b3",
+     "8e938470-94e7-4828-9770-b7d13adfca2f"
+    ],
+    "grades": [
+     "relevant",
+     "relevant",
+     "partly",
+     "not",
+     "relevant",
+     "not",
+     "partly",
+     "not"
+    ]
+   },
+   {
+    "requirement_id": "R2",
+    "query": "weak grid performance low SCR weak grid interconnection testing",
+    "chunk_ids": [
+     "306dbf69-8de7-43a5-bede-fc3b0fadc683",
+     "8e938470-94e7-4828-9770-b7d13adfca2f",
+     "a24983fa-e8ff-4af4-bdac-b3b7426883fc",
+     "4f3e40b1-367f-4b9b-94e4-21e79b71b036",
+     "dd3f2693-f5ea-437f-bfc2-9a7966a4ebd1",
+     "07cde11f-7ffd-4622-906e-ab3c59568c88",
+     "b7e68d76-3243-4602-b26e-205386b33194",
+     "0c38dcd3-ab66-4a05-a904-c31b268cd8d3"
+    ],
+    "grades": [
+     "partly",
+     "relevant",
+     "relevant",
+     "relevant",
+     "relevant",
+     "relevant",
+     "partly",
+     "partly"
+    ]
+   },
+   {
+    "requirement_id": "R3",
+    "query": "black start capability grid restoration black start energization commissioning",
+    "chunk_ids": [
+     "408ed71c-7790-4efd-9a8a-3fe26009ce95",
+     "ba93adb8-ef00-4493-8531-f690f0a6854e",
+     "f0542fd5-ee95-415b-97e4-d0c2dbcde432",
+     "99f7bcf6-ec2e-4407-aeb1-61ead1a7d692",
+     "07cde11f-7ffd-4622-906e-ab3c59568c88",
+     "91292d1b-f7eb-410d-8fb4-9e3d1df1d3b9",
+     "b7e68d76-3243-4602-b26e-205386b33194",
+     "5dca499b-7954-409d-998f-b40428b76548"
+    ],
+    "grades": [
+     "relevant",
+     "not",
+     "not",
+     "partly",
+     "not",
+     "not",
+     "not",
+     "not"
+    ]
+   },
+   {
+    "requirement_id": "R3",
+    "query": "black start voltage ramp load energization",
+    "chunk_ids": [
+     "408ed71c-7790-4efd-9a8a-3fe26009ce95",
+     "306dbf69-8de7-43a5-bede-fc3b0fadc683",
+     "1ad74fc2-d7f4-44eb-81c4-3463d689236b",
+     "0252abc4-5591-4ef5-8832-102b925129e1",
+     "a24983fa-e8ff-4af4-bdac-b3b7426883fc",
+     "807f3ab8-c543-42d8-a819-a0b60d5839d9",
+     "40096fa7-63c1-4149-a4c2-e0b8c0a0d79a",
+     "be29235f-0d77-4bf5-ab81-00bf49e83419"
+    ],
+    "grades": [
+     "relevant",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not"
+    ]
+   },
+   {
+    "requirement_id": "R3",
+    "query": "grid forming inverter black start restore dead feeder",
+    "chunk_ids": [
+     "408ed71c-7790-4efd-9a8a-3fe26009ce95",
+     "1ad74fc2-d7f4-44eb-81c4-3463d689236b",
+     "91292d1b-f7eb-410d-8fb4-9e3d1df1d3b9",
+     "306dbf69-8de7-43a5-bede-fc3b0fadc683",
+     "850911c8-d2c6-4118-b2b2-27960c29274a",
+     "7e3daf20-d42f-42a5-a0a2-bd1894f0b095",
+     "c0258cac-b05f-4426-b705-5265a85cfba4",
+     "a5ef2b4c-85d3-4038-b9d0-ff02e59cc494"
+    ],
+    "grades": [
+     "relevant",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not"
+    ]
+   },
+   {
+    "requirement_id": "R4",
+    "query": "offshore wind farm grid integration offshore wind interconnection experience",
+    "chunk_ids": [
+     "306dbf69-8de7-43a5-bede-fc3b0fadc683",
+     "ff6935f5-7e43-4a7b-aa5b-96a063fe1e93",
+     "a24983fa-e8ff-4af4-bdac-b3b7426883fc",
+     "1ad74fc2-d7f4-44eb-81c4-3463d689236b",
+     "0252abc4-5591-4ef5-8832-102b925129e1",
+     "29c6935d-0936-4c5b-8715-f0d46ff26c23",
+     "7e3daf20-d42f-42a5-a0a2-bd1894f0b095",
+     "b554503e-7997-4292-9a3c-1cabbc435b14"
+    ],
+    "grades": [
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not"
+    ]
+   },
+   {
+    "requirement_id": "R4",
+    "query": "\"offshore wind\" project experience case study",
+    "chunk_ids": [
+     "e7581c4a-52c3-4a39-8261-47a0248cc2d1",
+     "1a642d84-42fc-4dd9-89a1-a64ef1307ab9",
+     "ff6935f5-7e43-4a7b-aa5b-96a063fe1e93",
+     "37a05d98-ad8c-41db-b1b1-09795c20a42a",
+     "23c5e1a5-5835-49c2-a23a-7a7054954d90",
+     "ba93adb8-ef00-4493-8531-f690f0a6854e",
+     "06c1bb8c-793c-4df7-979d-5740e97abdd4",
+     "29c6935d-0936-4c5b-8715-f0d46ff26c23"
+    ],
+    "grades": [
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not"
+    ]
+   },
+   {
+    "requirement_id": "R4",
+    "query": "wind farm grid integration",
+    "chunk_ids": [
+     "306dbf69-8de7-43a5-bede-fc3b0fadc683",
+     "1ad74fc2-d7f4-44eb-81c4-3463d689236b",
+     "c0258cac-b05f-4426-b705-5265a85cfba4",
+     "bfac99f0-bd3a-4250-a0c2-2782f1f56ce7",
+     "fe13bd13-c747-4921-923a-b74e53aa5508",
+     "a24983fa-e8ff-4af4-bdac-b3b7426883fc",
+     "b170a3a1-31e8-499b-90dc-1810cbf8de30",
+     "91292d1b-f7eb-410d-8fb4-9e3d1df1d3b9"
+    ],
+    "grades": [
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not"
+    ]
+   }
+  ],
+  "invalid_citations": 0,
+  "tokens_in": 19487,
+  "tokens_out": 12535,
+  "cost_usd": 0.04833975,
+  "latency_s": 99.04700000002049,
+  "given": [
+   "07cde11f-7ffd-4622-906e-ab3c59568c88",
+   "408ed71c-7790-4efd-9a8a-3fe26009ce95",
+   "4f3e40b1-367f-4b9b-94e4-21e79b71b036",
+   "82dd68a1-158a-4be5-b14f-00f8544fb48f",
+   "8e938470-94e7-4828-9770-b7d13adfca2f",
+   "9ad2f399-36c1-4d67-a724-d2bca8090df6",
+   "a24983fa-e8ff-4af4-bdac-b3b7426883fc",
+   "dd3f2693-f5ea-437f-bfc2-9a7966a4ebd1",
+   "e37899d6-049d-42e4-8dc9-2cbaee9d1aee"
+  ],
+  "stats": {
+   "claims": 9,
+   "supported": 5,
+   "latency_s": 99.04700000002049,
+   "cost_usd": 0.04833975
+  }
+ },
+ {
+  "task_id": "T03",
+  "variant": "B1",
+  "paragraphs": [
+   {
+    "text": "Lumen Grid Labs has demonstrated a consistent record of technical milestone execution across prior federally funded research projects. Under a 2023 DOE SBIR Phase I award titled Degradation-aware BMS for second-life batteries in the amount of $200,000, the company met all project milestones on schedule and within budget. Additionally, the company completed a 2024 NSF SBIR Phase I award titled Grid-forming control for weak grids for $275,000, successfully meeting all planned objectives and demonstrating 14% faster fault ride-through than baseline controls.",
+    "citations": [
+     "a6ea20c8-7baa-4a46-88c8-ade7685b3d9f",
+     "a546c59c-c1ca-4fdf-ba77-633a650b4dbf",
+     "fc3f212f-4dc2-4f10-be76-a7af9601bba2",
+     "a24983fa-e8ff-4af4-bdac-b3b7426883fc"
+    ],
+    "supported": true
+   },
+   {
+    "text": "Lumen Grid Labs also holds customer validation from Front Range Utility Cooperative, which provided a formal letter of support in 2025. This customer evaluation followed a six-week field pilot deployment of the HelioLink 250 inverter with the cooperative, during which the system achieved 99.2% operational availability.",
+    "citations": [
+     "e7581c4a-52c3-4a39-8261-47a0248cc2d1",
+     "fc3f212f-4dc2-4f10-be76-a7af9601bba2"
+    ],
+    "supported": false
+   }
+  ],
+  "gaps": [
+   "R4"
+  ],
+  "retrieval_trace": [
+   {
+    "requirement_id": "R1",
+    "query": "federal award contract amount value prior federal awards agency funding",
+    "chunk_ids": [
+     "a6ea20c8-7baa-4a46-88c8-ade7685b3d9f",
+     "e7581c4a-52c3-4a39-8261-47a0248cc2d1",
+     "333fc58c-63f4-4f45-aa50-2e5ebacafc84",
+     "a546c59c-c1ca-4fdf-ba77-633a650b4dbf",
+     "25779ca2-6d4c-4d04-8533-4bb098fac846",
+     "5c3329e8-c316-49ae-afc3-992d35cc81d7",
+     "1e3580f0-572a-49d9-9d70-2d2c06dd4946",
+     "fc3f212f-4dc2-4f10-be76-a7af9601bba2"
+    ],
+    "grades": [
+     "relevant",
+     "relevant",
+     "not",
+     "relevant",
+     "not",
+     "not",
+     "relevant",
+     "relevant"
+    ]
+   },
+   {
+    "requirement_id": "R2",
+    "query": "milestone completed deliverables met schedule project milestone performance completion",
+    "chunk_ids": [
+     "ca445065-aaa3-45ea-9dbc-1c4a5f34ae57",
+     "23c5e1a5-5835-49c2-a23a-7a7054954d90",
+     "e14d2995-1307-45a5-a2e9-7f7f5819492c",
+     "62ce2019-7a12-4eba-9ec0-461112985bd5",
+     "e7581c4a-52c3-4a39-8261-47a0248cc2d1",
+     "a6ea20c8-7baa-4a46-88c8-ade7685b3d9f",
+     "fc8b5af7-ecc2-47f6-b23f-153f2c5aa5d6",
+     "a24983fa-e8ff-4af4-bdac-b3b7426883fc"
+    ],
+    "grades": [
+     "relevant",
+     "partly",
+     "not",
+     "partly",
+     "relevant",
+     "relevant",
+     "partly",
+     "relevant"
+    ]
+   },
+   {
+    "requirement_id": "R3",
+    "query": "customer reference point of contact POC past performance reference contact details",
+    "chunk_ids": [
+     "5c3329e8-c316-49ae-afc3-992d35cc81d7",
+     "efcc8075-1455-4914-8c30-89cbca8ec82b",
+     "51ccd03e-dab3-4861-9240-d8adfcca199c",
+     "fad70c92-f9a1-4426-a4e1-7429350c3c08",
+     "bdfdd064-6da3-457a-b1ac-e287dd7637ac",
+     "7cf6e434-f5a6-4259-852c-5dc88a816724",
+     "ed255f2e-96dd-4060-a125-237c14c302c7",
+     "c96543fb-272e-4b69-949a-35206edfc7b0"
+    ],
+    "grades": [
+     "relevant",
+     "partly",
+     "partly",
+     "partly",
+     "relevant",
+     "relevant",
+     "relevant",
+     "not"
+    ]
+   },
+   {
+    "requirement_id": "R4",
+    "query": "Phase III transition Program of Record DoD SBIR Phase III transition DoD",
+    "chunk_ids": [
+     "e7581c4a-52c3-4a39-8261-47a0248cc2d1",
+     "54fee46f-e9c5-4c4f-8bed-72bc6ad6385a",
+     "a6ea20c8-7baa-4a46-88c8-ade7685b3d9f",
+     "419be46b-f2dd-42f5-8310-7e0fb17fe0cd",
+     "013eb388-0bcc-476e-bedb-2722010bfbb4",
+     "333fc58c-63f4-4f45-aa50-2e5ebacafc84",
+     "54306052-937b-4eb1-88b0-40f3bd31bed0",
+     "a546c59c-c1ca-4fdf-ba77-633a650b4dbf"
+    ],
+    "grades": [
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not"
+    ]
+   },
+   {
+    "requirement_id": "R4",
+    "query": "\"Phase III\" commercialization DoD OR defense",
+    "chunk_ids": [
+     "333fc58c-63f4-4f45-aa50-2e5ebacafc84",
+     "d4628462-62f5-40f3-9bb6-78dae002e26f",
+     "013eb388-0bcc-476e-bedb-2722010bfbb4",
+     "726d1eee-b363-4d0f-b49b-7a1054019c5f",
+     "40d96ee9-858c-4f9a-b6d1-a99997975162",
+     "85c9b61e-c8d6-467b-83b3-40f398d6c6f6",
+     "b5c2f29c-1ba9-44ce-b087-3ae73245956d",
+     "b3f677e5-fc9b-4b6c-8313-5180a4cb0a13"
+    ],
+    "grades": [
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not"
+    ]
+   },
+   {
+    "requirement_id": "R4",
+    "query": "\"Phase III\" \"program of record\"",
+    "chunk_ids": [
+     "d4628462-62f5-40f3-9bb6-78dae002e26f",
+     "d1aff2b9-5e2c-4fca-9b6e-40a6dbac9b99",
+     "a24983fa-e8ff-4af4-bdac-b3b7426883fc",
+     "d69b7367-5030-4b4e-8602-5d3f85308c1e",
+     "66bbed3d-87de-44b2-aa0f-eb182ca49725",
+     "62ce2019-7a12-4eba-9ec0-461112985bd5",
+     "5dca499b-7954-409d-998f-b40428b76548",
+     "807f3ab8-c543-42d8-a819-a0b60d5839d9"
+    ],
+    "grades": [
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not"
+    ]
+   }
+  ],
+  "invalid_citations": 0,
+  "tokens_in": 14850,
+  "tokens_out": 12337,
+  "cost_usd": 0.048185,
+  "latency_s": 114.20299999997951,
+  "given": [
+   "1e3580f0-572a-49d9-9d70-2d2c06dd4946",
+   "5c3329e8-c316-49ae-afc3-992d35cc81d7",
+   "7cf6e434-f5a6-4259-852c-5dc88a816724",
+   "a24983fa-e8ff-4af4-bdac-b3b7426883fc",
+   "a546c59c-c1ca-4fdf-ba77-633a650b4dbf",
+   "a6ea20c8-7baa-4a46-88c8-ade7685b3d9f",
+   "bdfdd064-6da3-457a-b1ac-e287dd7637ac",
+   "ca445065-aaa3-45ea-9dbc-1c4a5f34ae57",
+   "e7581c4a-52c3-4a39-8261-47a0248cc2d1",
+   "ed255f2e-96dd-4060-a125-237c14c302c7",
+   "fc3f212f-4dc2-4f10-be76-a7af9601bba2"
+  ],
+  "stats": {
+   "claims": 5,
+   "supported": 3,
+   "latency_s": 114.20299999997951,
+   "cost_usd": 0.048185
+  }
+ },
+ {
+  "task_id": "T04",
+  "variant": "B1",
+  "paragraphs": [
+   {
+    "text": "Dr. Maya Okafor, founder and Chief Executive Officer of Lumen Grid Labs, serves as Principal Investigator with a committed level of effort of 35% across the 24-month project execution window. She holds a Ph.D. in electrical engineering from the Colorado School of Mines, where her dissertation addressed state estimation for lithium-ion packs, along with an M.S. from the University of Colorado Boulder and a B.S. from Rice University. Prior to founding Lumen Grid Labs in 2019, Dr. Okafor served for five years as a controls engineer at a national laboratory focusing on battery storage integration for distribution feeders and three years as a senior engineer at a stationary storage manufacturer. She oversees a 32-person team and has served as Principal Investigator on both of the company's prior federal awards, including a 2023 DOE SBIR Phase I project and a 2024 NSF SBIR Phase I award.",
+    "citations": [
+     "24a05f80-1784-40ff-b65d-85b6b04ba3e0",
+     "0a2bd0be-38b9-4cbd-ba5b-1cd90d761ae4",
+     "da9636ac-7d34-4547-9e58-8263688f3af5"
+    ],
+    "supported": true
+   },
+   {
+    "text": "All key personnel are based out of the company's Golden, Colorado facility and have dedicated specific time commitments for the proposed Phase II execution window. Chief Technology Officer Ravi Deshmukh will commit 40% effort as Co-Investigator for the power stage. Lead Battery Scientist Elena Brandt will serve as Technical Lead for battery systems at 60% effort. Test Engineer Jordan Lee will commit 75% effort as Hardware Validation Lead, and Senior Firmware Engineer Sofia Ramirez will dedicate 50% effort as Embedded Systems Engineer.",
+    "citations": [
+     "da9636ac-7d34-4547-9e58-8263688f3af5"
+    ],
+    "supported": true
+   },
+   {
+    "text": "Sofia Ramirez serves as Firmware Lead, directing low-level embedded software architecture and real-time control algorithms for energy storage and utility-intertie systems. She introduced embedded Rust into the laboratory's microcontroller workflows and leads firmware development for both the LGL-BMS3 solid-state battery management system and the HelioLink 250 grid-forming inverter. Her implementations include active balancing state-machines that maintain cell balancing precision within plus or minus 2 mV and constrain state-of-charge estimation error to no more than 1.5%, pulse-width modulation and protection logic for the 250 kW silicon carbide inverter, and physical communication layers for OPAL-RT hardware-in-the-loop simulation. On prior federal projects, Ramirez delivered dynamic cell-level health evaluation firmware for the 2023 DOE SBIR Phase I award and embedded virtual synchronous machine controls that achieved 14% faster fault ride-through under the 2024 NSF SBIR Phase I award.",
+    "citations": [
+     "49e04aea-3ca4-42f8-8a6c-3fbbb7642ead",
+     "3b8da4b0-4e7a-4b3a-b488-15d2f8eecbab",
+     "8e5224aa-86b3-4796-a4d0-1a9f63c16122"
+    ],
+    "supported": true
+   }
+  ],
+  "gaps": [
+   "R4"
+  ],
+  "retrieval_trace": [
+   {
+    "requirement_id": "R1",
+    "query": "Principal Investigator qualifications bio PI resume experience education",
+    "chunk_ids": [
+     "24a05f80-1784-40ff-b65d-85b6b04ba3e0",
+     "0a2bd0be-38b9-4cbd-ba5b-1cd90d761ae4",
+     "5c3329e8-c316-49ae-afc3-992d35cc81d7",
+     "f97d6e81-0676-4488-a210-eadd38dfa8fb",
+     "b42bdd05-2a7f-4dc5-98da-799fbb77d64f",
+     "39ba8124-13a4-409e-ac64-1ff6c37c01f2",
+     "da9636ac-7d34-4547-9e58-8263688f3af5",
+     "c85ea0f3-65b2-438f-95f6-82b545c4977c"
+    ],
+    "grades": [
+     "relevant",
+     "relevant",
+     "partly",
+     "partly",
+     "partly",
+     "not",
+     "partly",
+     "relevant"
+    ]
+   },
+   {
+    "requirement_id": "R2",
+    "query": "key personnel level of effort commitment key personnel hours percentage time",
+    "chunk_ids": [
+     "da9636ac-7d34-4547-9e58-8263688f3af5",
+     "25779ca2-6d4c-4d04-8533-4bb098fac846",
+     "64e1624f-1ec5-44bc-ac66-606bbb9aed7e",
+     "97939841-15e9-4fa2-aa42-7d9652ae4d81",
+     "0fba3200-0512-4c1f-9080-b95a51d8b7b8",
+     "f97d6e81-0676-4488-a210-eadd38dfa8fb",
+     "64307261-65f5-4664-9b51-928bfd1c4d69",
+     "d5543f75-92d7-42b5-b68e-ef4080f95079"
+    ],
+    "grades": [
+     "relevant",
+     "partly",
+     "partly",
+     "not",
+     "not",
+     "not",
+     "relevant",
+     "not"
+    ]
+   },
+   {
+    "requirement_id": "R3",
+    "query": "firmware lead experience resume embedded firmware lead qualifications",
+    "chunk_ids": [
+     "49e04aea-3ca4-42f8-8a6c-3fbbb7642ead",
+     "3b8da4b0-4e7a-4b3a-b488-15d2f8eecbab",
+     "76da66f5-f28e-48f4-b55f-2a9f1445cd2f",
+     "c7aa8105-4bc9-4b38-b3c1-65f9315c6917",
+     "50c0a163-1a3b-40ad-b3d9-6c9d8c727853",
+     "8e5224aa-86b3-4796-a4d0-1a9f63c16122",
+     "06c1bb8c-793c-4df7-979d-5740e97abdd4",
+     "0a2bd0be-38b9-4cbd-ba5b-1cd90d761ae4"
+    ],
+    "grades": [
+     "relevant",
+     "relevant",
+     "relevant",
+     "not",
+     "partly",
+     "relevant",
+     "not",
+     "not"
+    ]
+   },
+   {
+    "requirement_id": "R4",
+    "query": "certified cybersecurity CISSP CISM staff cybersecurity certification professional resume",
+    "chunk_ids": [
+     "76da66f5-f28e-48f4-b55f-2a9f1445cd2f",
+     "49e04aea-3ca4-42f8-8a6c-3fbbb7642ead",
+     "b42bdd05-2a7f-4dc5-98da-799fbb77d64f",
+     "50e75552-5a54-4726-8651-b07fc6c2ca55",
+     "e97f3960-4422-40a0-8aef-bb9346fbb09c",
+     "5c3329e8-c316-49ae-afc3-992d35cc81d7",
+     "6189f3c9-075b-41e1-97b2-1d120a5de0d4",
+     "b9d29fbb-e27e-4504-93b2-f5a5bd247f85"
+    ],
+    "grades": [
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not"
+    ]
+   },
+   {
+    "requirement_id": "R4",
+    "query": "CompTIA \"Security+\" OR \"CEH\" cybersecurity",
+    "chunk_ids": [
+     "26e8ef81-b11f-4484-965d-e7cdc702ef80",
+     "505dc0b6-a3d0-4073-8ba1-b3bad9162f89",
+     "6086572a-dcfd-43e1-9c98-383b8af022af",
+     "11b7e960-991d-4b2a-ba4c-09a89ceb9524",
+     "2ef6bbe5-3c23-4f60-9f3b-9a7ee6607590",
+     "a4626b6b-b757-4a0b-ba4c-03a3de68354e",
+     "6633f871-c9e9-43e8-a4b1-79f9a1fddd3f",
+     "c971125f-9733-40cd-9e63-3cf531dfa43a"
+    ],
+    "grades": [
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not"
+    ]
+   },
+   {
+    "requirement_id": "R4",
+    "query": "CISSP staff OR team OR bio",
+    "chunk_ids": [
+     "25779ca2-6d4c-4d04-8533-4bb098fac846",
+     "64e1624f-1ec5-44bc-ac66-606bbb9aed7e",
+     "a38eddeb-e9cc-40ff-a1d7-7db9476f4a40",
+     "5a6b89f5-eac4-4092-9752-be434573327f",
+     "1aff1dce-7691-4177-a720-ba6c9f1615df",
+     "d5543f75-92d7-42b5-b68e-ef4080f95079",
+     "26e8ef81-b11f-4484-965d-e7cdc702ef80",
+     "badfe817-1f9e-465e-99d2-e317e8a57cac"
+    ],
+    "grades": [
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not"
+    ]
+   }
+  ],
+  "invalid_citations": 0,
+  "tokens_in": 20263,
+  "tokens_out": 13687,
+  "cost_usd": 0.0567765,
+  "latency_s": 122.40700000000652,
+  "given": [
+   "0a2bd0be-38b9-4cbd-ba5b-1cd90d761ae4",
+   "24a05f80-1784-40ff-b65d-85b6b04ba3e0",
+   "3b8da4b0-4e7a-4b3a-b488-15d2f8eecbab",
+   "49e04aea-3ca4-42f8-8a6c-3fbbb7642ead",
+   "64307261-65f5-4664-9b51-928bfd1c4d69",
+   "76da66f5-f28e-48f4-b55f-2a9f1445cd2f",
+   "8e5224aa-86b3-4796-a4d0-1a9f63c16122",
+   "c85ea0f3-65b2-438f-95f6-82b545c4977c",
+   "da9636ac-7d34-4547-9e58-8263688f3af5"
+  ],
+  "stats": {
+   "claims": 13,
+   "supported": 13,
+   "latency_s": 122.40700000000652,
+   "cost_usd": 0.0567765
+  }
+ },
+ {
+  "task_id": "T05",
+  "variant": "B1",
+  "paragraphs": [
+   {
+    "text": "Lumen Grid Labs conducts experimental development and validation at its headquarters facility in Golden, Colorado, which houses a dedicated 1,800-square-foot power-electronics laboratory. The testing space is constructed with reinforced concrete flooring, isolated grounding, and electrical distribution wired for three-phase power at 480 V to support demanding full-power prototype testing. The laboratory layout includes distinct workstations for low-voltage control engineering, battery pack evaluations, and high-power inverter testing, complete with a marked perimeter dedicated to high-power safety.",
+    "citations": [
+     "56e33796-b6a0-446c-9938-4e111d4d55e1",
+     "2e44526b-771e-4e85-97e0-2ce138bf15a0",
+     "23cdc569-ef51-4e3a-bdc9-374b7fcb9a27"
+    ],
+    "supported": true
+   },
+   {
+    "text": "The facility is equipped with a 500 kW regenerative grid simulator and an OPAL-RT hardware-in-the-loop platform. Interfaced directly to the facility feed, the 500 kW simulator provides bidirectional power testing capability to emulate weak grids, voltage sags, harmonics injection, phase jumps, variable line impedances, and dynamic frequency excursions. The OPAL-RT digital simulation platform performs real-time control prototyping, sub-microsecond power electronics emulation, and multi-node grid interaction studies, executing electromagnetic transient models at a 25-microsecond step time across high-speed digital and analog interfaces.",
+    "citations": [
+     "56e33796-b6a0-446c-9938-4e111d4d55e1",
+     "23cdc569-ef51-4e3a-bdc9-374b7fcb9a27",
+     "ba80d97c-7942-4bb4-9217-07a4b4b01fcc",
+     "54b7a33d-a92a-4040-9b37-86233e48d333",
+     "516739c7-f559-4071-889d-1facb00ba1d3"
+    ],
+    "supported": true
+   },
+   {
+    "text": "Operations inside the power-electronics lab strictly follow NFPA 70E-2024 electrical safety protocols, mandating lockout/tagout implementation on all AC feeds and DC source lines prior to wiring adjustments. Personnel operating within the perimeter of the 500 kW regenerative grid simulator must wear Category 2 Arc Flash apparel, safety glasses, and Class 0 1000 V rated gloves, with all high-voltage activities requiring two-person teams and daily morning kill-switch checks conducted by Jordan Lee. Battery evaluation work areas integrate continuous thermocouple monitoring with automated 55 \u00b0C shutdown limits, open-circuit voltage verification below 48 VDC prior to manual movement, dry chemical suppression systems, Class D extinguishers, and emergency power-off controls at all four exit corridors.",
+    "citations": [
+     "b6865afe-9a80-41ed-ab65-befb1b197120",
+     "e14a3421-9d20-47d4-b89b-aea7d09d6d5a",
+     "7edacde9-e19d-4b80-8aec-e07f07314138"
+    ],
+    "supported": true
+   }
+  ],
+  "gaps": [
+   "R5"
+  ],
+  "retrieval_trace": [
+   {
+    "requirement_id": "R1",
+    "query": "laboratory space facility capabilities lab testing facility square footage",
+    "chunk_ids": [
+     "dcfc6e9a-9f8a-4f00-9165-c6758fb1dd0e",
+     "424a87cc-03f5-4c1a-b9a1-4e232639067c",
+     "56e33796-b6a0-446c-9938-4e111d4d55e1",
+     "ad327b0f-d667-4194-84f6-ec7d76a54632",
+     "2e44526b-771e-4e85-97e0-2ce138bf15a0",
+     "23cdc569-ef51-4e3a-bdc9-374b7fcb9a27",
+     "f1200cbd-c0fd-411e-a715-cde64bdf8dd3",
+     "0db9c6b9-667a-4d2c-89a4-3c0b5fb788ff"
+    ],
+    "grades": [
+     "partly",
+     "partly",
+     "relevant",
+     "partly",
+     "relevant",
+     "relevant",
+     "relevant",
+     "partly"
+    ]
+   },
+   {
+    "requirement_id": "R2",
+    "query": "hardware-in-the-loop HIL simulation equipment real-time digital simulator testbench",
+    "chunk_ids": [
+     "ba80d97c-7942-4bb4-9217-07a4b4b01fcc",
+     "23cdc569-ef51-4e3a-bdc9-374b7fcb9a27",
+     "56e33796-b6a0-446c-9938-4e111d4d55e1",
+     "0c38dcd3-ab66-4a05-a904-c31b268cd8d3",
+     "54b7a33d-a92a-4040-9b37-86233e48d333",
+     "516739c7-f559-4071-889d-1facb00ba1d3",
+     "863add4a-e165-4b8e-a9ac-9c38e2253755",
+     "dd3f2693-f5ea-437f-bfc2-9a7966a4ebd1"
+    ],
+    "grades": [
+     "relevant",
+     "relevant",
+     "relevant",
+     "not",
+     "relevant",
+     "relevant",
+     "partly",
+     "not"
+    ]
+   },
+   {
+    "requirement_id": "R3",
+    "query": "regenerative grid simulator equipment AC power grid emulation testbed",
+    "chunk_ids": [
+     "23cdc569-ef51-4e3a-bdc9-374b7fcb9a27",
+     "56e33796-b6a0-446c-9938-4e111d4d55e1",
+     "ba80d97c-7942-4bb4-9217-07a4b4b01fcc",
+     "863add4a-e165-4b8e-a9ac-9c38e2253755",
+     "9ae08fff-4f81-45f0-b202-f16c637832c3",
+     "54b7a33d-a92a-4040-9b37-86233e48d333",
+     "07cde11f-7ffd-4622-906e-ab3c59568c88",
+     "f1200cbd-c0fd-411e-a715-cde64bdf8dd3"
+    ],
+    "grades": [
+     "relevant",
+     "relevant",
+     "relevant",
+     "relevant",
+     "relevant",
+     "relevant",
+     "relevant",
+     "relevant"
+    ]
+   },
+   {
+    "requirement_id": "R4",
+    "query": "laboratory safety protocols EHS lab safety practices and procedures",
+    "chunk_ids": [
+     "0aafc206-7e32-4c1b-9fc3-46efa51f7216",
+     "5cdbf619-c225-4c6f-9cd6-84de0aa0eff1",
+     "096bed7c-f00c-4d1c-9956-bdd9cf745881",
+     "b6865afe-9a80-41ed-ab65-befb1b197120",
+     "e14a3421-9d20-47d4-b89b-aea7d09d6d5a",
+     "c44c60d7-12f6-4b9a-bb3b-0d99988de229",
+     "bb2df067-bc55-4c8a-9fa1-95fc75fd8ee4",
+     "7edacde9-e19d-4b80-8aec-e07f07314138"
+    ],
+    "grades": [
+     "partly",
+     "relevant",
+     "partly",
+     "relevant",
+     "relevant",
+     "partly",
+     "partly",
+     "relevant"
+    ]
+   },
+   {
+    "requirement_id": "R5",
+    "query": "hydrogen storage and handling facility H2 gas containment and dispensing infrastructure",
+    "chunk_ids": [
+     "863add4a-e165-4b8e-a9ac-9c38e2253755",
+     "9ae08fff-4f81-45f0-b202-f16c637832c3",
+     "56e33796-b6a0-446c-9938-4e111d4d55e1",
+     "1d1ed7d2-e3fa-491c-9833-57f4dbb47874",
+     "f97d6e81-0676-4488-a210-eadd38dfa8fb",
+     "5cdbf619-c225-4c6f-9cd6-84de0aa0eff1",
+     "8d8f3ab5-8ec1-4295-8962-d184dcf2fe08",
+     "e14a3421-9d20-47d4-b89b-aea7d09d6d5a"
+    ],
+    "grades": [
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not"
+    ]
+   },
+   {
+    "requirement_id": "R5",
+    "query": "hydrogen gas storage tanks handling safety infrastructure",
+    "chunk_ids": [
+     "5cdbf619-c225-4c6f-9cd6-84de0aa0eff1",
+     "e14a3421-9d20-47d4-b89b-aea7d09d6d5a",
+     "0fd18567-ec0f-4fd4-9470-2fc46cd4cb37",
+     "b6865afe-9a80-41ed-ab65-befb1b197120",
+     "096bed7c-f00c-4d1c-9956-bdd9cf745881",
+     "863add4a-e165-4b8e-a9ac-9c38e2253755",
+     "9ae08fff-4f81-45f0-b202-f16c637832c3",
+     "8d8f3ab5-8ec1-4295-8962-d184dcf2fe08"
+    ],
+    "grades": [
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not"
+    ]
+   },
+   {
+    "requirement_id": "R5",
+    "query": "hydrogen storage facility fuel cell",
+    "chunk_ids": [
+     "863add4a-e165-4b8e-a9ac-9c38e2253755",
+     "1d1ed7d2-e3fa-491c-9833-57f4dbb47874",
+     "313a36d1-25c5-4153-b83a-b8971ae78fff",
+     "9ae08fff-4f81-45f0-b202-f16c637832c3",
+     "d9b318eb-dc2d-4df6-b261-6fad08816db6",
+     "d1aff2b9-5e2c-4fca-9b6e-40a6dbac9b99",
+     "5cdbf619-c225-4c6f-9cd6-84de0aa0eff1",
+     "cb47227d-ebc3-49cf-8d84-4ef9e09f6672"
+    ],
+    "grades": [
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not"
+    ]
+   }
+  ],
+  "invalid_citations": 0,
+  "tokens_in": 22267,
+  "tokens_out": 8869,
+  "cost_usd": 0.03766325,
+  "latency_s": 77.57799999997951,
+  "given": [
+   "07cde11f-7ffd-4622-906e-ab3c59568c88",
+   "23cdc569-ef51-4e3a-bdc9-374b7fcb9a27",
+   "2e44526b-771e-4e85-97e0-2ce138bf15a0",
+   "516739c7-f559-4071-889d-1facb00ba1d3",
+   "54b7a33d-a92a-4040-9b37-86233e48d333",
+   "56e33796-b6a0-446c-9938-4e111d4d55e1",
+   "5cdbf619-c225-4c6f-9cd6-84de0aa0eff1",
+   "7edacde9-e19d-4b80-8aec-e07f07314138",
+   "863add4a-e165-4b8e-a9ac-9c38e2253755",
+   "9ae08fff-4f81-45f0-b202-f16c637832c3",
+   "b6865afe-9a80-41ed-ab65-befb1b197120",
+   "ba80d97c-7942-4bb4-9217-07a4b4b01fcc",
+   "e14a3421-9d20-47d4-b89b-aea7d09d6d5a",
+   "f1200cbd-c0fd-411e-a715-cde64bdf8dd3"
+  ],
+  "stats": {
+   "claims": 9,
+   "supported": 9,
+   "latency_s": 77.57799999997951,
+   "cost_usd": 0.03766325
+  }
+ },
+ {
+  "task_id": "T06",
+  "variant": "B1",
+  "paragraphs": [
+   {
+    "text": "Lumen Grid Labs delivers compelling financial returns for energy storage customers by repurposing retired automotive battery packs using the proprietary LGL-BMS3 solid-state battery management system. Compared to virgin utility-grade installations averaging $138 per kilowatt-hour, fully packaged second-life battery systems cost $85.50 per kilowatt-hour, comprising module-scale pack acquisition at $42.00, grading and recertification at $16.50, and LGL-BMS3 electronics integration at $27.00. This structure yields a 38 percent capital cost reduction per kilowatt-hour, while joint commercial modeling with Front Range Utility Cooperative demonstrates a 29 percent reduction in the Levelized Cost of Storage across a 10-year asset horizon.",
+    "citations": [
+     "71d6d012-48d8-4b48-9513-387d4e137e50",
+     "cb84fb7a-5d9d-4310-a797-7d4237ae7388",
+     "f0d15a7c-fefc-4245-a945-db83d153a444"
+    ],
+    "supported": true
+   },
+   {
+    "text": "Commercialization is reinforced by direct customer commitments across utility and microgrid sectors. Front Range Utility Cooperative has committed to host a 2 MW pilot expansion at a regional distribution substation, providing interconnection access for parallel HelioLink 250 units and access to secondary utility battery banks managed by LGL-BMS3. Furthermore, Summit Storage Partners has executed a formal letter of intent to procure 12 LGL-BMS3 units and two HelioLink 250 units for a 500 kW, 1,000 kWh commercial microgrid demonstration project in 2026. Backed by these partnerships, commercial sales targets for 2026 comprise 40 HelioLink 250 units generating $2.08 million at an average selling price of $52,000, along with $1.15 million from LGL-BMS3 pack integration contracts, totaling $3.23 million.",
+    "citations": [
+     "443fc8e8-03a2-4a0a-a132-2730c3754f5b",
+     "85c9b61e-c8d6-467b-83b3-40f398d6c6f6",
+     "f223844d-1c81-4235-a3b7-8bcf4e67d36c",
+     "8aea1c07-3ab9-42d3-928e-2c94f99b2be5"
+    ],
+    "supported": true
+   },
+   {
+    "text": "Hardware manufacturing balances capital efficiency with rigorous quality control by pairing regional contract manufacturing with in-house integration. An established contract manufacturer in Longmont performs surface-mount technology assembly, automated optical inspection of gate driver and control boards, assembly of 1,200 V silicon carbide power blocks into NEMA 3R outdoor enclosures, liquid-cooling cold plate torque testing, and wire harness routing. Sub-assemblies are then transferred to the company 1,800-square-foot power electronics laboratory in Golden, Colorado, where final integration, control firmware loading, full-power 250 kW burn-in testing on a regenerative grid simulator, and LGL-BMS3 system coupling validation are completed.",
+    "citations": [
+     "c5fd0157-e838-40a9-8e32-92042eb28cc2",
+     "99f7bcf6-ec2e-4407-aeb1-61ead1a7d692"
+    ],
+    "supported": true
+   }
+  ],
+  "gaps": [],
+  "retrieval_trace": [
+   {
+    "requirement_id": "R1",
+    "query": "customer cost savings ROI analysis total cost of ownership reduction",
+    "chunk_ids": [
+     "71d6d012-48d8-4b48-9513-387d4e137e50",
+     "cb84fb7a-5d9d-4310-a797-7d4237ae7388",
+     "f0d15a7c-fefc-4245-a945-db83d153a444",
+     "769f7ad9-f4d2-467a-81b4-4891ab1a4513",
+     "c57cc9cf-f32e-44c3-a6b2-3c030aa44ceb",
+     "ceadabda-4458-4146-94a6-9b22c9a9db97",
+     "a6f614bb-a957-46f6-adc2-0cfce52eea6e",
+     "b5c2f29c-1ba9-44ce-b087-3ae73245956d"
+    ],
+    "grades": [
+     "relevant",
+     "relevant",
+     "relevant",
+     "partly",
+     "partly",
+     "partly",
+     "not",
+     "not"
+    ]
+   },
+   {
+    "requirement_id": "R2",
+    "query": "annual sales targets quota revenue projections sales forecast",
+    "chunk_ids": [
+     "b0684c7c-c1cc-491b-b172-36540ffbad72",
+     "443fc8e8-03a2-4a0a-a132-2730c3754f5b",
+     "c57cc9cf-f32e-44c3-a6b2-3c030aa44ceb",
+     "5b4a7990-7b06-4380-ad95-a0060de0a8aa",
+     "78cb96b8-9223-4c1b-8aa5-06c4c505d29c",
+     "cd06cb50-e8b8-4f93-8af0-00fa722c252f",
+     "471f25d3-ef7a-495d-ba62-43a1d04489bf",
+     "66681693-bca8-430f-9ee7-1e352bce21ef"
+    ],
+    "grades": [
+     "relevant",
+     "relevant",
+     "relevant",
+     "partly",
+     "partly",
+     "partly",
+     "not",
+     "not"
+    ]
+   },
+   {
+    "requirement_id": "R3",
+    "query": "manufacturing process production facility assembly fabrication supply chain workflow",
+    "chunk_ids": [
+     "c5fd0157-e838-40a9-8e32-92042eb28cc2",
+     "e5b7f8f1-835a-45a8-8386-93e0ae02a771",
+     "4c9ec921-2414-4e66-81aa-4de2f6a3e2d8",
+     "ad327b0f-d667-4194-84f6-ec7d76a54632",
+     "54fee46f-e9c5-4c4f-8bed-72bc6ad6385a",
+     "aa4e1b1a-9553-4656-bfbd-ecd5f7dfec72",
+     "424a87cc-03f5-4c1a-b9a1-4e232639067c",
+     "99f7bcf6-ec2e-4407-aeb1-61ead1a7d692"
+    ],
+    "grades": [
+     "relevant",
+     "partly",
+     "not",
+     "not",
+     "partly",
+     "not",
+     "not",
+     "relevant"
+    ]
+   },
+   {
+    "requirement_id": "R4",
+    "query": "customer letters of intent LOI signed purchase commitments pre-orders",
+    "chunk_ids": [
+     "85c9b61e-c8d6-467b-83b3-40f398d6c6f6",
+     "b5c2f29c-1ba9-44ce-b087-3ae73245956d",
+     "f223844d-1c81-4235-a3b7-8bcf4e67d36c",
+     "a6f614bb-a957-46f6-adc2-0cfce52eea6e",
+     "a938407f-ac28-4fda-8122-e79a57f66a5d",
+     "8aea1c07-3ab9-42d3-928e-2c94f99b2be5",
+     "54fee46f-e9c5-4c4f-8bed-72bc6ad6385a",
+     "b0684c7c-c1cc-491b-b172-36540ffbad72"
+    ],
+    "grades": [
+     "relevant",
+     "partly",
+     "relevant",
+     "partly",
+     "partly",
+     "relevant",
+     "partly",
+     "not"
+    ]
+   }
+  ],
+  "invalid_citations": 0,
+  "tokens_in": 14625,
+  "tokens_out": 5323,
+  "cost_usd": 0.02404575,
+  "latency_s": 41.78200000000652,
+  "given": [
+   "443fc8e8-03a2-4a0a-a132-2730c3754f5b",
+   "71d6d012-48d8-4b48-9513-387d4e137e50",
+   "85c9b61e-c8d6-467b-83b3-40f398d6c6f6",
+   "8aea1c07-3ab9-42d3-928e-2c94f99b2be5",
+   "99f7bcf6-ec2e-4407-aeb1-61ead1a7d692",
+   "b0684c7c-c1cc-491b-b172-36540ffbad72",
+   "c57cc9cf-f32e-44c3-a6b2-3c030aa44ceb",
+   "c5fd0157-e838-40a9-8e32-92042eb28cc2",
+   "cb84fb7a-5d9d-4310-a797-7d4237ae7388",
+   "f0d15a7c-fefc-4245-a945-db83d153a444",
+   "f223844d-1c81-4235-a3b7-8bcf4e67d36c"
+  ],
+  "stats": {
+   "claims": 10,
+   "supported": 10,
+   "latency_s": 41.78200000000652,
+   "cost_usd": 0.02404575
+  }
+ },
+ {
+  "task_id": "T07",
+  "variant": "B1",
+  "paragraphs": [
+   {
+    "text": "Lumen Grid Labs provides hands-on student training through a ten-week paid summer internship program at its Golden facility for undergraduate and graduate students in electrical engineering, computer engineering, and materials science, paying thirty dollars per hour for forty hours per week under the executive direction of Dr. Maya Okafor. Interns in the advanced energy storage track work with Elena Brandt and Jordan Lee to configure automated cell cycling equipment, evaluate state-of-health routines, and assist with firmware development and validation for the LGL-BMS3 solid-state battery management system. The company also sponsors four paid student internships annually supervised by Jordan Lee and Ravi Deshmukh for hardware-in-the-loop validation and high-power inverter testing, while the Colorado School of Mines commits a fully funded Ph.D. graduate research assistant under Dr. Aris Thorne to develop transient response algorithms for the HelioLink 250 controller and track battery degradation for the LGL-BMS3.",
+    "citations": [
+     "d239aea8-89f9-4cac-ba38-e1050800e5f5",
+     "43d2022b-5c25-4d5f-b347-c2113860323e",
+     "70be1674-e278-4cda-b2d2-f189d2a2426d",
+     "0400afcf-609d-4449-9b28-6ad3b061bdb2"
+    ],
+    "supported": true
+   },
+   {
+    "text": "Educational partnerships anchor the company's regional workforce initiatives, centered on an active STTR collaboration with the Colorado School of Mines that gives graduate and undergraduate students access to an 1,800 square foot power-electronics lab, a 500 kW regenerative grid simulator, and an OPAL-RT hardware-in-the-loop rig. In addition, Lumen Grid Labs partners with Colorado community colleges through a technical apprenticeship program coordinated by Dr. Maya Okafor, supplying open-access instructional materials derived from HelioLink 250 inverter controls and LGL-BMS3 battery telemetry to align vocational training with industry needs. This initiative is further complemented by bi-monthly technical workshops led by Elena Brandt covering battery pack safety, electrochemical balancing, and non-destructive testing.",
+    "citations": [
+     "c278be6b-7353-4180-b482-080992b6c147",
+     "43d2022b-5c25-4d5f-b347-c2113860323e"
+    ],
+    "supported": true
+   },
+   {
+    "text": "The team disseminates its research through peer-reviewed conference and journal publications spanning battery management and power conversion. Core publications include articles by Dr. Maya Okafor and Elena Brandt on degradation-aware balancing for second-life lithium-ion packs in the Journal of Power Sources, Okafor's study on online capacity estimation under irregular duty cycles in IEEE Transactions on Control Systems Technology, and Brandt's research on incremental capacity features as health indicators for retired modules in the Journal of the Electrochemical Society. Additionally, Ravi Deshmukh has published research on virtual impedance shaping for grid-forming inverters on weak feeders in the IEEE Energy Conversion Congress with Dr. Maya Okafor, as well as switching loss trade-offs in 1200 V silicon-carbide half bridges in the IEEE Applied Power Electronics Conference.",
+    "citations": [
+     "87a7f4c8-e647-4d2f-9f8f-fcb5e8a8c032",
+     "46451bc4-772c-490e-9423-cb613a2ad8dc",
+     "321214c0-5fb2-4ffb-9c0a-92289bed419b"
+    ],
+    "supported": true
+   }
+  ],
+  "gaps": [
+   "R4"
+  ],
+  "retrieval_trace": [
+   {
+    "requirement_id": "R1",
+    "query": "student training mentorship program undergraduate graduate student research training",
+    "chunk_ids": [
+     "c278be6b-7353-4180-b482-080992b6c147",
+     "d239aea8-89f9-4cac-ba38-e1050800e5f5",
+     "43d2022b-5c25-4d5f-b347-c2113860323e",
+     "70be1674-e278-4cda-b2d2-f189d2a2426d",
+     "1420e3ad-cff2-4d1d-a5aa-1b2f2cf06567",
+     "c0258cac-b05f-4426-b705-5265a85cfba4",
+     "a938407f-ac28-4fda-8122-e79a57f66a5d",
+     "0400afcf-609d-4449-9b28-6ad3b061bdb2"
+    ],
+    "grades": [
+     "relevant",
+     "relevant",
+     "relevant",
+     "relevant",
+     "relevant",
+     "relevant",
+     "partly",
+     "relevant"
+    ]
+   },
+   {
+    "requirement_id": "R2",
+    "query": "educational partnerships university collaboration academic school district community college partnership",
+    "chunk_ids": [
+     "a198c3bf-2740-4f79-bff2-94c0618ab747",
+     "1420e3ad-cff2-4d1d-a5aa-1b2f2cf06567",
+     "c278be6b-7353-4180-b482-080992b6c147",
+     "c003c57c-a680-47b2-8a06-42831510d368",
+     "505dc0b6-a3d0-4073-8ba1-b3bad9162f89",
+     "43d2022b-5c25-4d5f-b347-c2113860323e",
+     "51ccd03e-dab3-4861-9240-d8adfcca199c",
+     "bcb11e36-d797-4f39-8355-54591bc70768"
+    ],
+    "grades": [
+     "partly",
+     "relevant",
+     "relevant",
+     "partly",
+     "not",
+     "relevant",
+     "partly",
+     "partly"
+    ]
+   },
+   {
+    "requirement_id": "R3",
+    "query": "peer-reviewed publications journal articles selected publications conference papers",
+    "chunk_ids": [
+     "87a7f4c8-e647-4d2f-9f8f-fcb5e8a8c032",
+     "46451bc4-772c-490e-9423-cb613a2ad8dc",
+     "321214c0-5fb2-4ffb-9c0a-92289bed419b",
+     "805b935e-b815-4a7f-a4d1-176d1f51d850",
+     "68822dbe-a922-47c9-810d-d59a5b40fd08",
+     "40096fa7-63c1-4149-a4c2-e0b8c0a0d79a",
+     "9845fc7c-a40d-4933-9699-668c31be8c4e",
+     "cf74b147-a581-4cc8-8d75-582a380ae86c"
+    ],
+    "grades": [
+     "relevant",
+     "relevant",
+     "relevant",
+     "partly",
+     "not",
+     "not",
+     "partly",
+     "not"
+    ]
+   },
+   {
+    "requirement_id": "R4",
+    "query": "offshore wind workforce training program offshore wind technician training curriculum",
+    "chunk_ids": [
+     "43d2022b-5c25-4d5f-b347-c2113860323e",
+     "863add4a-e165-4b8e-a9ac-9c38e2253755",
+     "505dc0b6-a3d0-4073-8ba1-b3bad9162f89",
+     "70457b8f-0699-4afb-965a-375c7351acab",
+     "5cdbf619-c225-4c6f-9cd6-84de0aa0eff1",
+     "bb2df067-bc55-4c8a-9fa1-95fc75fd8ee4",
+     "b6865afe-9a80-41ed-ab65-befb1b197120",
+     "9ae08fff-4f81-45f0-b202-f16c637832c3"
+    ],
+    "grades": [
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not"
+    ]
+   },
+   {
+    "requirement_id": "R4",
+    "query": "offshore wind workforce development",
+    "chunk_ids": [
+     "43d2022b-5c25-4d5f-b347-c2113860323e",
+     "505dc0b6-a3d0-4073-8ba1-b3bad9162f89",
+     "e73b7123-4ef5-4c4e-b85c-c4887ffc107b",
+     "c278be6b-7353-4180-b482-080992b6c147",
+     "863add4a-e165-4b8e-a9ac-9c38e2253755",
+     "c0258cac-b05f-4426-b705-5265a85cfba4",
+     "d5543f75-92d7-42b5-b68e-ef4080f95079",
+     "bb108aba-313f-48fa-8455-d64ea6b66811"
+    ],
+    "grades": [
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not"
+    ]
+   },
+   {
+    "requirement_id": "R4",
+    "query": "offshore wind technician training program",
+    "chunk_ids": [
+     "43d2022b-5c25-4d5f-b347-c2113860323e",
+     "70be1674-e278-4cda-b2d2-f189d2a2426d",
+     "505dc0b6-a3d0-4073-8ba1-b3bad9162f89",
+     "70457b8f-0699-4afb-965a-375c7351acab",
+     "c0258cac-b05f-4426-b705-5265a85cfba4",
+     "8d7cecc4-e17f-47ef-aa3a-9ac06b72e97a",
+     "863add4a-e165-4b8e-a9ac-9c38e2253755",
+     "1420e3ad-cff2-4d1d-a5aa-1b2f2cf06567"
+    ],
+    "grades": [
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not"
+    ]
+   }
+  ],
+  "invalid_citations": 0,
+  "tokens_in": 18655,
+  "tokens_out": 7262,
+  "cost_usd": 0.031282,
+  "latency_s": 59.48499999998603,
+  "given": [
+   "0400afcf-609d-4449-9b28-6ad3b061bdb2",
+   "1420e3ad-cff2-4d1d-a5aa-1b2f2cf06567",
+   "321214c0-5fb2-4ffb-9c0a-92289bed419b",
+   "43d2022b-5c25-4d5f-b347-c2113860323e",
+   "46451bc4-772c-490e-9423-cb613a2ad8dc",
+   "70be1674-e278-4cda-b2d2-f189d2a2426d",
+   "87a7f4c8-e647-4d2f-9f8f-fcb5e8a8c032",
+   "c0258cac-b05f-4426-b705-5265a85cfba4",
+   "c278be6b-7353-4180-b482-080992b6c147",
+   "d239aea8-89f9-4cac-ba38-e1050800e5f5"
+  ],
+  "stats": {
+   "claims": 14,
+   "supported": 14,
+   "latency_s": 59.48499999998603,
+   "cost_usd": 0.031282
+  }
+ },
+ {
+  "task_id": "T08",
+  "variant": "B1",
+  "paragraphs": [
+   {
+    "text": "Final anonymized datasets supporting peer-reviewed publications will be deposited in the Zenodo repository in accordance with federal public access mandates. Datasets uploaded to Zenodo will be assigned a persistent Digital Object Identifier, made available under a Creative Commons Attribution (CC-BY 4.0) license, and retained for a minimum of ten years.",
+    "citations": [
+     "84cce396-475f-456a-a1fa-6fb03ab1433e"
+    ],
+    "supported": true
+   },
+   {
+    "text": "Lumen Grid Labs protects its core technical innovations through formal patent filings and proprietary datasets. The company is the assignee of U.S. Patent Application 18/442,107, titled 'Systems and Methods for Degradation-Aware Dynamic Balancing in Multi-Cell Energy Storage Packs,' which was developed under a DOE SBIR Phase I award. Furthermore, the intellectual property portfolio includes U.S. Patent 11,000,001, covering a method for ranking retired cells by remaining usable capacity, supported by proprietary tuning data collected during Phase I development.",
+    "citations": [
+     "14caea04-8a2b-474e-b958-af3af4952345",
+     "a98b55e1-a5f1-47ae-b6e6-5bc6563cece1",
+     "46451bc4-772c-490e-9423-cb613a2ad8dc"
+    ],
+    "supported": false
+   }
+  ],
+  "gaps": [
+   "R3"
+  ],
+  "retrieval_trace": [
+   {
+    "requirement_id": "R1",
+    "query": "data sharing repository archive open access data repository",
+    "chunk_ids": [
+     "84cce396-475f-456a-a1fa-6fb03ab1433e",
+     "a5f5e6fe-adcc-4b96-82f4-f8d56c8c0c1c",
+     "1287a759-46dc-4823-9faf-ca023e6edbc1",
+     "5c2ee7e7-7125-4a6d-9062-887797d58e57",
+     "05ae41ef-9390-452b-9c04-62ffc0446391",
+     "9ae08fff-4f81-45f0-b202-f16c637832c3",
+     "71d6d012-48d8-4b48-9513-387d4e137e50",
+     "51ccd03e-dab3-4861-9240-d8adfcca199c"
+    ],
+    "grades": [
+     "relevant",
+     "partly",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not"
+    ]
+   },
+   {
+    "requirement_id": "R1",
+    "query": "Zenodo anonymized datasets repository",
+    "chunk_ids": [
+     "84cce396-475f-456a-a1fa-6fb03ab1433e",
+     "a5f5e6fe-adcc-4b96-82f4-f8d56c8c0c1c",
+     "5c2ee7e7-7125-4a6d-9062-887797d58e57",
+     "1287a759-46dc-4823-9faf-ca023e6edbc1",
+     "05ae41ef-9390-452b-9c04-62ffc0446391",
+     "bdfdd064-6da3-457a-b1ac-e287dd7637ac",
+     "321214c0-5fb2-4ffb-9c0a-92289bed419b",
+     "cf74b147-a581-4cc8-8d75-582a380ae86c"
+    ],
+    "grades": [
+     "relevant",
+     "partly",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not"
+    ]
+   },
+   {
+    "requirement_id": "R1",
+    "query": "data sharing repository",
+    "chunk_ids": [
+     "84cce396-475f-456a-a1fa-6fb03ab1433e",
+     "a5f5e6fe-adcc-4b96-82f4-f8d56c8c0c1c",
+     "5c2ee7e7-7125-4a6d-9062-887797d58e57",
+     "1287a759-46dc-4823-9faf-ca023e6edbc1",
+     "c53ef343-60ac-4446-8172-254ee07b2c6b",
+     "05ae41ef-9390-452b-9c04-62ffc0446391",
+     "71d6d012-48d8-4b48-9513-387d4e137e50",
+     "bcb11e36-d797-4f39-8355-54591bc70768"
+    ],
+    "grades": [
+     "relevant",
+     "partly",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not"
+    ]
+   },
+   {
+    "requirement_id": "R2",
+    "query": "protected intellectual property proprietary rights background IP patents trade secrets",
+    "chunk_ids": [
+     "40d96ee9-858c-4f9a-b6d1-a99997975162",
+     "14caea04-8a2b-474e-b958-af3af4952345",
+     "a98b55e1-a5f1-47ae-b6e6-5bc6563cece1",
+     "8926842d-9962-4efc-9f9d-9f72dad90f53",
+     "0fe7f14f-363d-4b82-aef1-2269562d275d",
+     "321214c0-5fb2-4ffb-9c0a-92289bed419b",
+     "f0f0f25c-6484-4ed9-a28a-c334480c5d7a",
+     "46451bc4-772c-490e-9423-cb613a2ad8dc"
+    ],
+    "grades": [
+     "partly",
+     "relevant",
+     "relevant",
+     "relevant",
+     "not",
+     "relevant",
+     "not",
+     "relevant"
+    ]
+   },
+   {
+    "requirement_id": "R3",
+    "query": "NIST SP 800-171 cybersecurity controls safeguarding CUI NIST 800-171 compliance",
+    "chunk_ids": [
+     "a5f5e6fe-adcc-4b96-82f4-f8d56c8c0c1c",
+     "bb2df067-bc55-4c8a-9fa1-95fc75fd8ee4",
+     "ad327b0f-d667-4194-84f6-ec7d76a54632",
+     "b9d29fbb-e27e-4504-93b2-f5a5bd247f85",
+     "7bbafafc-314a-4738-b821-8e940dfc80a8",
+     "b6865afe-9a80-41ed-ab65-befb1b197120",
+     "5c2ee7e7-7125-4a6d-9062-887797d58e57",
+     "82082806-e72b-4b74-8b2e-1c35f0244a3d"
+    ],
+    "grades": [
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not"
+    ]
+   },
+   {
+    "requirement_id": "R3",
+    "query": "\"NIST SP 800-171\" System Security Plan cybersecurity",
+    "chunk_ids": [
+     "4f5a2f77-8902-45c1-8d94-0bef9f452e8a",
+     "b9d29fbb-e27e-4504-93b2-f5a5bd247f85",
+     "4c9ec921-2414-4e66-81aa-4de2f6a3e2d8",
+     "0aafc206-7e32-4c1b-9fc3-46efa51f7216",
+     "a5f5e6fe-adcc-4b96-82f4-f8d56c8c0c1c",
+     "bb2df067-bc55-4c8a-9fa1-95fc75fd8ee4",
+     "c44c60d7-12f6-4b9a-bb3b-0d99988de229",
+     "dd4f08ee-36bb-475e-9ba3-ca459a5c61f5"
+    ],
+    "grades": [
+     "not",
+     "not",
+     "not",
+     "not",
+     "partly",
+     "not",
+     "not",
+     "not"
+    ]
+   },
+   {
+    "requirement_id": "R3",
+    "query": "\"NIST SP 800-171\" CUI project data controls",
+    "chunk_ids": [
+     "a5f5e6fe-adcc-4b96-82f4-f8d56c8c0c1c",
+     "84cce396-475f-456a-a1fa-6fb03ab1433e",
+     "1287a759-46dc-4823-9faf-ca023e6edbc1",
+     "5c2ee7e7-7125-4a6d-9062-887797d58e57",
+     "5a6b89f5-eac4-4092-9752-be434573327f",
+     "b9d29fbb-e27e-4504-93b2-f5a5bd247f85",
+     "05ae41ef-9390-452b-9c04-62ffc0446391",
+     "c74928ed-f69e-4562-b56f-bc9a53716984"
+    ],
+    "grades": [
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not"
+    ]
+   }
+  ],
+  "invalid_citations": 0,
+  "tokens_in": 16383,
+  "tokens_out": 10687,
+  "cost_usd": 0.040416,
+  "latency_s": 99.06299999996554,
+  "given": [
+   "14caea04-8a2b-474e-b958-af3af4952345",
+   "321214c0-5fb2-4ffb-9c0a-92289bed419b",
+   "46451bc4-772c-490e-9423-cb613a2ad8dc",
+   "84cce396-475f-456a-a1fa-6fb03ab1433e",
+   "8926842d-9962-4efc-9f9d-9f72dad90f53",
+   "a98b55e1-a5f1-47ae-b6e6-5bc6563cece1"
+  ],
+  "stats": {
+   "claims": 7,
+   "supported": 3,
+   "latency_s": 99.06299999996554,
+   "cost_usd": 0.040416
+  }
+ },
+ {
+  "task_id": "T09",
+  "variant": "B1",
+  "paragraphs": [
+   {
+    "text": "Lumen Grid Labs tracks operational and technical risks through a formal risk register evaluated bi-weekly by the executive leadership team. Risks are prioritized based on severity, probability, and velocity. Any risk item demonstrating an escalated severity score triggers the immediate execution of a corrective action plan approved by Dr. Maya Okafor.",
+    "citations": [
+     "82082806-e72b-4b74-8b2e-1c35f0244a3d"
+    ],
+    "supported": false
+   },
+   {
+    "text": "To mitigate critical supply chain risks and lead times that exceed 26 weeks for high-voltage switches, Lumen Grid Labs maintains dual-sourcing framework agreements with two qualified suppliers providing pin-compatible 1200 V silicon carbide power modules. The company retains a safety buffer of at least 36 matched module sets on-site in Golden, Colorado, and maintains active supplier tiers via a minimum 70/30 volume split. Quality risks are managed upon arrival by test engineer Jordan Lee, who evaluates ten percent of each incoming batch using the OPAL-RT hardware-in-the-loop rig and a 500 kW regenerative grid simulator. Additionally, custom inverter output inductors and isolation transformers are co-designed and wound domestically in Colorado to maintain turnaround times under six weeks.",
+    "citations": [
+     "aa4e1b1a-9553-4656-bfbd-ecd5f7dfec72",
+     "9d65c451-e187-4fda-8aea-675b15e12d66"
+    ],
+    "supported": false
+   },
+   {
+    "text": "Technical compliance risk is mitigated through comprehensive standards validation. In March 2025, the HelioLink 250 inverter completed third-party witness testing and achieved full certification compliance under UL 1741 SB requirements for advanced grid-interconnection and ride-through functions. To prevent engineering bottlenecks during continuous validation campaigns, operational use of the OPAL-RT hardware-in-the-loop rig is structured across staggered eight-hour shift windows.",
+    "citations": [
+     "c3357699-9497-496a-8f03-6b5724d382e1",
+     "c3a98fc6-f014-4867-904c-79c67256664d"
+    ],
+    "supported": false
+   }
+  ],
+  "gaps": [],
+  "retrieval_trace": [
+   {
+    "requirement_id": "R1",
+    "query": "risk tracking register methodology risk monitoring and reporting process",
+    "chunk_ids": [
+     "82082806-e72b-4b74-8b2e-1c35f0244a3d",
+     "4f5a2f77-8902-45c1-8d94-0bef9f452e8a",
+     "70d6bddf-dd31-4f4d-a0d7-6483b0c38bf7",
+     "caaf3c25-3492-406e-b023-e36a9e06ae2d",
+     "c3357699-9497-496a-8f03-6b5724d382e1",
+     "fe13bd13-c747-4921-923a-b74e53aa5508",
+     "e7cd7003-37c6-4fd1-8930-550390aa8483",
+     "ca445065-aaa3-45ea-9dbc-1c4a5f34ae57"
+    ],
+    "grades": [
+     "relevant",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not"
+    ]
+   },
+   {
+    "requirement_id": "R1",
+    "query": "risk tracking workflow review cadence procedure",
+    "chunk_ids": [
+     "82082806-e72b-4b74-8b2e-1c35f0244a3d",
+     "4f5a2f77-8902-45c1-8d94-0bef9f452e8a",
+     "70d6bddf-dd31-4f4d-a0d7-6483b0c38bf7",
+     "c3357699-9497-496a-8f03-6b5724d382e1",
+     "75f2b3c9-849f-42ca-ac1b-319aa9fdf77f",
+     "505dc0b6-a3d0-4073-8ba1-b3bad9162f89",
+     "e7cd7003-37c6-4fd1-8930-550390aa8483",
+     "5a6b89f5-eac4-4092-9752-be434573327f"
+    ],
+    "grades": [
+     "relevant",
+     "partly",
+     "not",
+     "partly",
+     "not",
+     "not",
+     "partly",
+     "not"
+    ]
+   },
+   {
+    "requirement_id": "R1",
+    "query": "risk register tracking review process",
+    "chunk_ids": [
+     "82082806-e72b-4b74-8b2e-1c35f0244a3d",
+     "4f5a2f77-8902-45c1-8d94-0bef9f452e8a",
+     "70d6bddf-dd31-4f4d-a0d7-6483b0c38bf7",
+     "c3357699-9497-496a-8f03-6b5724d382e1",
+     "caaf3c25-3492-406e-b023-e36a9e06ae2d",
+     "e7cd7003-37c6-4fd1-8930-550390aa8483",
+     "505dc0b6-a3d0-4073-8ba1-b3bad9162f89",
+     "75f2b3c9-849f-42ca-ac1b-319aa9fdf77f"
+    ],
+    "grades": [
+     "relevant",
+     "partly",
+     "not",
+     "partly",
+     "partly",
+     "partly",
+     "not",
+     "not"
+    ]
+   },
+   {
+    "requirement_id": "R2",
+    "query": "supply chain risk mitigation strategy vendor contingency business continuity",
+    "chunk_ids": [
+     "c3357699-9497-496a-8f03-6b5724d382e1",
+     "aa4e1b1a-9553-4656-bfbd-ecd5f7dfec72",
+     "4c9ec921-2414-4e66-81aa-4de2f6a3e2d8",
+     "4f5a2f77-8902-45c1-8d94-0bef9f452e8a",
+     "9d65c451-e187-4fda-8aea-675b15e12d66",
+     "e7cd7003-37c6-4fd1-8930-550390aa8483",
+     "cd06cb50-e8b8-4f93-8af0-00fa722c252f",
+     "caaf3c25-3492-406e-b023-e36a9e06ae2d"
+    ],
+    "grades": [
+     "relevant",
+     "relevant",
+     "partly",
+     "partly",
+     "relevant",
+     "not",
+     "partly",
+     "not"
+    ]
+   },
+   {
+    "requirement_id": "R3",
+    "query": "product certification compliance status accreditation ISO regulatory certified",
+    "chunk_ids": [
+     "0bbfbeff-55c5-4d3e-a76b-12a264991a82",
+     "b9d29fbb-e27e-4504-93b2-f5a5bd247f85",
+     "b6d93dfb-1884-45c4-809b-b23a86ab3f4b",
+     "c3a98fc6-f014-4867-904c-79c67256664d",
+     "3a7aea76-5e79-40b5-b610-1a9b93e659f7",
+     "cd06cb50-e8b8-4f93-8af0-00fa722c252f",
+     "4062d190-5123-4eca-a09f-c99ef52443e7",
+     "f1200cbd-c0fd-411e-a715-cde64bdf8dd3"
+    ],
+    "grades": [
+     "relevant",
+     "not",
+     "not",
+     "relevant",
+     "not",
+     "partly",
+     "relevant",
+     "not"
+    ]
+   }
+  ],
+  "invalid_citations": 0,
+  "tokens_in": 13564,
+  "tokens_out": 17393,
+  "cost_usd": 0.06698175,
+  "latency_s": 119.84299999999348,
+  "given": [
+   "0bbfbeff-55c5-4d3e-a76b-12a264991a82",
+   "4062d190-5123-4eca-a09f-c99ef52443e7",
+   "82082806-e72b-4b74-8b2e-1c35f0244a3d",
+   "9d65c451-e187-4fda-8aea-675b15e12d66",
+   "aa4e1b1a-9553-4656-bfbd-ecd5f7dfec72",
+   "c3357699-9497-496a-8f03-6b5724d382e1",
+   "c3a98fc6-f014-4867-904c-79c67256664d"
+  ],
+  "stats": {
+   "claims": 10,
+   "supported": 5,
+   "latency_s": 119.84299999999348,
+   "cost_usd": 0.06698175
+  }
+ },
+ {
+  "task_id": "T10",
+  "variant": "B1",
+  "paragraphs": [
+   {
+    "text": "Lumen Grid Labs, LLC is an advanced clean energy technology development firm based in Golden, Colorado. Founded in 2019, the company operates as a 100% U.S.-owned business with an active workforce of 32 employees under Unique Entity Identifier LGLSYNTH0001. Under the leadership of Chief Executive Officer Dr. Maya Okafor, the organization specializes in the design, modeling, and fabrication of advanced power electronics and intelligent energy storage management systems.",
+    "citations": [
+     "4062d190-5123-4eca-a09f-c99ef52443e7",
+     "32497078-8e5b-4933-ac85-dcf22f23a591",
+     "a53bee1c-420e-456b-b46c-ba38b68c32f3"
+    ],
+    "supported": true
+   },
+   {
+    "text": "The company's commercial hardware portfolio features the HelioLink 250, a 250 kW silicon carbide grid-forming inverter that achieves 98.7% peak efficiency. Engineered to deliver autonomous voltage and frequency stabilization for distribution feeders and weak grids, the platform is evaluated against UL 1741 SB standards for interoperability and advanced grid support functions. Lumen Grid Labs also produces the LGL-BMS3, a modular solid-state battery management system designed for stationary energy storage that provides active cell balancing to within plus or minus 2 mV and maintains a state-of-charge estimation error of 1.5% or less.",
+    "citations": [
+     "b6d93dfb-1884-45c4-809b-b23a86ab3f4b",
+     "0bbfbeff-55c5-4d3e-a76b-12a264991a82",
+     "4c9ec921-2414-4e66-81aa-4de2f6a3e2d8"
+    ],
+    "supported": true
+   }
+  ],
+  "gaps": [
+   "R4"
+  ],
+  "retrieval_trace": [
+   {
+    "requirement_id": "R1",
+    "query": "total headcount employees full-time employee count",
+    "chunk_ids": [
+     "97939841-15e9-4fa2-aa42-7d9652ae4d81",
+     "fac7db75-0386-4848-8ac9-d1d3d2f32530",
+     "da9636ac-7d34-4547-9e58-8263688f3af5",
+     "c971125f-9733-40cd-9e63-3cf531dfa43a",
+     "5d4d7ae4-b04c-4cc4-98a4-380452b05145",
+     "64307261-65f5-4664-9b51-928bfd1c4d69",
+     "d417d16a-cc76-4a7c-986f-6678ef3f2846",
+     "71631b7d-3574-4e21-89c0-c3b4e6240c1b"
+    ],
+    "grades": [
+     "partly",
+     "partly",
+     "partly",
+     "not",
+     "partly",
+     "not",
+     "not",
+     "partly"
+    ]
+   },
+   {
+    "requirement_id": "R1",
+    "query": "current active employees headcount 2024",
+    "chunk_ids": [
+     "97939841-15e9-4fa2-aa42-7d9652ae4d81",
+     "fac7db75-0386-4848-8ac9-d1d3d2f32530",
+     "c971125f-9733-40cd-9e63-3cf531dfa43a",
+     "5d4d7ae4-b04c-4cc4-98a4-380452b05145",
+     "da9636ac-7d34-4547-9e58-8263688f3af5",
+     "fc8b5af7-ecc2-47f6-b23f-153f2c5aa5d6",
+     "b42bdd05-2a7f-4dc5-98da-799fbb77d64f",
+     "4062d190-5123-4eca-a09f-c99ef52443e7"
+    ],
+    "grades": [
+     "partly",
+     "partly",
+     "not",
+     "partly",
+     "not",
+     "not",
+     "not",
+     "relevant"
+    ]
+   },
+   {
+    "requirement_id": "R1",
+    "query": "Q1 2025 quarterly report active workforce",
+    "chunk_ids": [
+     "4062d190-5123-4eca-a09f-c99ef52443e7",
+     "fc8b5af7-ecc2-47f6-b23f-153f2c5aa5d6",
+     "bcb11e36-d797-4f39-8355-54591bc70768",
+     "32497078-8e5b-4933-ac85-dcf22f23a591",
+     "db8893f9-4a38-4f8e-8b36-286c32a7bad8",
+     "71631b7d-3574-4e21-89c0-c3b4e6240c1b",
+     "c3a98fc6-f014-4867-904c-79c67256664d",
+     "a198c3bf-2740-4f79-bff2-94c0618ab747"
+    ],
+    "grades": [
+     "relevant",
+     "not",
+     "not",
+     "relevant",
+     "not",
+     "partly",
+     "not",
+     "not"
+    ]
+   },
+   {
+    "requirement_id": "R2",
+    "query": "product specifications key features technical datasheet products",
+    "chunk_ids": [
+     "bc8363d5-83e2-4f17-a724-5b4e213f997a",
+     "e60ba8c1-67d2-4427-aca5-8edea816e906",
+     "05bfe678-f62e-4767-adf9-add50be5bf31",
+     "b6d93dfb-1884-45c4-809b-b23a86ab3f4b",
+     "48c7c704-9f31-4650-8435-bcdb504a1b19",
+     "0bbfbeff-55c5-4d3e-a76b-12a264991a82",
+     "7a4a06c3-82fb-4ca3-bc1d-1d701f450ac8",
+     "0b51c19e-09ee-4e8b-850a-965262e46d44"
+    ],
+    "grades": [
+     "relevant",
+     "relevant",
+     "not",
+     "relevant",
+     "relevant",
+     "relevant",
+     "partly",
+     "partly"
+    ]
+   },
+   {
+    "requirement_id": "R3",
+    "query": "company ownership structure shareholders parent company",
+    "chunk_ids": [
+     "a38eddeb-e9cc-40ff-a1d7-7db9476f4a40",
+     "40d96ee9-858c-4f9a-b6d1-a99997975162",
+     "51ccd03e-dab3-4861-9240-d8adfcca199c",
+     "8a98888a-3ba5-48f0-a715-70ef89943a7a",
+     "badfe817-1f9e-465e-99d2-e317e8a57cac",
+     "4c9ec921-2414-4e66-81aa-4de2f6a3e2d8",
+     "a53bee1c-420e-456b-b46c-ba38b68c32f3",
+     "4062d190-5123-4eca-a09f-c99ef52443e7"
+    ],
+    "grades": [
+     "not",
+     "relevant",
+     "not",
+     "relevant",
+     "not",
+     "relevant",
+     "relevant",
+     "relevant"
+    ]
+   },
+   {
+    "requirement_id": "R4",
+    "query": "power electronics hydrogen electrolyzer electrolysis power supply rectifier",
+    "chunk_ids": [
+     "b170a3a1-31e8-499b-90dc-1810cbf8de30",
+     "d570e3e4-3f82-41cc-bec8-773bc1d6bd23",
+     "d212778d-eecd-4105-a9ff-87c116352331",
+     "56e33796-b6a0-446c-9938-4e111d4d55e1",
+     "1a3f7d3c-6f63-4f5f-be13-7b437a951c1b",
+     "726d1eee-b363-4d0f-b49b-7a1054019c5f",
+     "516739c7-f559-4071-889d-1facb00ba1d3",
+     "54b7a33d-a92a-4040-9b37-86233e48d333"
+    ],
+    "grades": [
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not"
+    ]
+   },
+   {
+    "requirement_id": "R4",
+    "query": "hydrogen electrolyzer power converter",
+    "chunk_ids": [
+     "48c7c704-9f31-4650-8435-bcdb504a1b19",
+     "516739c7-f559-4071-889d-1facb00ba1d3",
+     "726d1eee-b363-4d0f-b49b-7a1054019c5f",
+     "b5c2f29c-1ba9-44ce-b087-3ae73245956d",
+     "b170a3a1-31e8-499b-90dc-1810cbf8de30",
+     "2b3d8d0c-af8b-4286-b6db-056fb5be4d43",
+     "5dca499b-7954-409d-998f-b40428b76548",
+     "54306052-937b-4eb1-88b0-40f3bd31bed0"
+    ],
+    "grades": [
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not"
+    ]
+   },
+   {
+    "requirement_id": "R4",
+    "query": "electrolyzer power electronics",
+    "chunk_ids": [
+     "b170a3a1-31e8-499b-90dc-1810cbf8de30",
+     "d570e3e4-3f82-41cc-bec8-773bc1d6bd23",
+     "726d1eee-b363-4d0f-b49b-7a1054019c5f",
+     "516739c7-f559-4071-889d-1facb00ba1d3",
+     "68822dbe-a922-47c9-810d-d59a5b40fd08",
+     "56e33796-b6a0-446c-9938-4e111d4d55e1",
+     "d212778d-eecd-4105-a9ff-87c116352331",
+     "bf88d346-1b73-4bf4-9c31-8a438c8ca1b0"
+    ],
+    "grades": [
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not"
+    ]
+   }
+  ],
+  "invalid_citations": 0,
+  "tokens_in": 20316,
+  "tokens_out": 9641,
+  "cost_usd": 0.03806,
+  "latency_s": 84.09400000004098,
+  "given": [
+   "0bbfbeff-55c5-4d3e-a76b-12a264991a82",
+   "32497078-8e5b-4933-ac85-dcf22f23a591",
+   "4062d190-5123-4eca-a09f-c99ef52443e7",
+   "40d96ee9-858c-4f9a-b6d1-a99997975162",
+   "48c7c704-9f31-4650-8435-bcdb504a1b19",
+   "4c9ec921-2414-4e66-81aa-4de2f6a3e2d8",
+   "8a98888a-3ba5-48f0-a715-70ef89943a7a",
+   "a53bee1c-420e-456b-b46c-ba38b68c32f3",
+   "b6d93dfb-1884-45c4-809b-b23a86ab3f4b",
+   "bc8363d5-83e2-4f17-a724-5b4e213f997a",
+   "e60ba8c1-67d2-4427-aca5-8edea816e906"
+  ],
+  "stats": {
+   "claims": 6,
+   "supported": 6,
+   "latency_s": 84.09400000004098,
+   "cost_usd": 0.03806
+  }
+ },
+ {
+  "task_id": "T11",
+  "variant": "B1",
+  "paragraphs": [
+   {
+    "text": "Hardware-in-the-loop validation is conducted inside a dedicated 1,800 square foot power-electronics laboratory using an OPAL-RT real-time digital simulator executing EMT-grade models of IEEE 33-bus weak distribution feeders at a 25-microsecond step time. Interfaced with a 500 kW regenerative grid simulator and high-speed I/O, the HelioLink 250 control hardware executes proprietary virtual synchronous machine firmware across 1,200 fault scenarios covering short-circuit ratios from 1.1 to 2.5, phase-to-ground faults, three-phase symmetrical faults, and frequency dips up to 2.5 Hz/s. Across these tests, the system maintains voltage source behavior without tripping, achieves a 14% faster fault ride-through recovery, settles dynamic voltage within plus or minus 1.0% in under 65 milliseconds, and dampens 150 kW load steps with zero oscillatory overshoot.",
+    "citations": [
+     "ba80d97c-7942-4bb4-9217-07a4b4b01fcc",
+     "dd3f2693-f5ea-437f-bfc2-9a7966a4ebd1"
+    ],
+    "supported": true
+   },
+   {
+    "text": "Environmental thermal testing evaluates operational integrity inside a calibrated chamber across the full operating envelope of -20 \u00b0C to 55 \u00b0C using stepped 15 \u00b0C increments and 4-hour dwell times. Telemetry captured during testing of a 16-cell stack under 1.2 A active cell balancing and 10% to 90% depth-of-discharge cycling confirms robust thermal resilience across 120 continuous cycles. The system maintains cell balancing precision between plus or minus 0.9 mV and plus or minus 1.8 mV, restricts low-temperature voltage sensing drift to 0.8 mV, and keeps extended Kalman filter state-of-charge estimation errors below the 1.5% requirement with zero thermal throttling or communication faults.",
+    "citations": [
+     "9f7e2f1e-ca5f-4327-8350-d6854c8f5a92",
+     "3a7aea76-5e79-40b5-b610-1a9b93e659f7",
+     "dada6070-820d-4708-80e2-c4bd5dac902b"
+    ],
+    "supported": true
+   },
+   {
+    "text": "All testing is governed by documented engineering procedures requiring dual sign-off from the test engineer and technical lead. Battery and BMS characterization follows formalized procedures including TP-002 for cell balancing precision, TP-005 for state-of-charge drift and estimation accuracy, and TP-009 for second-life degradation parameter identification. Power electronics and grid integration evaluations follow TP-011 for peak conversion efficiency, TP-014 for weak-grid dynamic impedance and fault ride-through, and TP-018 for anti-islanding and interconnection response, with every high-power run linked to written test plans and tagged, version-controlled firmware releases.",
+    "citations": [
+     "5a6b89f5-eac4-4092-9752-be434573327f",
+     "ef84b1c8-e753-48e3-a0bf-3534711d53d8",
+     "b7e68d76-3243-4602-b26e-205386b33194",
+     "b9d29fbb-e27e-4504-93b2-f5a5bd247f85"
+    ],
+    "supported": false
+   }
+  ],
+  "gaps": [
+   "R4"
+  ],
+  "retrieval_trace": [
+   {
+    "requirement_id": "R1",
+    "query": "hardware-in-the-loop HIL coverage HIL test verification coverage",
+    "chunk_ids": [
+     "ba80d97c-7942-4bb4-9217-07a4b4b01fcc",
+     "dd3f2693-f5ea-437f-bfc2-9a7966a4ebd1",
+     "f427e9a6-529d-4fc5-901a-c5ecd8c07623",
+     "daea0cf4-5e25-4180-9626-ae3e8c1d8d73",
+     "0c38dcd3-ab66-4a05-a904-c31b268cd8d3",
+     "54b7a33d-a92a-4040-9b37-86233e48d333",
+     "b6865afe-9a80-41ed-ab65-befb1b197120",
+     "8d8f3ab5-8ec1-4295-8962-d184dcf2fe08"
+    ],
+    "grades": [
+     "relevant",
+     "relevant",
+     "partly",
+     "not",
+     "partly",
+     "partly",
+     "not",
+     "partly"
+    ]
+   },
+   {
+    "requirement_id": "R2",
+    "query": "environmental temperature thermal chamber testing thermal cycling qualification test",
+    "chunk_ids": [
+     "9f7e2f1e-ca5f-4327-8350-d6854c8f5a92",
+     "3a7aea76-5e79-40b5-b610-1a9b93e659f7",
+     "dada6070-820d-4708-80e2-c4bd5dac902b",
+     "22f13572-cff1-40d3-baa5-e42f52952c56",
+     "383ae0b5-fceb-44cc-be69-aaa4accd5cd0",
+     "dcfc6e9a-9f8a-4f00-9165-c6758fb1dd0e",
+     "8090ac6b-8f9b-465e-90eb-129c0713e536",
+     "9ae08fff-4f81-45f0-b202-f16c637832c3"
+    ],
+    "grades": [
+     "relevant",
+     "relevant",
+     "relevant",
+     "not",
+     "not",
+     "partly",
+     "not",
+     "partly"
+    ]
+   },
+   {
+    "requirement_id": "R3",
+    "query": "documented test procedures protocols standard test procedure verification plan",
+    "chunk_ids": [
+     "5a6b89f5-eac4-4092-9752-be434573327f",
+     "c36b89d9-297b-4ca7-a04d-0a0cc4604040",
+     "ef84b1c8-e753-48e3-a0bf-3534711d53d8",
+     "b7e68d76-3243-4602-b26e-205386b33194",
+     "b9d29fbb-e27e-4504-93b2-f5a5bd247f85",
+     "f427e9a6-529d-4fc5-901a-c5ecd8c07623",
+     "3a7aea76-5e79-40b5-b610-1a9b93e659f7",
+     "0fd18567-ec0f-4fd4-9470-2fc46cd4cb37"
+    ],
+    "grades": [
+     "relevant",
+     "partly",
+     "relevant",
+     "relevant",
+     "relevant",
+     "partly",
+     "relevant",
+     "partly"
+    ]
+   },
+   {
+    "requirement_id": "R4",
+    "query": "offshore salt-fog corrosion testing salt spray test ASTM B117",
+    "chunk_ids": [
+     "383ae0b5-fceb-44cc-be69-aaa4accd5cd0",
+     "4941d957-3790-492a-9058-b2f96efb466f",
+     "9ae08fff-4f81-45f0-b202-f16c637832c3",
+     "9f7e2f1e-ca5f-4327-8350-d6854c8f5a92",
+     "8e938470-94e7-4828-9770-b7d13adfca2f",
+     "3fdf6e6e-4153-4717-a614-4834bcef90e9",
+     "516739c7-f559-4071-889d-1facb00ba1d3",
+     "b6865afe-9a80-41ed-ab65-befb1b197120"
+    ],
+    "grades": [
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not"
+    ]
+   },
+   {
+    "requirement_id": "R4",
+    "query": "offshore salt fog testing procedure",
+    "chunk_ids": [
+     "9ae08fff-4f81-45f0-b202-f16c637832c3",
+     "c36b89d9-297b-4ca7-a04d-0a0cc4604040",
+     "8e938470-94e7-4828-9770-b7d13adfca2f",
+     "4941d957-3790-492a-9058-b2f96efb466f",
+     "b7e68d76-3243-4602-b26e-205386b33194",
+     "383ae0b5-fceb-44cc-be69-aaa4accd5cd0",
+     "9f7e2f1e-ca5f-4327-8350-d6854c8f5a92",
+     "b6865afe-9a80-41ed-ab65-befb1b197120"
+    ],
+    "grades": [
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not"
+    ]
+   },
+   {
+    "requirement_id": "R4",
+    "query": "salt spray corrosion testing",
+    "chunk_ids": [
+     "383ae0b5-fceb-44cc-be69-aaa4accd5cd0",
+     "4941d957-3790-492a-9058-b2f96efb466f",
+     "9ae08fff-4f81-45f0-b202-f16c637832c3",
+     "9f7e2f1e-ca5f-4327-8350-d6854c8f5a92",
+     "346116b2-690f-4cc5-908d-4c94ffbe64ef",
+     "3fdf6e6e-4153-4717-a614-4834bcef90e9",
+     "3a7aea76-5e79-40b5-b610-1a9b93e659f7",
+     "8e938470-94e7-4828-9770-b7d13adfca2f"
+    ],
+    "grades": [
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not"
+    ]
+   }
+  ],
+  "invalid_citations": 0,
+  "tokens_in": 20100,
+  "tokens_out": 10395,
+  "cost_usd": 0.04322425,
+  "latency_s": 74.60999999998603,
+  "given": [
+   "3a7aea76-5e79-40b5-b610-1a9b93e659f7",
+   "5a6b89f5-eac4-4092-9752-be434573327f",
+   "9f7e2f1e-ca5f-4327-8350-d6854c8f5a92",
+   "b7e68d76-3243-4602-b26e-205386b33194",
+   "b9d29fbb-e27e-4504-93b2-f5a5bd247f85",
+   "ba80d97c-7942-4bb4-9217-07a4b4b01fcc",
+   "dada6070-820d-4708-80e2-c4bd5dac902b",
+   "dd3f2693-f5ea-437f-bfc2-9a7966a4ebd1",
+   "ef84b1c8-e753-48e3-a0bf-3534711d53d8"
+  ],
+  "stats": {
+   "claims": 9,
+   "supported": 8,
+   "latency_s": 74.60999999998603,
+   "cost_usd": 0.04322425
+  }
+ },
+ {
+  "task_id": "T12",
+  "variant": "B1",
+  "paragraphs": [
+   {
+    "text": "The proposed budget supports an 18-month Phase II schedule structured across four major technical tasks and associated milestones. Project activities begin with system refinement and co-simulation across Months 1 through 4, transition to hardware integration and bench verification in Months 5 through 9, proceed to utility pre-deployment and stress testing in Months 10 through 14, and conclude with field demonstration and project closeout at the Front Range Utility Cooperative pilot site across Months 15 through 18.",
+    "citations": [
+     "86f91096-9b8e-426f-ae3a-e598e518c70a"
+    ],
+    "supported": false
+   },
+   {
+    "text": "Labor expenditures include a standard company-wide fringe benefit rate of 28% applied to all direct labor categories. This fringe rate accounts for health and dental insurance, disability, FICA, worker's compensation, and retirement contributions, yielding $64,960 in Year 1 fringe on direct labor of $232,000 and $67,558 in Year 2 fringe on direct labor of $241,280, for a total fringe allocation of $132,518.",
+    "citations": [
+     "14b39ca5-e714-437e-9796-a26ca6b5dc6f"
+    ],
+    "supported": true
+   }
+  ],
+  "gaps": [
+   "R3"
+  ],
+  "retrieval_trace": [
+   {
+    "requirement_id": "R1",
+    "query": "fringe benefit rate indirect rate fringe benefits",
+    "chunk_ids": [
+     "14b39ca5-e714-437e-9796-a26ca6b5dc6f",
+     "64307261-65f5-4664-9b51-928bfd1c4d69",
+     "97939841-15e9-4fa2-aa42-7d9652ae4d81",
+     "d417d16a-cc76-4a7c-986f-6678ef3f2846",
+     "8de43c12-609e-41df-b12e-30abac5bc37c",
+     "9aacc676-c4f8-4c5f-b943-a2eac7cb1a70",
+     "383ae0b5-fceb-44cc-be69-aaa4accd5cd0",
+     "9ac689d2-4531-4b7d-97ce-ccea2cb375e7"
+    ],
+    "grades": [
+     "relevant",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not"
+    ]
+   },
+   {
+    "requirement_id": "R1",
+    "query": "standard company-wide fringe rate",
+    "chunk_ids": [
+     "14b39ca5-e714-437e-9796-a26ca6b5dc6f",
+     "d417d16a-cc76-4a7c-986f-6678ef3f2846",
+     "1fa5f904-b9e4-4a11-a21a-5b28aeca8099",
+     "9aacc676-c4f8-4c5f-b943-a2eac7cb1a70",
+     "08bcfac8-1719-4f7d-8da7-9f99fe9d21d6",
+     "21745567-f555-4f73-a063-ed034e3c1f83",
+     "9ac689d2-4531-4b7d-97ce-ccea2cb375e7",
+     "8de43c12-609e-41df-b12e-30abac5bc37c"
+    ],
+    "grades": [
+     "relevant",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not"
+    ]
+   },
+   {
+    "requirement_id": "R1",
+    "query": "fringe benefit rate",
+    "chunk_ids": [
+     "14b39ca5-e714-437e-9796-a26ca6b5dc6f",
+     "d417d16a-cc76-4a7c-986f-6678ef3f2846",
+     "8de43c12-609e-41df-b12e-30abac5bc37c",
+     "9aacc676-c4f8-4c5f-b943-a2eac7cb1a70",
+     "08bcfac8-1719-4f7d-8da7-9f99fe9d21d6",
+     "9ac689d2-4531-4b7d-97ce-ccea2cb375e7",
+     "383ae0b5-fceb-44cc-be69-aaa4accd5cd0",
+     "97939841-15e9-4fa2-aa42-7d9652ae4d81"
+    ],
+    "grades": [
+     "relevant",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not"
+    ]
+   },
+   {
+    "requirement_id": "R2",
+    "query": "budget period of performance schedule project timeline budget coverage",
+    "chunk_ids": [
+     "14b39ca5-e714-437e-9796-a26ca6b5dc6f",
+     "64307261-65f5-4664-9b51-928bfd1c4d69",
+     "383ae0b5-fceb-44cc-be69-aaa4accd5cd0",
+     "25779ca2-6d4c-4d04-8533-4bb098fac846",
+     "2a892e32-6202-452b-ba4f-40e410489971",
+     "0fba3200-0512-4c1f-9080-b95a51d8b7b8",
+     "b101b438-43a1-421f-997d-a9e8b59c4f18",
+     "86f91096-9b8e-426f-ae3a-e598e518c70a"
+    ],
+    "grades": [
+     "partly",
+     "partly",
+     "not",
+     "not",
+     "partly",
+     "not",
+     "not",
+     "relevant"
+    ]
+   },
+   {
+    "requirement_id": "R2",
+    "query": "Phase II schedule tasks milestones",
+    "chunk_ids": [
+     "86f91096-9b8e-426f-ae3a-e598e518c70a",
+     "0fba3200-0512-4c1f-9080-b95a51d8b7b8",
+     "d4628462-62f5-40f3-9bb6-78dae002e26f",
+     "2a892e32-6202-452b-ba4f-40e410489971",
+     "9ae08fff-4f81-45f0-b202-f16c637832c3",
+     "e14d2995-1307-45a5-a2e9-7f7f5819492c",
+     "66bbed3d-87de-44b2-aa0f-eb182ca49725",
+     "da9636ac-7d34-4547-9e58-8263688f3af5"
+    ],
+    "grades": [
+     "relevant",
+     "not",
+     "partly",
+     "partly",
+     "not",
+     "not",
+     "not",
+     "partly"
+    ]
+   },
+   {
+    "requirement_id": "R2",
+    "query": "18-month Phase II schedule budget tasks",
+    "chunk_ids": [
+     "86f91096-9b8e-426f-ae3a-e598e518c70a",
+     "0fba3200-0512-4c1f-9080-b95a51d8b7b8",
+     "d4628462-62f5-40f3-9bb6-78dae002e26f",
+     "2a892e32-6202-452b-ba4f-40e410489971",
+     "9ae08fff-4f81-45f0-b202-f16c637832c3",
+     "da9636ac-7d34-4547-9e58-8263688f3af5",
+     "ee8b2d62-c21c-4783-82b3-a1ca4cb73d55",
+     "e14d2995-1307-45a5-a2e9-7f7f5819492c"
+    ],
+    "grades": [
+     "relevant",
+     "partly",
+     "partly",
+     "partly",
+     "not",
+     "not",
+     "not",
+     "not"
+    ]
+   },
+   {
+    "requirement_id": "R3",
+    "query": "CMMC compliance cost justification cybersecurity CMMC budget rationale",
+    "chunk_ids": [
+     "14b39ca5-e714-437e-9796-a26ca6b5dc6f",
+     "64307261-65f5-4664-9b51-928bfd1c4d69",
+     "824d6195-b69f-4f99-bae8-801eb73535ea",
+     "5875f915-5928-4b38-871d-b679018e732b",
+     "66681693-bca8-430f-9ee7-1e352bce21ef",
+     "b101b438-43a1-421f-997d-a9e8b59c4f18",
+     "9aacc676-c4f8-4c5f-b943-a2eac7cb1a70",
+     "d44170fc-f9c3-4fa5-afff-e303eec2ba2b"
+    ],
+    "grades": [
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not"
+    ]
+   },
+   {
+    "requirement_id": "R3",
+    "query": "CMMC compliance justification NIST 800-171 DoD cybersecurity",
+    "chunk_ids": [
+     "8aea1c07-3ab9-42d3-928e-2c94f99b2be5",
+     "a24983fa-e8ff-4af4-bdac-b3b7426883fc",
+     "cd06cb50-e8b8-4f93-8af0-00fa722c252f",
+     "54306052-937b-4eb1-88b0-40f3bd31bed0",
+     "333fc58c-63f4-4f45-aa50-2e5ebacafc84",
+     "14b39ca5-e714-437e-9796-a26ca6b5dc6f",
+     "5dca499b-7954-409d-998f-b40428b76548",
+     "b9d29fbb-e27e-4504-93b2-f5a5bd247f85"
+    ],
+    "grades": [
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not"
+    ]
+   },
+   {
+    "requirement_id": "R3",
+    "query": "CMMC cybersecurity budget narrative cost justification",
+    "chunk_ids": [
+     "14b39ca5-e714-437e-9796-a26ca6b5dc6f",
+     "64307261-65f5-4664-9b51-928bfd1c4d69",
+     "5875f915-5928-4b38-871d-b679018e732b",
+     "824d6195-b69f-4f99-bae8-801eb73535ea",
+     "66681693-bca8-430f-9ee7-1e352bce21ef",
+     "b101b438-43a1-421f-997d-a9e8b59c4f18",
+     "da9636ac-7d34-4547-9e58-8263688f3af5",
+     "6102a62e-5a11-4a15-9d74-e45f9316bcf0"
+    ],
+    "grades": [
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not",
+     "not"
+    ]
+   }
+  ],
+  "invalid_citations": 0,
+  "tokens_in": 20967,
+  "tokens_out": 7364,
+  "cost_usd": 0.02746775,
+  "latency_s": 75.51500000001397,
+  "given": [
+   "14b39ca5-e714-437e-9796-a26ca6b5dc6f",
+   "86f91096-9b8e-426f-ae3a-e598e518c70a"
+  ],
+  "stats": {
+   "claims": 4,
+   "supported": 2,
+   "latency_s": 75.51500000001397,
+   "cost_usd": 0.02746775
+  }
+ }
+]

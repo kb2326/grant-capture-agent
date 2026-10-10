@@ -1,0 +1,622 @@
+[
+ {
+  "task_id": "T01",
+  "variant": "B0",
+  "paragraphs": [
+   {
+    "text": "Lumen Grid Labs established its foundational second-life battery management capabilities under the Department of Energy Phase I Small Business Innovation Research project. The investigation focused on repurposed electric-vehicle battery modules exhibiting four to six years of vehicle service, with initial capacities spanning 71% to 86% of nameplate and internal resistance between 1.4 and 2.3 times nameplate values. Initial screening of thirty-two cells identified and removed two outlier cells before pack assembly. The team then constructed two sixteen-cell test packs to evaluate active degradation-aware management against baseline voltage balancing over 300 cycles. The degradation-aware architecture achieved a 27% reduction in capacity fade spread, holding the spread to 4.7 percentage points compared to 6.4 percentage points in the baseline pack, while maintaining a worst-case cell balancing residual of 1.8 mV at rest across fifty balancing trials.",
+    "citations": [
+     "a546c59c-c1ca-4fdf-ba77-633a650b4dbf",
+     "ee8b2d62-c21c-4783-82b3-a1ca4cb73d55",
+     "c5664828-e082-4683-9eb8-1cebec622666",
+     "ca445065-aaa3-45ea-9dbc-1c4a5f34ae57",
+     "57c4c81b-f2be-434b-bb1b-67ffa462fdef",
+     "4941d957-3790-492a-9058-b2f96efb466f"
+    ],
+    "supported": false
+   },
+   {
+    "text": "Prior experimental evaluations demonstrated robust state-of-charge estimation accuracy across dynamic and thermal operational regimes. In Phase I cycling runs over mixed duty cycles, state-of-charge estimation error on retired modules achieved 1.3% root-mean-square and maintained a worst-case error of 1.5%, including test runs initiated with an intentional twenty-percentage-point offset. Subsequent environmental chamber evaluations over an extended operating temperature range from -20 degrees Celsius to 55 degrees Celsius validated state-of-charge estimation error within 1.5%. Specifically, estimation error registered at 0.62% under ambient 25 degrees Celsius conditions, 1.18% at 55 degrees Celsius, and reached a maximum of 1.41% at -20 degrees Celsius.",
+    "citations": [
+     "ca445065-aaa3-45ea-9dbc-1c4a5f34ae57",
+     "57c4c81b-f2be-434b-bb1b-67ffa462fdef",
+     "3a7aea76-5e79-40b5-b610-1a9b93e659f7",
+     "dada6070-820d-4708-80e2-c4bd5dac902b"
+    ],
+    "supported": true
+   },
+   {
+    "text": "To validate long-term cell life extension and algorithm stability at scale, the technical work plan defines an accelerated stress testing sequence. Under this protocol, twelve prototype sub-strings will undergo a 1,000-cycle accelerated aging test across thermal operating conditions spanning 15 degrees Celsius to 45 degrees Celsius. The resulting empirical degradation curves will quantify real-time impedance growth, track state-of-health convergence, and confirm active capacity preservation under accelerated degradation conditions.",
+    "citations": [
+     "9ae08fff-4f81-45f0-b202-f16c637832c3"
+    ],
+    "supported": false
+   }
+  ],
+  "gaps": [
+   "R4"
+  ],
+  "retrieval_trace": [],
+  "invalid_citations": 0,
+  "tokens_in": 68921,
+  "tokens_out": 3616,
+  "cost_usd": 0.06525075,
+  "latency_s": 40.78099999995902,
+  "given": [],
+  "stats": {
+   "claims": 12,
+   "supported": 10,
+   "latency_s": 40.78099999995902,
+   "cost_usd": 0.06525075
+  }
+ },
+ {
+  "task_id": "T02",
+  "variant": "B0",
+  "paragraphs": [
+   {
+    "text": "The HelioLink 250 is a 250 kW silicon carbide grid-forming inverter achieving a 98.7% peak efficiency. In weak-grid evaluations conducted under an NSF SBIR Phase I program, the inverter demonstrated a 14% faster fault ride-through recovery than baseline droop-controlled architectures. Across extensive testing under short-circuit ratios ranging from 1.5 to 5, the adaptive virtual impedance controller remained stable in all runs and avoided tripping under severe weak-grid conditions at a short-circuit ratio of 1.5, where baseline controllers tripped in 5 of 12 trials. Furthermore, laboratory testing verified that the inverter maintained steady-state terminal voltage within 1.0% of nominal at a short-circuit ratio of 1.2 without triggering overcurrent protections or requiring supplementary active damping hardware.",
+    "citations": [
+     "06c1bb8c-793c-4df7-979d-5740e97abdd4",
+     "0bbfbeff-55c5-4d3e-a76b-12a264991a82",
+     "37a05d98-ad8c-41db-b1b1-09795c20a42a",
+     "29c6935d-0936-4c5b-8715-f0d46ff26c23",
+     "a24983fa-e8ff-4af4-bdac-b3b7426883fc",
+     "4f3e40b1-367f-4b9b-94e4-21e79b71b036",
+     "68822dbe-a922-47c9-810d-d59a5b40fd08"
+    ],
+    "supported": true
+   },
+   {
+    "text": "The operational reliability and availability of the HelioLink 250 have been established through active utility field trials conducted with Front Range Utility Cooperative. During an initial six-week field pilot on a rural distribution feeder with an approximate short-circuit ratio of 2.5, the inverter recorded 99.2% availability, with its sole trip traced to an unadjusted factory default undervoltage protection setting that was subsequently resolved. In a follow-on 92-day field test in the third quarter of 2025 comprising 2,208 scheduled operating hours, the inverter achieved zero unplanned trips, maintained a 98.7% peak conversion efficiency, and sustained seamless voltage regulation through 19 transient grid disturbances. A six-month rural community microgrid installation demonstrated further resilience by managing six separate feeder disconnection events with zero thermal de-rating events at full 250 kW dispatches and executing seamless islanding transitions in under 12 milliseconds.",
+    "citations": [
+     "ceadabda-4458-4146-94a6-9b22c9a9db97",
+     "9ad2f399-36c1-4d67-a724-d2bca8090df6",
+     "7e3daf20-d42f-42a5-a0a2-bd1894f0b095",
+     "e37899d6-049d-42e4-8dc9-2cbaee9d1aee",
+     "965c75b9-2429-447e-b23f-36ab5ab294b3",
+     "c53ef343-60ac-4446-8172-254ee07b2c6b",
+     "82dd68a1-158a-4be5-b14f-00f8544fb48f"
+    ],
+    "supported": true
+   },
+   {
+    "text": "The inverter platform integrates autonomous black-start and grid-forming capabilities designed to restore disconnected distribution infrastructure without relying on bulk grid reference signals. By establishing an internal voltage phasor using virtual synchronous machine control and decentralized voltage-building algorithms, the system can ramp unenergized 12.47 kV distribution lines to nominal voltage within 3.5 seconds while mitigating transformer inrush currents. The control framework also coordinates parallel inverter units through active droop controls to share real and reactive power evenly during dynamic load pickup.",
+    "citations": [
+     "99f7bcf6-ec2e-4407-aeb1-61ead1a7d692",
+     "408ed71c-7790-4efd-9a8a-3fe26009ce95",
+     "91292d1b-f7eb-410d-8fb4-9e3d1df1d3b9"
+    ],
+    "supported": false
+   }
+  ],
+  "gaps": [
+   "R4"
+  ],
+  "retrieval_trace": [],
+  "invalid_citations": 0,
+  "tokens_in": 69652,
+  "tokens_out": 13606,
+  "cost_usd": 0.1032615,
+  "latency_s": 80.07800000009593,
+  "given": [],
+  "stats": {
+   "claims": 11,
+   "supported": 9,
+   "latency_s": 80.07800000009593,
+   "cost_usd": 0.1032615
+  }
+ },
+ {
+  "task_id": "T03",
+  "variant": "B0",
+  "paragraphs": [
+   {
+    "text": "Lumen Grid Labs has successfully executed two federal Small Business Innovation Research Phase I awards under the leadership of Principal Investigator Dr. Maya Okafor. Under a 2023 Department of Energy SBIR Phase I award titled \"Degradation-aware BMS for second-life batteries\" funded at $200,000, the company met all technical milestones on schedule and validated adaptive health tracking across aged battery modules. Additionally, the company completed a 2024 National Science Foundation SBIR Phase I award titled \"Grid-forming control for weak grids\" in the amount of $275,000, achieving all stated research objectives and demonstrating 14% faster fault ride-through than baseline inverter controls.",
+    "citations": [
+     "0a2bd0be-38b9-4cbd-ba5b-1cd90d761ae4",
+     "a6ea20c8-7baa-4a46-88c8-ade7685b3d9f",
+     "e7581c4a-52c3-4a39-8261-47a0248cc2d1",
+     "a546c59c-c1ca-4fdf-ba77-633a650b4dbf",
+     "37a05d98-ad8c-41db-b1b1-09795c20a42a",
+     "c5664828-e082-4683-9eb8-1cebec622666",
+     "29c6935d-0936-4c5b-8715-f0d46ff26c23",
+     "a24983fa-e8ff-4af4-bdac-b3b7426883fc"
+    ],
+    "supported": true
+   },
+   {
+    "text": "The company's past performance is corroborated by external customer references, notably Front Range Utility Cooperative and commercial energy storage integrator Summit Storage Partners. Front Range Utility Cooperative hosted a six-week field pilot in 2025 evaluating the HelioLink 250 grid-forming inverter on a rural distribution feeder, where the system achieved 99.2% availability, and provided a formal letter of support committing to host expanded substation deployments. Furthermore, Summit Storage Partners hosted a 60-day commercial demonstration deploying the LGL-BMS3 battery management system on a 250 kWh second-life battery pack, meeting every operational performance benchmark across 120 charge-discharge cycles.",
+    "citations": [
+     "e7581c4a-52c3-4a39-8261-47a0248cc2d1",
+     "76003893-95fc-40f7-85d6-bdeb78989264",
+     "8aea1c07-3ab9-42d3-928e-2c94f99b2be5",
+     "fc3f212f-4dc2-4f10-be76-a7af9601bba2",
+     "f223844d-1c81-4235-a3b7-8bcf4e67d36c",
+     "85c9b61e-c8d6-467b-83b3-40f398d6c6f6",
+     "9ad2f399-36c1-4d67-a724-d2bca8090df6",
+     "e37899d6-049d-42e4-8dc9-2cbaee9d1aee",
+     "d1aff2b9-5e2c-4fca-9b6e-40a6dbac9b99",
+     "2ad3ba4e-56ea-4d5b-a519-2cde6ccfce6a",
+     "62ce2019-7a12-4eba-9ec0-461112985bd5"
+    ],
+    "supported": true
+   }
+  ],
+  "gaps": [
+   "R4"
+  ],
+  "retrieval_trace": [],
+  "invalid_citations": 0,
+  "tokens_in": 68961,
+  "tokens_out": 5309,
+  "cost_usd": 0.0716295,
+  "latency_s": 40.0,
+  "given": [],
+  "stats": {
+   "claims": 6,
+   "supported": 6,
+   "latency_s": 40.0,
+   "cost_usd": 0.0716295
+  }
+ },
+ {
+  "task_id": "T04",
+  "variant": "B0",
+  "paragraphs": [
+   {
+    "text": "Dr. Maya Okafor serves as Principal Investigator and Chief Executive Officer of Lumen Grid Labs. She holds a Ph.D. in electrical engineering from the Colorado School of Mines, an M.S. in electrical engineering from the University of Colorado Boulder, and a B.S. in electrical engineering from Rice University. Prior to founding Lumen Grid Labs in 2019, Dr. Okafor spent five years as a controls engineer at a national laboratory developing battery storage integration for distribution feeders and three years as a senior engineer at a stationary storage manufacturer. She has demonstrated technical and administrative leadership as Principal Investigator on both the company's 2023 Department of Energy SBIR Phase I award and the 2024 National Science Foundation SBIR Phase I award, and she currently manages a 32-person team while leading coordination with research partner Colorado School of Mines and utility partner Front Range Utility Cooperative.",
+    "citations": [
+     "0a2bd0be-38b9-4cbd-ba5b-1cd90d761ae4"
+    ],
+    "supported": false
+   },
+   {
+    "text": "Sofia Ramirez serves as Firmware Lead, directing low-level embedded software architecture and real-time control algorithms across the company's hardware platforms. She pioneered the implementation of embedded Rust within the laboratory's microcontroller workflows to ensure deterministic execution and memory safety across critical control loops. Her development track includes creating the driver-level telemetry and active balancing state-machines for the LGL-BMS3 battery management system, as well as the pulse-width modulation routines, thermal throttles, and fast protection logic for the HelioLink 250 grid-forming inverter. In support of prior federal awards, Ramirez delivered dynamic cell-level health evaluation firmware under the 2023 Department of Energy award and embedded virtual synchronous machine controls under the 2024 National Science Foundation project.",
+    "citations": [
+     "49e04aea-3ca4-42f8-8a6c-3fbbb7642ead",
+     "3b8da4b0-4e7a-4b3a-b488-15d2f8eecbab",
+     "8e5224aa-86b3-4796-a4d0-1a9f63c16122"
+    ],
+    "supported": true
+   },
+   {
+    "text": "Each key team member has committed dedicated time to ensure the rigorous execution of project objectives. Dr. Maya Okafor will dedicate 35% of her effort to overall technical leadership, milestone oversight, and inter-organizational partner coordination. Chief Technology Officer Ravi Deshmukh will commit 40% of his effort to direct power converter design and inverter topology refinements. Lead Battery Scientist Elena Brandt will commit 60% of her time to state-of-charge algorithm development and battery degradation modeling. Test Engineer Jordan Lee will allocate 75% of his effort to hardware validation, safety enforcement, and experimental lab protocols, while Senior Firmware Engineer Sofia Ramirez will commit 50% effort to lead real-time controller programming and telemetry integration.",
+    "citations": [
+     "da9636ac-7d34-4547-9e58-8263688f3af5",
+     "f97d6e81-0676-4488-a210-eadd38dfa8fb"
+    ],
+    "supported": false
+   }
+  ],
+  "gaps": [
+   "R4"
+  ],
+  "retrieval_trace": [],
+  "invalid_citations": 0,
+  "tokens_in": 66581,
+  "tokens_out": 8358,
+  "cost_usd": 0.08127825,
+  "latency_s": 63.71899999992456,
+  "given": [],
+  "stats": {
+   "claims": 13,
+   "supported": 11,
+   "latency_s": 63.71899999992456,
+   "cost_usd": 0.08127825
+  }
+ },
+ {
+  "task_id": "T05",
+  "variant": "B0",
+  "paragraphs": [
+   {
+    "text": "Lumen Grid Labs operates a dedicated 1,800 square foot power-electronics laboratory within its 8,200 rentable square foot facility in Golden, Colorado. The laboratory space is constructed with reinforced concrete flooring, isolated grounding, and a dedicated 480 V, three-phase, 800 A utility electrical service. The facility features separate physical benches dedicated to low-voltage control development, battery pack evaluation, and high-power inverter testing, supported by a 15-ton rooftop cooling system for thermal management during heavy power-stage testing. In addition, standing agreements with STTR research partner Colorado School of Mines provide access to its Advanced Energy Systems Lab and battery characterization laboratory to supplement cell cycling and analytical modeling capabilities.",
+    "citations": [
+     "56e33796-b6a0-446c-9938-4e111d4d55e1",
+     "f1200cbd-c0fd-411e-a715-cde64bdf8dd3",
+     "d9b318eb-dc2d-4df6-b261-6fad08816db6",
+     "2e44526b-771e-4e85-97e0-2ce138bf15a0",
+     "ad327b0f-d667-4194-84f6-ec7d76a54632",
+     "23cdc569-ef51-4e3a-bdc9-374b7fcb9a27",
+     "cb47227d-ebc3-49cf-8d84-4ef9e09f6672"
+    ],
+    "supported": false
+   },
+   {
+    "text": "For full-power emulation and digital prototyping, the Golden facility houses a 500 kW regenerative grid simulator and an OPAL-RT hardware-in-the-loop rig. The 500 kW regenerative grid simulator supports bidirectional power testing and dynamic grid disturbance emulation, including voltage sags, harmonics injection, phase jumps, and frequency excursions. It operates alongside a 500 kW programmable regenerative DC power supply to evaluate prototype power conversion systems under realistic source conditions. The OPAL-RT real-time digital simulator interfaces directly with control hardware through high-speed analog and digital input-output channels, executing electromagnetic transient models of weak distribution feeders at a 25-microsecond step time to enable sub-microsecond power electronics emulation and controller verification prior to field deployment.",
+    "citations": [
+     "56e33796-b6a0-446c-9938-4e111d4d55e1",
+     "f1200cbd-c0fd-411e-a715-cde64bdf8dd3",
+     "23cdc569-ef51-4e3a-bdc9-374b7fcb9a27",
+     "516739c7-f559-4071-889d-1facb00ba1d3",
+     "ba80d97c-7942-4bb4-9217-07a4b4b01fcc"
+    ],
+    "supported": false
+   },
+   {
+    "text": "Laboratory operations strictly adhere to NFPA 70E electrical safety standards under the direction of test engineer and lab safety lead Jordan Lee. All employees complete high-voltage safety and arc flash training before accessing the floor, and high-power operations require two qualified personnel, approved written test plans, and verified lockout and tagout procedures on all AC feeds and DC source lines. Personnel working within active test boundaries wear Category 2 arc flash protective apparel and Class 0 voltage-rated gloves, while automated safety interlocks and kill switches on the grid simulator and hardware-in-the-loop rig undergo daily inspections. Battery testing areas feature isolated benches with continuous multi-point thermocouple monitoring, automated 55 \u00b0C thermal shutdown trips, open-circuit voltage verification below 48 V DC prior to transport, dry chemical suppression systems, and emergency power-off buttons at all laboratory exit doors.",
+    "citations": [
+     "b9d29fbb-e27e-4504-93b2-f5a5bd247f85",
+     "0aafc206-7e32-4c1b-9fc3-46efa51f7216",
+     "b6865afe-9a80-41ed-ab65-befb1b197120",
+     "e14a3421-9d20-47d4-b89b-aea7d09d6d5a",
+     "7edacde9-e19d-4b80-8aec-e07f07314138",
+     "5cdbf619-c225-4c6f-9cd6-84de0aa0eff1"
+    ],
+    "supported": false
+   }
+  ],
+  "gaps": [
+   "R5"
+  ],
+  "retrieval_trace": [],
+  "invalid_citations": 0,
+  "tokens_in": 71477,
+  "tokens_out": 11770,
+  "cost_usd": 0.09774525,
+  "latency_s": 69.56200000003446,
+  "given": [],
+  "stats": {
+   "claims": 12,
+   "supported": 8,
+   "latency_s": 69.56200000003446,
+   "cost_usd": 0.09774525
+  }
+ },
+ {
+  "task_id": "T06",
+  "variant": "B0",
+  "paragraphs": [
+   {
+    "text": "Lumen Grid Labs delivers a substantial economic advantage to stationary storage integrators and utilities by enabling the deployment of decommissioned electric vehicle battery packs. Repurposed battery packs managed by the LGL-BMS3 achieve a 38% lower capital cost per kilowatt-hour compared to newly manufactured battery systems, reducing total packaged capital costs from $138.00 per kilowatt-hour to $85.50 per kilowatt-hour. Furthermore, economic modeling developed in collaboration with regional utility partners demonstrates a 29% reduction in the levelized cost of storage across a ten-year operational horizon.",
+    "citations": [
+     "cb84fb7a-5d9d-4310-a797-7d4237ae7388",
+     "f0d15a7c-fefc-4245-a945-db83d153a444",
+     "71d6d012-48d8-4b48-9513-387d4e137e50"
+    ],
+    "supported": true
+   },
+   {
+    "text": "Commercial adoption is supported by direct customer agreements across utility and storage sectors. Summit Storage Partners has executed a formal letter of intent to evaluate and procure twelve LGL-BMS3 units and two HelioLink 250 inverters for a 500-kilowatt, 1,000-kilowatt-hour commercial microgrid demonstration project scheduled for 2026. In addition, Front Range Utility Cooperative provided a formal letter of support committing to host a 2-megawatt pilot expansion at its regional distribution substation, providing interconnection access, secondary utility battery banks, and feeder data telemetry.",
+    "citations": [
+     "8aea1c07-3ab9-42d3-928e-2c94f99b2be5",
+     "f223844d-1c81-4235-a3b7-8bcf4e67d36c",
+     "85c9b61e-c8d6-467b-83b3-40f398d6c6f6"
+    ],
+    "supported": false
+   },
+   {
+    "text": "Building on these initial commitments, the company has established clear commercial targets for calendar year 2026. Lumen Grid Labs is targeting the production and sale of 40 HelioLink 250 inverters, representing 10 megawatts of grid-forming capacity and $2.08 million in inverter hardware revenue at an anticipated average selling price of $52,000. For the LGL-BMS3 line, the company targets 125 integrated system packs representing 15 megawatt-hours of battery capacity, projected to generate $1.15 million across integration contracts and bringing total anticipated 2026 commercial revenue to $3.23 million.",
+    "citations": [
+     "8b624a4b-30b3-4091-8a8e-7805427c921f",
+     "b3f677e5-fc9b-4b6c-8313-5180a4cb0a13",
+     "443fc8e8-03a2-4a0a-a132-2730c3754f5b"
+    ],
+    "supported": true
+   },
+   {
+    "text": "Hardware production couples an established external assembly pipeline with rigorous internal testing. A contract manufacturer in Longmont handles surface-mount electronics assembly, automated optical inspection, gate driver population, wire harness routing, and mechanical mounting of 1,200-volt silicon carbide power blocks into outdoor enclosures. Completed sub-assemblies are transferred to the company's 1,800-square-foot laboratory in Golden, Colorado for final integration, control firmware loading, and full-power 250-kilowatt burn-in validation on a 500-kilowatt regenerative grid simulator and hardware-in-the-loop test bench. Supply chain continuity is maintained through dual-sourcing agreements for silicon carbide power modules and domestic winding of custom magnetics in Colorado.",
+    "citations": [
+     "c5fd0157-e838-40a9-8e32-92042eb28cc2",
+     "99f7bcf6-ec2e-4407-aeb1-61ead1a7d692",
+     "aa4e1b1a-9553-4656-bfbd-ecd5f7dfec72",
+     "9d65c451-e187-4fda-8aea-675b15e12d66"
+    ],
+    "supported": true
+   }
+  ],
+  "gaps": [],
+  "retrieval_trace": [],
+  "invalid_citations": 0,
+  "tokens_in": 66193,
+  "tokens_out": 6517,
+  "cost_usd": 0.0740835,
+  "latency_s": 39.51599999994505,
+  "given": [],
+  "stats": {
+   "claims": 13,
+   "supported": 12,
+   "latency_s": 39.51599999994505,
+   "cost_usd": 0.0740835
+  }
+ },
+ {
+  "task_id": "T07",
+  "variant": "B0",
+  "paragraphs": [
+   {
+    "text": "Lumen Grid Labs actively trains undergraduate and graduate students through structured research internships and collaborative laboratory initiatives. The company sponsors four paid student internships annually at its Golden facility under the supervision of Jordan Lee and Ravi Deshmukh, centering on hardware-in-the-loop validation and high-power inverter testing. Additionally, the firm conducts a paid ten-week summer internship program featuring dedicated tracks in inverter controls and advanced energy storage systems mentored by senior engineering staff. Through an ongoing partnership with the Colorado School of Mines, university students engage in applied research within the company's 1,800 square foot laboratory, while a fully funded Ph.D. graduate research assistant contributes directly to joint controller and battery degradation modeling.",
+    "citations": [
+     "c278be6b-7353-4180-b482-080992b6c147",
+     "43d2022b-5c25-4d5f-b347-c2113860323e",
+     "70be1674-e278-4cda-b2d2-f189d2a2426d",
+     "d74353ba-3cd5-4446-9767-48c88eb7e586",
+     "0400afcf-609d-4449-9b28-6ad3b061bdb2",
+     "d239aea8-89f9-4cac-ba38-e1050800e5f5"
+    ],
+    "supported": true
+   },
+   {
+    "text": "Educational partnerships form a cornerstone of the company's regional workforce engagement. Lumen Grid Labs maintains an active STTR research partnership with the Colorado School of Mines, linking academic study with practical grid-hardware experimentation. To address regional technician shortages, the organization is launching an apprenticeship initiative targeting Colorado community colleges, where Dr. Maya Okafor coordinates direct vocational curriculum modules. The company also supplies open-access instructional materials derived from HelioLink 250 inverter controls and LGL-BMS3 battery telemetry to regional colleges, while Elena Brandt hosts bi-monthly technical seminars on battery pack safety, electrochemical balancing, and non-destructive testing.",
+    "citations": [
+     "c278be6b-7353-4180-b482-080992b6c147",
+     "43d2022b-5c25-4d5f-b347-c2113860323e"
+    ],
+    "supported": false
+   },
+   {
+    "text": "Technical findings and research methodologies are widely disseminated through peer-reviewed academic literature. Lumen Grid Labs researchers have authored peer-reviewed articles including studies on degradation-aware pack balancing in the Journal of Power Sources, online capacity estimation in IEEE Transactions on Control Systems Technology, and incremental capacity health indicators in the Journal of the Electrochemical Society. The engineering team has also contributed peer-reviewed papers on virtual impedance shaping to the IEEE Energy Conversion Congress, switching loss trade-offs to the IEEE Applied Power Electronics Conference, and grid-forming controls for weak distribution networks to IEEE Transactions on Power Electronics.",
+    "citations": [
+     "46451bc4-772c-490e-9423-cb613a2ad8dc",
+     "87a7f4c8-e647-4d2f-9f8f-fcb5e8a8c032",
+     "321214c0-5fb2-4ffb-9c0a-92289bed419b",
+     "40096fa7-63c1-4149-a4c2-e0b8c0a0d79a",
+     "68822dbe-a922-47c9-810d-d59a5b40fd08",
+     "bf88d346-1b73-4bf4-9c31-8a438c8ca1b0"
+    ],
+    "supported": false
+   }
+  ],
+  "gaps": [
+   "R4"
+  ],
+  "retrieval_trace": [],
+  "invalid_citations": 0,
+  "tokens_in": 67132,
+  "tokens_out": 8327,
+  "cost_usd": 0.08157525,
+  "latency_s": 54.68700000003446,
+  "given": [],
+  "stats": {
+   "claims": 12,
+   "supported": 8,
+   "latency_s": 54.68700000003446,
+   "cost_usd": 0.08157525
+  }
+ },
+ {
+  "task_id": "T08",
+  "variant": "B0",
+  "paragraphs": [
+   {
+    "text": "In accordance with federal public access guidelines, final anonymized datasets supporting peer-reviewed technical publications will be deposited in the Zenodo repository. Datasets uploaded to Zenodo will be assigned a persistent Digital Object Identifier, licensed under Creative Commons Attribution (CC-BY 4.0), and preserved for a minimum of ten years. Project time-series data generated during testing are recorded in open, machine-readable formats including CSV, HDF5, and Parquet alongside configuration scripts, while firmware code and FPGA bitstreams are managed in version-controlled Git repositories.",
+    "citations": [
+     "a5f5e6fe-adcc-4b96-82f4-f8d56c8c0c1c",
+     "84cce396-475f-456a-a1fa-6fb03ab1433e"
+    ],
+    "supported": true
+   },
+   {
+    "text": "Primary experimental files are stored on local fault-tolerant network storage arrays with automated daily offsite differential backups, with access permissions managed directly by project leaders to protect proprietary circuit topologies and trade secrets. Domestic intellectual property is held by Lumen Grid Labs, including U.S. Patent Application 18/442,107 covering systems and methods for degradation-aware dynamic balancing in multi-cell packs. This application encompasses solid-state switching matrices for active balancing, real-time capacity and resistance degradation tracking, and power interfaces that coordinate pack balancing with inverter stages.",
+    "citations": [
+     "a5f5e6fe-adcc-4b96-82f4-f8d56c8c0c1c",
+     "a98b55e1-a5f1-47ae-b6e6-5bc6563cece1",
+     "0e1607c2-5ad0-462e-9a98-9e07e2e5a6b2",
+     "4d669af0-8d5a-4cc4-802c-f8eb7f1845b3",
+     "40d96ee9-858c-4f9a-b6d1-a99997975162"
+    ],
+    "supported": false
+   },
+   {
+    "text": "Lumen Grid Labs also maintains issued patents protecting core battery and inverter control technologies. These include patents for ranking retired battery cells by remaining usable capacity, limiting current during fault ride-through in voltage-source inverters, and estimating state of charge using temperature-compensated open-circuit voltage curves.",
+    "citations": [
+     "46451bc4-772c-490e-9423-cb613a2ad8dc",
+     "87a7f4c8-e647-4d2f-9f8f-fcb5e8a8c032",
+     "321214c0-5fb2-4ffb-9c0a-92289bed419b"
+    ],
+    "supported": false
+   }
+  ],
+  "gaps": [
+   "R3"
+  ],
+  "retrieval_trace": [],
+  "invalid_citations": 0,
+  "tokens_in": 63362,
+  "tokens_out": 9933,
+  "cost_usd": 0.08477025,
+  "latency_s": 66.71900000004098,
+  "given": [],
+  "stats": {
+   "claims": 9,
+   "supported": 7,
+   "latency_s": 66.71900000004098,
+   "cost_usd": 0.08477025
+  }
+ },
+ {
+  "task_id": "T09",
+  "variant": "B0",
+  "paragraphs": [
+   {
+    "text": "Lumen Grid Labs maintains a comprehensive risk governance process where the executive leadership team formally reviews the company risk register bi-weekly. Technical and operational risks are systematically ranked according to severity, probability, and velocity, and any risk item demonstrating an escalated severity score requires an immediate corrective action plan approved by Chief Executive Officer Dr. Maya Okafor. Ongoing technical risks, including battery management estimation drift and weak-grid inverter stability, are tracked and mitigated through rigorous hardware-in-the-loop simulations, continuous thermal-cycling validation, and regenerative grid testing.",
+    "citations": [
+     "4f5a2f77-8902-45c1-8d94-0bef9f452e8a",
+     "caaf3c25-3492-406e-b023-e36a9e06ae2d",
+     "82082806-e72b-4b74-8b2e-1c35f0244a3d"
+    ],
+    "supported": false
+   },
+   {
+    "text": "To address procurement bottlenecks and lead times that can exceed 26 weeks for high-voltage power switches, the company enforces strict supply chain controls built on verified dual-sourcing agreements. Lumen Grid Labs maintains active procurement pathways with two qualified suppliers for pin-compatible 1,200 V silicon carbide half-bridge modules, enforcing a minimum 70/30 volume allocation split and maintaining an on-site safety buffer of 36 matched module sets in Golden, Colorado. Quality control procedures require test engineer Jordan Lee to inspect 10% of every incoming semiconductor batch on the lab simulator and hardware-in-the-loop rig before warehouse integration, while custom output magnetics and transformers are wound domestically within Colorado to ensure delivery turnarounds under six weeks.",
+    "citations": [
+     "c3357699-9497-496a-8f03-6b5724d382e1",
+     "4c9ec921-2414-4e66-81aa-4de2f6a3e2d8",
+     "aa4e1b1a-9553-4656-bfbd-ecd5f7dfec72",
+     "9d65c451-e187-4fda-8aea-675b15e12d66"
+    ],
+    "supported": true
+   },
+   {
+    "text": "Product certification risks are actively mitigated through rigorous third-party compliance evaluations and standards alignment. The HelioLink 250 grid-forming inverter successfully completed and passed third-party witness testing against UL 1741 SB requirements in March 2025, confirming full compliance with advanced inverter grid-support functions, including autonomous voltage and frequency ride-through. As a pre-certified platform evaluated for interoperability and distribution stability, the hardware satisfies all necessary utility interconnection criteria ahead of commercial deployments.",
+    "citations": [
+     "0bbfbeff-55c5-4d3e-a76b-12a264991a82",
+     "c3a98fc6-f014-4867-904c-79c67256664d"
+    ],
+    "supported": false
+   }
+  ],
+  "gaps": [],
+  "retrieval_trace": [],
+  "invalid_citations": 0,
+  "tokens_in": 64729,
+  "tokens_out": 9256,
+  "cost_usd": 0.08325675,
+  "latency_s": 60.85899999993853,
+  "given": [],
+  "stats": {
+   "claims": 9,
+   "supported": 6,
+   "latency_s": 60.85899999993853,
+   "cost_usd": 0.08325675
+  }
+ },
+ {
+  "task_id": "T10",
+  "variant": "B0",
+  "paragraphs": [
+   {
+    "text": "Lumen Grid Labs, LLC is an advanced clean energy technology development firm based in Golden, Colorado. Founded in 2019, the enterprise is a 100% U.S.-owned small business with a current workforce of 32 employees.",
+    "citations": [
+     "a53bee1c-420e-456b-b46c-ba38b68c32f3",
+     "ab5fd089-c752-49c0-b503-53fa86c717d0",
+     "038a9d45-822c-4081-942c-896419acb1b6"
+    ],
+    "supported": true
+   },
+   {
+    "text": "The company's commercial product offerings are anchored by the LGL-BMS3 solid-state battery management system. Engineered for high-precision energy storage platforms, the LGL-BMS3 delivers active cell balancing within \u00b12 mV and maintains a state-of-charge estimation error of 1.5% or less across dynamic duty cycles.",
+    "citations": [
+     "0bbfbeff-55c5-4d3e-a76b-12a264991a82",
+     "ab5fd089-c752-49c0-b503-53fa86c717d0",
+     "f0f0f25c-6484-4ed9-a28a-c334480c5d7a",
+     "d69b7367-5030-4b4e-8602-5d3f85308c1e"
+    ],
+    "supported": true
+   },
+   {
+    "text": "Complementing its energy storage management platform, Lumen Grid Labs manufactures the HelioLink 250, a 250 kW silicon carbide grid-forming inverter. Built to provide resilient autonomous voltage and frequency stabilization on distribution networks, the HelioLink 250 achieves a 98.7% peak conversion efficiency.",
+    "citations": [
+     "0bbfbeff-55c5-4d3e-a76b-12a264991a82",
+     "ab5fd089-c752-49c0-b503-53fa86c717d0",
+     "f0f0f25c-6484-4ed9-a28a-c334480c5d7a",
+     "c3a98fc6-f014-4867-904c-79c67256664d"
+    ],
+    "supported": true
+   }
+  ],
+  "gaps": [
+   "R4"
+  ],
+  "retrieval_trace": [],
+  "invalid_citations": 0,
+  "tokens_in": 64176,
+  "tokens_out": 3059,
+  "cost_usd": 0.05960325,
+  "latency_s": 25.67200000002049,
+  "given": [],
+  "stats": {
+   "claims": 6,
+   "supported": 6,
+   "latency_s": 25.67200000002049,
+   "cost_usd": 0.05960325
+  }
+ },
+ {
+  "task_id": "T11",
+  "variant": "B0",
+  "paragraphs": [
+   {
+    "text": "Hardware-in-the-loop test coverage is conducted in the company's 1,800 square foot laboratory using an OPAL-RT real-time digital simulator interfaced with a 500 kW regenerative grid simulator. The real-time simulation platform executes electromagnetic transient models of IEEE 33-bus weak distribution networks at a 25-microsecond step time, coupling directly to physical digital control boards operating proprietary virtual synchronous machine firmware. Comprehensive hardware-in-the-loop test sequences subject the control hardware to 1,200 simulated fault scenarios across weak-grid conditions, evaluating performance under short-circuit ratios from 1.1 to 2.5, symmetrical three-phase faults, asymmetrical phase-to-ground faults, and rapid frequency excursions up to 2.5 Hz/s. Across these simulated grid disturbances, the hardware maintains continuous voltage-source behavior, restores point-of-common-coupling voltage to within 1.0% of nominal in under 65 milliseconds after fault clearance, and provides damped synthetic inertia response during severe load step changes without oscillatory overshoot.",
+    "citations": [
+     "0c38dcd3-ab66-4a05-a904-c31b268cd8d3",
+     "ba80d97c-7942-4bb4-9217-07a4b4b01fcc",
+     "dd3f2693-f5ea-437f-bfc2-9a7966a4ebd1"
+    ],
+    "supported": true
+   },
+   {
+    "text": "Environmental temperature testing is executed inside calibrated thermal chambers across a broad operating envelope spanning -20 \u00b0C to 55 \u00b0C to ensure hardware resilience and measurement integrity under extreme field environments. Stepped thermal evaluation profiles run in 15 \u00b0C increments with four-hour dwell intervals during active battery cycling from 10% to 90% depth-of-discharge and continuous 1.2 A channel balancing loads. Under low-temperature soak conditions at -20 \u00b0C, analog front-end voltage drift is held to 0.8 mV, while active cell balancing maintains \u00b11.6 mV precision and state-of-charge estimation error reaches a maximum of 1.41%. During high-temperature dwell conditions at 55 \u00b0C, internal microcontroller temperatures remain below 71 \u00b0C, active cell balancing precision holds stable at \u00b11.8 mV, and peak state-of-charge estimation error is constrained to 1.18%, with zero communication dropouts or thermal throttling faults recorded across 120 continuous cycles.",
+    "citations": [
+     "3a7aea76-5e79-40b5-b610-1a9b93e659f7",
+     "9f7e2f1e-ca5f-4327-8350-d6854c8f5a92",
+     "dada6070-820d-4708-80e2-c4bd5dac902b"
+    ],
+    "supported": true
+   },
+   {
+    "text": "Testing and validation activities adhere to a documented catalog of standard test procedures that govern both energy storage management and grid-forming power conversion platforms. Procedure TP-002 defines active balancing verification to ensure voltage divergence does not exceed \u00b12 mV under rapid charge-discharge profiles, while procedure TP-005 establishes protocol for verifying that state-of-charge estimation error remains at or below 1.5% across 100 continuous thermal cycles. For power conversion systems, procedure TP-011 guides precision power-analyzer sweeps on the 500 kW regenerative grid simulator to confirm peak conversion efficiency of 98.7% on the HelioLink 250 inverter. In addition, procedure TP-014 specifies the evaluation of weak-grid dynamic impedance and fault ride-through under short-circuit ratios down to 1.2 on the OPAL-RT real-time rig, and procedure TP-018 standardizes anti-islanding disconnects and synthetic inertia injection parameters.",
+    "citations": [
+     "c36b89d9-297b-4ca7-a04d-0a0cc4604040",
+     "ef84b1c8-e753-48e3-a0bf-3534711d53d8",
+     "b7e68d76-3243-4602-b26e-205386b33194"
+    ],
+    "supported": true
+   }
+  ],
+  "gaps": [
+   "R4"
+  ],
+  "retrieval_trace": [],
+  "invalid_citations": 0,
+  "tokens_in": 67375,
+  "tokens_out": 4091,
+  "cost_usd": 0.0658725,
+  "latency_s": 27.5,
+  "given": [],
+  "stats": {
+   "claims": 12,
+   "supported": 12,
+   "latency_s": 27.5,
+   "cost_usd": 0.0658725
+  }
+ },
+ {
+  "task_id": "T12",
+  "variant": "B0",
+  "paragraphs": [
+   {
+    "text": "The proposed budget covers a two-year project schedule divided into Year 1 and Year 2, reflecting a 24-month execution window. Under this project timeline, direct labor commitments are established on an annual basis for senior personnel, providing 4.0 person-months per year for Principal Investigator Dr. Maya Okafor, 3.0 person-months per year for Chief Technology Officer Ravi Deshmukh, 6.0 person-months per year for Lead Battery Scientist Elena Brandt, and 8.0 person-months per year for Test Engineer Jordan Lee. Planned capital equipment acquisition is scheduled entirely within Year 1, while project-related travel is distributed across both operational years to support continuous field integration, utility testing, and annual programmatic reviews.",
+    "citations": [
+     "da9636ac-7d34-4547-9e58-8263688f3af5",
+     "64307261-65f5-4664-9b51-928bfd1c4d69",
+     "5875f915-5928-4b38-871d-b679018e732b",
+     "b101b438-43a1-421f-997d-a9e8b59c4f18"
+    ],
+    "supported": true
+   },
+   {
+    "text": "Lumen Grid Labs applies a standard company-wide fringe benefit rate of 28% across all direct labor categories. These fringe benefits provide coverage for health and dental insurance, disability, FICA, worker's compensation, and employee retirement contributions. Based on direct labor totals of $232,000 in Year 1 and $241,280 in Year 2, budgeted fringe benefits amount to $64,960 and $67,558, respectively, yielding a total fringe benefit cost of $132,518 over the course of the project.",
+    "citations": [
+     "14b39ca5-e714-437e-9796-a26ca6b5dc6f"
+    ],
+    "supported": true
+   },
+   {
+    "text": "Capital equipment funding of $58,500 is budgeted in Year 1 to acquire a multi-channel precision cell cycling test bench. This hardware is necessary to maintain continuous measurement acquisition within plus or minus 0.5 mV across high-voltage series strings during high-rate cycling runs within the Golden testing laboratory. Additionally, the travel budget provides $15,000 across Years 1 and 2 to fund six substation integration trips for two personnel to Front Range Utility Cooperative sites in Colorado, alongside attendance by Dr. Okafor and Elena Brandt at annual DOE contractor review meetings in Washington, D.C., and domestic energy storage conferences.",
+    "citations": [
+     "5875f915-5928-4b38-871d-b679018e732b",
+     "b101b438-43a1-421f-997d-a9e8b59c4f18"
+    ],
+    "supported": false
+   }
+  ],
+  "gaps": [
+   "R3"
+  ],
+  "retrieval_trace": [],
+  "invalid_citations": 0,
+  "tokens_in": 64576,
+  "tokens_out": 6184,
+  "cost_usd": 0.071622,
+  "latency_s": 39.95299999997951,
+  "given": [],
+  "stats": {
+   "claims": 11,
+   "supported": 10,
+   "latency_s": 39.95299999997951,
+   "cost_usd": 0.071622
+  }
+ }
+]

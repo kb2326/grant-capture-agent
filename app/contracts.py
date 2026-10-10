@@ -83,6 +83,7 @@ class ModelBrief(BaseModel):
     evaluation_criteria: list[ModelCriterion] = Field(default_factory=list)
     required_sections: list[ModelSection] = Field(default_factory=list)
     deadlines: list[ModelDeadline] = Field(default_factory=list)
+    ai_policy: list[ModelRequirement] = Field(default_factory=list)
 
 
 # ---- internal contracts ----
@@ -133,6 +134,9 @@ class SolicitationBrief(BaseModel):
     evaluation_criteria: list[Criterion] = Field(default_factory=list)
     required_sections: list[SectionSpec] = Field(default_factory=list)
     deadlines: list[Deadline] = Field(default_factory=list)
+    ai_policy: list[Requirement] = Field(
+        default_factory=list
+    )  # quoted AI-use rules (M3)
     dropped_quotes: int = 0
     notes: list[str] = Field(default_factory=list)
     model: str
@@ -159,6 +163,7 @@ _LISTS = {
     "evaluation_criteria": Criterion,
     "required_sections": SectionSpec,
     "deadlines": Deadline,
+    "ai_policy": Requirement,
 }
 
 
@@ -270,3 +275,46 @@ PreferenceKind = Literal[
 class Preference(BaseModel):
     kind: PreferenceKind
     value: str
+
+
+# ---- M3 Draft (M3 spec §3.3) ----
+
+
+class TaskRequirement(BaseModel):
+    id: str  # "R1".."Rn"
+    text: str
+
+
+class DraftTask(BaseModel):
+    id: str
+    section_title: str
+    instructions: str
+    requirements: list[TaskRequirement]
+    criteria: list[str] = []
+    opportunity_id: uuid.UUID | None = None
+
+
+class Paragraph(BaseModel):
+    text: str
+    citations: list[uuid.UUID]
+    supported: bool | None = None  # set by the faithfulness judge
+
+
+class RetrievalAttempt(BaseModel):
+    requirement_id: str
+    query: str
+    chunk_ids: list[uuid.UUID]
+    grades: list[str]
+
+
+class DraftSection(BaseModel):
+    task_id: str
+    variant: Literal["B0", "B1"]
+    paragraphs: list[Paragraph]
+    gaps: list[str]  # requirement ids with no evidence
+    retrieval_trace: list[RetrievalAttempt] = []
+    invalid_citations: int = 0  # labels the model invented, removed after one retry
+    tokens_in: int = 0
+    tokens_out: int = 0
+    cost_usd: float = 0.0
+    latency_s: float = 0.0

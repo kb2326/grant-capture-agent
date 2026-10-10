@@ -1,0 +1,2 @@
+[{"task_id": "S1", "gaps": ["R2"], "paragraphs": [{"citations": ["a"], "supported": true}], "given": ["a"],
+  "stats": {"claims": 1, "supported": 1, "latency_s": 3.0, "cost_usd": 0.0}}]

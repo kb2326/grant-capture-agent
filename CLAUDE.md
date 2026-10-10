@@ -90,3 +90,8 @@ Ask the user: Option A (simple single-project) or Option B (full CI/CD pipeline 
 - Index: `uv run python -m rag build-cards`, then `uv run python -m rag embed --model gemini --max-usd 0.50` (local EmbeddingGemma 2: `uv sync --group local-embed --inexact`, `--model local`; CPU takes hours, see STATUS for the Kaggle GPU route).
 - Evals: `uv run python -m evals.discover {queries|retrieval|label|workflow|report}`; `workflow` needs `--yes` above $0.50.
 - Analyze over A2A: `uv run uvicorn app.analyze.a2a_app:a2a_app --host 127.0.0.1 --port 8001`, then set `DISCOVER_V4_TRANSPORT=a2a`.
+
+## Draft commands (M3)
+- Corpus: `uv run python -m ingest.company_corpus {check|generate|load}` (generate needs `--yes` above $0.50 and never overwrites).
+- Evals: `uv run python -m evals.draft {run --variant B0|B1|pairs|kappa|report}`; grader labeling page: `uv run python -m evals.grader_label` (http://127.0.0.1:8766).
+- MCP server: `uv run python -m mcp_server` (registered as `grant-capture` in `.mcp.json`).

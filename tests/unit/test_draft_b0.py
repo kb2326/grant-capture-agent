@@ -85,3 +85,21 @@ def test_gemini_json_passes_cached_content_without_system_instruction():
         seen["config"].cached_content == "cachedContents/1"
         and seen["config"].system_instruction is None
     )
+
+
+def test_gemini_json_caps_thinking_when_asked():
+    seen = {}
+
+    class Models:
+        def generate_content(self, model, contents, config):
+            seen["config"] = config
+            return SimpleNamespace(text=OK.model_dump_json(), usage_metadata=None)
+
+    client = SimpleNamespace(models=Models())
+    GeminiJson(Settings(_env_file=None), client=client, thinking_budget=512).generate(
+        ModelDraft, "r", "t"
+    )
+    assert seen["config"].thinking_config.thinking_budget == 512
+    GeminiJson(Settings(_env_file=None), client=client).generate(ModelDraft, "r", "t")
+    assert seen["config"].thinking_config is None
+    assert Settings(_env_file=None).draft_thinking_budget == 1024

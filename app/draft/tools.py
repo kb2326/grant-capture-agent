@@ -67,7 +67,9 @@ def default_draft_deps(session: Session, settings: Settings) -> DraftDeps:
     client = make_client(settings)
     return DraftDeps(
         settings=settings,
-        llm=GeminiJson(settings, client=client),
+        llm=GeminiJson(
+            settings, client=client, thinking_budget=settings.draft_thinking_budget
+        ),
         grader=GeminiJson(settings, model_id=settings.model_grader, client=client),
         chunks=chunks,
         search=search,

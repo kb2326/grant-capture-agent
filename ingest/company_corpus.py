@@ -298,7 +298,8 @@ def embed_company_chunks(
             .where(DocumentRow.corpus == "company", ChunkRow.embedding.is_(None))
         )
     )
-    start, stats = embedder.tokens, {"embedded": 0, "cost_usd": 0.0, "stopped": None}
+    start = embedder.tokens
+    stats: dict = {"embedded": 0, "cost_usd": 0.0, "stopped": None}
     for i in range(0, len(ids), batch):
         if stats["cost_usd"] >= max_usd:
             stats["stopped"] = "budget"

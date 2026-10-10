@@ -1,0 +1,20 @@
+
+#20 [stage-1  9/12] COPY rag ./rag
+#20 CACHED
+
+#21 [stage-1  6/12] COPY app ./app
+#21 CACHED
+
+#22 [stage-1  8/12] COPY db ./db
+#22 CACHED
+
+#23 [stage-1 12/12] RUN uv sync --frozen --no-dev
+#23 CACHED
+
+#24 exporting to image
+#24 exporting layers done
+#24 writing image sha256:56caaffad3bf8ca94c731fdbb6943f5c817ef251ace2e506d5e948520dfb7940 done
+#24 naming to docker.io/library/grant-capture-api:local 0.0s done
+#24 DONE 0.0s
+
+View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/259v8mwzvdwpsc3n6vswliu2h

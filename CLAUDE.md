@@ -85,3 +85,8 @@ Ask the user: Option A (simple single-project) or Option B (full CI/CD pipeline 
 - Tunnel to Cloud SQL: `bash scripts/cloudsql.sh proxy` (localhost:5434); password: `gcloud secrets versions access latest --secret db-app-password`.
 - Keys to Secret Manager: `bash scripts/secrets_put.sh` (never prints values).
 - Ingestion image: `gcloud builds submit --config cloudbuild.ingest.yaml --substitutions _IMAGE=<artifact_repo>/ingest:<tag> .`; run: `gcloud run jobs execute grant-capture-ingest --region us-central1 --wait`.
+
+## Discover commands (M2)
+- Index: `uv run python -m rag build-cards`, then `uv run python -m rag embed --model gemini --max-usd 0.50` (local EmbeddingGemma 2: `uv sync --group local-embed --inexact`, `--model local`; CPU takes hours, see STATUS for the Kaggle GPU route).
+- Evals: `uv run python -m evals.discover {queries|retrieval|label|workflow|report}`; `workflow` needs `--yes` above $0.50.
+- Analyze over A2A: `uv run uvicorn app.analyze.a2a_app:a2a_app --host 127.0.0.1 --port 8001`, then set `DISCOVER_V4_TRANSPORT=a2a`.

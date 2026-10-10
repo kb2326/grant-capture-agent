@@ -109,7 +109,7 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
   <p class="lede">An AI system that finds federal funding a small R&amp;D company can actually win, rules out the ones it is not allowed to win, and drafts the proposal from the company's own evidence. It is an open, measured take on the workflow commercial GovCon platforms sell, built on Google ADK and Google Cloud, and run the way an AI product team would run it.</p>
   <div class="meta">
     <span>Owner: Karthick Balaje (kb2326)</span>
-    <span>Current phase: M1 Analyze complete · M2 Discover next</span>
+    <span>Current phase: M2 Discover complete · M3 Draft next</span>
     <span>Last updated: 9 Oct 2026</span>
   </div>
 </header>
@@ -119,6 +119,7 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
   <span class="eyebrow">Sections</span>
   <ol>
     <li><a href="#status">Where we are</a></li>
+    <li><a href="#m2">M2 Discover</a></li>
     <li><a href="#m1">M1 Analyze</a></li>
     <li><a href="#built">What we've built</a></li>
     <li><a href="#next">Your next steps</a></li>
@@ -158,6 +159,43 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
       <tr><td>Quality</td><td>One test file, no evals, no CI, not deployed</td><td>Eval sets, CI eval gate, tracing, live on Google Cloud</td></tr>
     </tbody>
   </table></div>
+</section>
+
+<section id="m2">
+  <header><span class="eyebrow">Section 01·M2</span><h2>M2 Discover: built, measured, merged</h2></header>
+  <p><b>The goal:</b> type a request in plain English ("SBIR work on grid-forming inverters") and get a short, ranked list of open opportunities the company can actually go after, each with a reason. Then let three small, cheap experiments decide the design instead of guessing.</p>
+  <h3>How one search works</h3>
+  <ol class="tight">
+    <li><b>Plan.</b> Gemini Flash turns the request, the company profile and remembered preferences into a search plan: 2–5 short queries plus filters. In the workflow a person can approve or edit the plan first.</li>
+    <li><b>Search.</b> Each query runs one SQL statement over 2,737 "opportunity cards": meaning search (embeddings in pgvector) and keyword search (Postgres full text), blended with Reciprocal Rank Fusion.</li>
+    <li><b>Verify.</b> Plain Python rules drop closed, closing-soon, duplicate and known-ineligible results. Eligibility can come from the Analyze agent, called directly or over A2A.</li>
+    <li><b>Explain.</b> One more Flash call writes a one-line "why" for each result, quoting the opportunity.</li>
+  </ol>
+  <h3>What the three experiments decided</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Question</th><th>Result (nDCG@10, silver set, 15 queries)</th><th>Decision</th></tr></thead>
+    <tbody>
+      <tr><td>Cloud or free local embeddings?</td><td>Gemini 0.514 vs EmbeddingGemma 2 0.472 (local better on vague requests: 0.499 vs 0.441)</td><td>Gemini (ADR-0020); local kept for a re-test</td></tr>
+      <tr><td>Does a reranker help?</td><td>0.512 with vs 0.514 without</td><td>Off (built and switchable)</td></tr>
+      <tr><td>Single pass or Plan-Execute-Verify?</td><td>The loop refined 0 of 15 times, so both ran the same code (0.464 vs 0.425 is run-to-run noise)</td><td>Inconclusive; single pass stays default (ADR-0017)</td></tr>
+    </tbody>
+  </table></div>
+  <div class="grid2">
+    <div class="panel"><h3>What we learned</h3>
+      <ul class="tight">
+        <li><b>A loop needs a judge that can say "not good enough".</b> Our verifier only counted results that passed the rules, and a 2,700-row index almost always gives 5, so the refine step never ran. Next idea: let the grader model judge relevance.</li>
+        <li><b>Measure fairly.</b> Gemini first looked slow because the timer included its one-off sign-in. Warming up each option before timing fixed the comparison.</li>
+        <li><b>Free GPUs exist.</b> EmbeddingGemma 2 would take ~9 hours on this laptop's CPU; Kaggle's free T4 did it in 6 minutes, driven entirely from the terminal.</li>
+        <li><b>A2A in practice:</b> three real integration bugs (missing Vertex config, same-origin card check, a short default timeout) that only show up when you actually run it.</li>
+      </ul></div>
+    <div class="panel"><h3>Numbers</h3>
+      <ul class="tight">
+        <li>Discover P@10: 0.50 (target 0.70, not met)</li>
+        <li>One request: about $0.003, p50 11 s (the planner call dominates; raw search is ~1 s)</li>
+        <li>M2 spend: about <b>$1.02</b> of the $2 cap</li>
+        <li>221 tests; report: <code>reports/m2/ablation.md</code></li>
+      </ul></div>
+  </div>
 </section>
 
 <section id="m1">
@@ -301,29 +339,30 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
 
 <section id="next">
   <header><span class="eyebrow">Section 01b</span><h2>Your next steps</h2></header>
-  <p>M0 and M1 are merged. From here the project runs <b>cost-minimal</b>: it's a learning prototype, so every step uses the cheapest way that still teaches the idea.</p>
+  <p>M0, M1 and M2 are merged. The project stays <b>cost-minimal</b>: a learning prototype, so every step uses the cheapest way that still teaches the idea.</p>
   <div class="grid2">
-    <div class="panel"><span class="eyebrow">Done</span><h3>M0 + M1</h3>
+    <div class="panel"><span class="eyebrow">Done</span><h3>M0 + M1 + M2</h3>
       <ul class="tight">
-        <li>Data foundation: 2,736 opportunities, 736 documents</li>
+        <li>Data foundation: 2,737 opportunities, searchable cards with two kinds of embeddings</li>
         <li>Analyze: brief + verdict with verified quotes; knockout recall 100%, precision 91% (silver set)</li>
+        <li>Discover: hybrid search, plan approval, A2A, preferences; three measured design decisions</li>
       </ul></div>
-    <div class="panel"><span class="eyebrow">You</span><h3>Before M2</h3>
+    <div class="panel"><span class="eyebrow">You</span><h3>Before M3</h3>
       <ol class="tight">
-        <li>Read the M1 section above and <code>reports/m1/ablation.md</code>.</li>
-        <li>Try it: <code>agents-cli playground</code>, then ask the agent to analyze an opportunity.</li>
-        <li>Say <b>"start M2"</b>.</li>
+        <li>Read the M2 section above and <code>reports/m2/ablation.md</code>.</li>
+        <li>Try it: <code>agents-cli playground</code>, then ask "find SBIR work on grid-forming inverters".</li>
+        <li>Optional: skim <code>reports/m2/label_spotcheck.md</code> and mark where you disagree with the AI labels.</li>
+        <li>Say <b>"start M3"</b>.</li>
       </ol></div>
-    <div class="panel"><span class="eyebrow">Next</span><h3>M2 Discover (cheap by design)</h3>
+    <div class="panel"><span class="eyebrow">Next</span><h3>M3 Draft (cheap by design)</h3>
       <ul class="tight">
-        <li>Search built from scratch: keyword + meaning search, with EmbeddingGemma 2 running free on your laptop</li>
-        <li>PEV vs. a simple search baseline, on 10–20 queries</li>
+        <li>Corrective RAG vs. plain long-context drafting over the company's documents</li>
+        <li>Hybrid requirement extraction (page windows only for chosen opportunities)</li>
         <li>Target spend: about $1–3</li>
       </ul></div>
-    <div class="panel"><span class="eyebrow">Later</span><h3>M3 · M4</h3>
+    <div class="panel"><span class="eyebrow">Later</span><h3>M4</h3>
       <ul class="tight">
-        <li><b>M3 Draft:</b> Corrective RAG vs. plain RAG; hybrid requirement extraction</li>
-        <li><b>M4 Ship:</b> web app on Google Cloud (database started only for demos), README, LinkedIn, Medium</li>
+        <li><b>M4 Ship:</b> web app on Google Cloud, Analyze deployed as an A2A service, Memory Bank, README, LinkedIn, Medium</li>
       </ul></div>
   </div>
 </section>
@@ -384,7 +423,7 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
     <div class="phase"><span class="n">03</span><div><h3>Decision records (ADRs)</h3><p>One short file per big choice, with the options we turned down and why. Listed in the design; written in M0 Task 11. <code>docs/adr/</code></p></div><span class="pill todo">in M0</span></div>
     <div class="phase"><span class="n">04</span><div><h3>Evals first</h3><p>Decide what "correct" means and label test data before writing features. The harness and labeling guide come in M0; labeled sets in M1–M3. <code>evals/</code></p></div><span class="pill todo">in M0</span></div>
     <div class="phase"><span class="n">05</span><div><h3>Implementation plan</h3><p>Each milestone broken into small, testable tasks. M0 has 21 tasks. <code>docs/plans/2026-10-07-m0-foundation.md</code></p></div><span class="pill done">M0 done</span></div>
-    <div class="phase current"><span class="n">06</span><div><h3>Build</h3><p>Tests first, small pull requests, CI on every pull request. M0 and M1 done; M2 next.</p></div><span class="pill now">in progress</span></div>
+    <div class="phase current"><span class="n">06</span><div><h3>Build</h3><p>Tests first, small pull requests, CI on every pull request. M0, M1 and M2 done; M3 next.</p></div><span class="pill now">in progress</span></div>
     <div class="phase"><span class="n">07</span><div><h3>Ship</h3><p>Deploy to Google Cloud with a demo UI, tracing, and an eval gate that blocks a bad release.</p></div><span class="pill todo">to do</span></div>
     <div class="phase"><span class="n">08</span><div><h3>Operate and report</h3><p>Eval report, cost report, and a write-up of what went wrong and what you'd change.</p></div><span class="pill todo">to do</span></div>
   </div>
@@ -563,7 +602,7 @@ flowchart LR
   <details class="stack"><summary><span><span class="layer">Models</span><br><strong>gemini-3.8-flash · gemini-3.5-flash-lite · gemini-3.1-pro-preview · gemini-embedding-001</strong></span><span class="chev">›</span></summary><div class="body"><dl>
     <dt>In plain terms</dt><dd>Different models for different jobs. Flash handles planning and extraction. Flash-Lite, the cheapest, grades thousands of passages. Pro, the most capable, writes the drafts. The embedding model turns text into searchable vectors.</dd>
     <dt>Why here</dt><dd>Matching model size to the task is how real teams control cost. Every call is logged with its token count and cost.</dd>
-    <dt>Verified</dt><dd>All four were tested with live calls on 7 Oct 2026. <code>gemini-embedding-2</code> is listed for the project but returned "not found", so we use <code>gemini-embedding-001</code> (768 numbers per passage, us-central1) and retry embedding-2 in M2.</dd>
+    <dt>Verified</dt><dd>All four were tested with live calls on 7 Oct 2026. <code>gemini-embedding-2</code> is listed for the project but returned "not found", so we use <code>gemini-embedding-001</code> (768 numbers per passage, us-central1). In M2 embedding-2 turned out to work in location <code>global</code>; the 404 was the region.</dd>
     <dt>Turned down</dt><dd>Using Pro for everything (several times the cost with no measured benefit for grading).</dd>
     <dt>Skill it teaches</dt><dd>Model routing, cost budgeting, structured output.</dd></dl></div></details>
 
@@ -693,7 +732,7 @@ flowchart LR
     <tbody>
       <tr><td><b>M0 Foundation</b></td><td>Part A (laptop): scaffold, settings, Postgres schema, Grants.gov + SAM.gov ingestion, fake company documents, eval harness, ADRs, CI. Part B (cloud): Terraform, Cloud Storage, Secret Manager, Cloud SQL, service accounts, keyless GitHub sign-in, ingestion as a Cloud Run Job.</td><td>Data pipelines, schema design, Terraform, IAM, CI</td><td><span class="pill done">done</span></td></tr>
       <tr><td><b>M1 Analyze</b></td><td>Parsing and chunking, Solicitation agent, knockout rules, labeled set of 25+ solicitations</td><td>Document parsing, structured extraction, labeling, precision/recall</td><td><span class="pill done">done</span></td></tr>
-      <tr><td><b>M2 Discover</b></td><td>Hybrid search, reranking, ADK 2 PEV workflow, approval step, timing benchmark</td><td>Retrieval engineering, agent graphs, human-in-the-loop</td><td><span class="pill todo">to do</span></td></tr>
+      <tr><td><b>M2 Discover</b></td><td>Hybrid search, reranking, ADK 2 workflow with approval step, three ablations, local A2A, preferences</td><td>Retrieval engineering, agent graphs, human-in-the-loop</td><td><span class="pill done">done</span></td></tr>
       <tr><td><b>M3 Draft</b></td><td>Corrective RAG over company documents, faithfulness check, MCP server</td><td>CRAG, LLM judges, citation design, MCP</td><td><span class="pill todo">to do</span></td></tr>
       <tr><td><b>M4 Ship</b></td><td>Agent Runtime deploy, web UI, Terraform, tracing, CI eval gate, red-team set, eval report</td><td>Production deployment, LLMOps, AI security</td><td><span class="pill todo">to do</span></td></tr>
       <tr><td><b>M5 Specialize</b></td><td>Fine-tune the grader and compare it with the prompted version; Gemini reads scanned PDF pages directly, compared with Docling</td><td>Fine-tuning and multimodal, two skills that show up often in AI engineer job postings</td><td><span class="pill todo">to do</span></td></tr>
@@ -771,6 +810,8 @@ flowchart LR
       <tr><td class="num">2026-10-09</td><td>M1 structured output: the clause constraint became a typed object after a live call showed a free-form one comes back empty.</td></tr>
       <tr><td class="num">2026-10-09</td><td>NIH announcements behind a bot challenge are not fetched; SAM.gov notice descriptions are stored as documents so notices without attachments can still be analyzed and labeled.</td></tr>
       <tr><td class="num">2026-10-09</td><td>OKF deferred to M3; EmbeddingGemma 2 joins the M2 embedding comparison.</td></tr>
+      <tr><td class="num">2026-10-10</td><td>M2 measured: Gemini embeddings over EmbeddingGemma 2 (ADR-0020, directional), reranker off, Plan-Execute-Verify inconclusive because its loop never ran, single pass stays default (ADR-0017). M2 cost about $1.02.</td></tr>
+      <tr><td class="num">2026-10-10</td><td>Local embeddings run on Kaggle's free T4 GPU instead of the laptop CPU (6 min vs ~9 h).</td></tr>
       <tr><td class="num">2026-10-09</td><td>Independent review of the whole M0 branch found 2 critical issues (the SAM.gov key could appear in logs; the SAM.gov daily cap could be exceeded) and 4 important ones (one bad record could end a run; attachment names could collide; failed downloads weren't retried; two SAM sources overwrote each other). All six fixed test-first (65 tests), 11 minor items noted for later. M0 merged into main.</td></tr>
       <tr><td class="num">2026-10-08</td><td>M0 Part B done: Terraform created 41 cloud resources; the loader ran as a Cloud Run Job (500 grants, 0 failures); teardown fixes added; Cloud SQL deleted and off by default. M0 complete.</td></tr>
       <tr><td class="num">2026-10-08</td><td>ADR-0019 written: Docker for local development, tests and CI; Terraform-managed Google Cloud for anything shared or deployed.</td></tr>

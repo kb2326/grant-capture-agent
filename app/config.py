@@ -2,6 +2,7 @@
 
 import os
 from functools import lru_cache
+from typing import Literal
 
 from pydantic import SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -59,6 +60,31 @@ class Settings(BaseSettings):
     eval_budget_usd: float = (
         1.25  # hard cap per eval variant run (estimated Gemini spend)
     )
+    # ---- M2 Discover ----
+    model_embedding_local: str = (
+        "google/embeddinggemma-2"  # Apache-2.0, not gated; 768-d, 8K context
+    )
+    local_query_prompt: str = "SearchQuery"
+    local_document_prompt: str = "Document"
+    embedding_batch_size: int = (
+        50  # live check 2026-10-09: gemini-embedding-001 accepts batched inputs
+    )
+    price_embedding_per_m: float = 0.15  # gemini-embedding-001, per 1M input tokens
+    price_grader_input_per_m: float = 0.25  # gemini-3.5-flash-lite (conservative; real spend checked in Cloud Monitoring)
+    price_grader_output_per_m: float = 1.50
+    rerank_model: str = "semantic-ranker-default-004"
+    price_rank_per_1k: float = 1.0  # Vertex AI Ranking API, per 1,000 queries
+    discover_embedding: Literal["gemini", "local"] = "gemini"  # M2 ablation, ADR-0020
+    discover_rerank: bool = (
+        False  # M2 ablation: no gain (nDCG@10 0.512 vs 0.514), extra latency
+    )
+    discover_tau: float | None = None  # V3 threshold, tuned on dev queries
+    discover_k: int = 5
+    discover_max_iterations: int = 3
+    discover_v4_transport: Literal["direct", "a2a"] = "direct"
+    discover_v4_max_checks: int = 5
+    analyze_a2a_url: str = "http://127.0.0.1:8001"
+    discover_eval_budget_usd: float = 1.0  # hard cap per Discover eval stage
 
     @model_validator(mode="after")
     def _secrets_from_secret_manager(self) -> "Settings":

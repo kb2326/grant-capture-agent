@@ -191,8 +191,8 @@ flowchart LR
 |---|---|---|
 | Knockout recall / precision | ≥ 0.95 / ≥ 0.85 | **1.00 / 0.91** on 40 solicitations (10 knockouts) · AI-labeled silver set |
 | Requirement extraction recall | ≥ 0.85 | **0.15** whole-document; **0.69** page windows (n=7) · not met, see [ADR-0016](docs/adr/0016-analyze-long-context.md) |
-| Discover precision@10 | ≥ 0.70 | *pending (M2)* |
-| Time to qualified shortlist vs. manual | ≥ 50% faster | *pending (M2)* |
+| Discover precision@10 | ≥ 0.70 | **0.50** single-pass workflow; nDCG@10 0.46 · 15 queries, AI-labeled silver set · not met, see [ADR-0017](docs/adr/0017-discover-architecture-by-ablation.md) |
+| Time to qualified shortlist vs. manual | ≥ 50% faster | *moved to M4* (needs the UI); one Discover request: p50 11 s, $0.003 |
 | Draft context relevance / faithfulness | ≥ 0.60 / ≥ 0.90 | *pending (M3)* |
 | Time to first draft vs. manual | ≥ 40% faster | *pending (M3)* |
 | Cost per full run · p95 latency | < $0.25 · < 90 s | Analyze alone: $0.04 · p50 61 s, p95 561 s · full run *pending (M4)* |
@@ -206,10 +206,10 @@ flowchart LR
 | Agents | **Google ADK 2.x** workflow graphs | Loops, branches and resumable human approval in one graph |
 | Lifecycle | **agents-cli** | Google's standard scaffold → eval → deploy → CI/CD toolchain |
 | Models | **Gemini 3.8 Flash · 3.5 Flash-Lite · 3.1 Pro** via `google-genai` | Model size matched to each job: extraction, grading, drafting |
-| Embeddings | **gemini-embedding-001** (768-d) | Strong retrieval with a small index |
+| Embeddings | **gemini-embedding-001** (768-d) | Beat local EmbeddingGemma 2 on our retrieval eval ([ADR-0020](docs/adr/0020-embedding-choice.md)) |
 | Store | **Cloud SQL Postgres + pgvector** | Metadata, full-text and vectors in one database; hybrid search in one SQL query |
 | Parsing | **Docling**, with Gemini multimodal as the fallback | Keeps headings, tables and page numbers for citations |
-| Reranking | **Vertex AI Ranking API** | Precise top-k after a broad hybrid recall |
+| Reranking | **Vertex AI Ranking API** (built, off by default) | Measured no gain over hybrid search on our cards (M2 ablation), so it stays switchable |
 | Tools | **MCP Toolbox for Databases** + a custom **MCP server** | Safe SQL tools; the same capabilities from any MCP client |
 | Agent protocols | **A2A** between the orchestrator and the Analyze agent · **MCP** for tools | Analyze runs as an independent service that other agents can call |
 | Serving | **Agent Runtime** (formerly Agent Engine) · **FastAPI + React** on **Cloud Run** | Managed agent hosting with sessions |
@@ -266,7 +266,7 @@ agents-cli playground           # chat with the agent locally
 
 - [x] **M0 Foundation:** scaffold, synthetic company data, Postgres schema, ingestion, CI, eval harness, ADRs
 - [x] **M1 Analyze:** page-tagged text layer, brief extraction (whole-document vs. page-window ablation), quote verification, knockout rules E0–E7, AI-labeled silver set ([report](reports/m1/ablation.md))
-- [ ] **M2 Discover:** hybrid search + rerank, PEV workflow with approval, timing benchmark
+- [x] **M2 Discover:** opportunity cards, hybrid search (pgvector + full text, RRF), three ablations (embeddings, rerank, single pass vs. Plan-Execute-Verify, the last inconclusive), ADK 2 workflow with plan approval, Analyze over local A2A, remembered preferences ([report](reports/m2/ablation.md))
 - [ ] **M3 Draft:** corrective RAG, calibrated grader, faithfulness check, MCP server
 - [ ] **M4 Ship:** Agent Runtime + Cloud Run, Terraform, tracing, CI eval gate, red team, eval report
 - [ ] **M5 Specialize:** fine-tuned grader vs. prompted grader; multimodal parsing vs. Docling

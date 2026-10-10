@@ -1,6 +1,6 @@
 # ADR-0005: Embeddings
 
-- Status: Accepted
+- Status: Accepted; re-tested 2026-10-10 by [ADR-0020](0020-embedding-choice.md) (still the choice)
 - Date: 2026-10-07
 - Deciders: Karthick Balaje
 

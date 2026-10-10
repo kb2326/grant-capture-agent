@@ -26,9 +26,11 @@ from google.cloud import bigquery
 
 from app.analyze.qa import ask_solicitation
 from app.analyze.service import analyze_opportunity
+from app.config import get_settings
+from app.discover.tools import find_opportunities, remembered_preferences
 
 
-MODEL = "gemini-3.8-flash"
+MODEL = get_settings().model_agent
 
 
 root_agent = Agent(
@@ -43,12 +45,20 @@ root_agent = Agent(
     ),
     instruction=(
         "You are the grant-capture assistant for a small R&D company (Lumen Grid Labs). "
+        "To find opportunities, call find_opportunities with the user's request; show each result's title, agency, "
+        "close date, eligibility and why, and mention the search plan it used. "
         "To decide whether the company may apply and what a solicitation requires, call analyze_opportunity "
         "with the opportunity ID. For follow-up questions about a solicitation, call ask_solicitation. "
-        "Report the verdict exactly as returned, quote the deciding clauses with their pages, and never "
-        "invent eligibility rules. Discover (search) arrives in M2 and Draft in M3."
+        "To see what the company asked you to remember, call remembered_preferences. "
+        "Report verdicts exactly as returned, quote deciding clauses with their pages, and never invent "
+        "eligibility rules. Draft arrives in M3."
     ),
-    tools=[analyze_opportunity, ask_solicitation],
+    tools=[
+        find_opportunities,
+        analyze_opportunity,
+        ask_solicitation,
+        remembered_preferences,
+    ],
 )
 import os
 

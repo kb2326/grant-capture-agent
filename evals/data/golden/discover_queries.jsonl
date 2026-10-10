@@ -1,0 +1,15 @@
+{"text": "DOE ARPA-E funding opportunities for solid-state battery management systems designed for utility-scale grid storage applications.", "slice": "specific", "split": "golden", "id": "q01"}
+{"text": "DOE Office of Electricity SBIR topics focusing on advanced BMS telemetry and state-of-health monitoring for solid-state batteries.", "slice": "specific", "split": "golden", "id": "q02"}
+{"text": "DOD SBIR Phase I solicitations for high-frequency silicon carbide power converters used in expeditionary microgrids.", "slice": "specific", "split": "golden", "id": "q03"}
+{"text": "Office of Naval Research BAA solicitations for gallium nitride power conversion systems and compact shipboard inverter designs.", "slice": "specific", "split": "golden", "id": "q04"}
+{"text": "DOE Solar Energy Technologies Office grants for grid-forming inverter control algorithms providing black-start and synthetic inertia capabilities.", "slice": "specific", "split": "golden", "id": "q05"}
+{"text": "DOD ESTCP funding opportunities for field demonstration of grid-forming inverters on military installation microgrids.", "slice": "specific", "split": "golden", "id": "q06"}
+{"text": "AFRL contracts for controller hardware-in-the-loop testing of high-voltage aircraft power electronics.", "slice": "specific", "split": "golden", "id": "q07"}
+{"text": "DOE EERE solicitations for hardware-in-the-loop validation of smart inverter power conditioning systems.", "slice": "specific", "split": "golden", "id": "q08"}
+{"text": "NSF Phase I SBIR funding for AI-driven battery degradation modeling under irregular grid-scale cycling conditions.", "slice": "specific", "split": "golden", "id": "q09"}
+{"text": "DOE Vehicle Technologies Office grants for advanced prognostic modeling of solid-state lithium battery degradation.", "slice": "specific", "split": "golden", "id": "q10"}
+{"text": "Federal funding opportunities to support our research on advanced power converters and inverters.", "slice": "vague", "split": "golden", "id": "q11"}
+{"text": "Small business grants to help us develop next-generation battery management systems.", "slice": "vague", "split": "golden", "id": "q12"}
+{"text": "Government solicitations for lab testing and simulation of clean energy hardware.", "slice": "vague", "split": "golden", "id": "q13"}
+{"text": "Funding programs for software that predicts how long batteries will last.", "slice": "vague", "split": "golden", "id": "q14"}
+{"text": "Federal opportunities to improve electrical grid stability and renewable energy integration.", "slice": "vague", "split": "golden", "id": "q15"}

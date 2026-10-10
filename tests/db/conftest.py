@@ -51,3 +51,37 @@ def db_session(migrated_engine):
     session = make_session_factory(migrated_engine)()
     yield session
     session.close()
+
+
+@pytest.fixture
+def make_opp(db_session):
+    import uuid as _uuid
+    from datetime import date
+
+    from db.models import OpportunityRow
+
+    def _make(**over) -> OpportunityRow:
+        data = dict(
+            id=_uuid.uuid4(),
+            source="grants_gov",
+            source_id=f"s-{_uuid.uuid4().hex[:8]}",
+            kind="grant",
+            title="Untitled",
+            agency="DEPT OF ENERGY",
+            summary="",
+            url="u",
+            status="open",
+            close_at=date(2030, 1, 1),
+            naics=[],
+            assistance_listings=[],
+            eligibility_codes=[],
+            raw={},
+            content_hash="h",
+        )
+        data.update(over)
+        row = OpportunityRow(**data)
+        db_session.add(row)
+        db_session.commit()
+        return row
+
+    return _make

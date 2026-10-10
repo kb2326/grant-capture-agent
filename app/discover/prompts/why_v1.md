@@ -1,0 +1,1 @@
+For each numbered funding opportunity below, write one sentence (at most 30 words) saying why it fits the request: "$intent". Quote a short phrase from the opportunity text in double quotes. Return items with the opportunity's index and the sentence. Skip an index if it does not fit.

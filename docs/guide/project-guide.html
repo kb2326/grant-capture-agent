@@ -109,7 +109,7 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
   <p class="lede">An AI system that finds federal funding a small R&amp;D company can actually win, rules out the ones it is not allowed to win, and drafts the proposal from the company's own evidence. It is an open, measured take on the workflow commercial GovCon platforms sell, built on Google ADK and Google Cloud, and run the way an AI product team would run it.</p>
   <div class="meta">
     <span>Owner: Karthick Balaje (kb2326)</span>
-    <span>Current phase: M2 Discover complete · M3 Draft next</span>
+    <span>Current phase: M3 Draft in progress (live run)</span>
     <span>Last updated: 9 Oct 2026</span>
   </div>
 </header>
@@ -119,6 +119,7 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
   <span class="eyebrow">Sections</span>
   <ol>
     <li><a href="#status">Where we are</a></li>
+    <li><a href="#m3">M3 Draft</a></li>
     <li><a href="#m2">M2 Discover</a></li>
     <li><a href="#m1">M1 Analyze</a></li>
     <li><a href="#built">What we've built</a></li>
@@ -159,6 +160,56 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
       <tr><td>Quality</td><td>One test file, no evals, no CI, not deployed</td><td>Eval sets, CI eval gate, tracing, live on Google Cloud</td></tr>
     </tbody>
   </table></div>
+</section>
+
+<section id="m3">
+  <header><span class="eyebrow">Section 01·M3</span><h2>M3 Draft: write a first draft from the company's own evidence</h2></header>
+  <p><b>The goal:</b> pick an analyzed opportunity and a section ("Technical Approach"). Get back a <b>first draft</b> where every claim cites a company document, a list of <b>gaps</b> (requirements with no evidence, so nothing gets invented), and <b>flags</b> on any sentence its own sources don't support. It is a starting point for a human writer, not something to submit.</p>
+
+  <h3>How real proposal teams and tools do it</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Step</th><th>What people do</th><th>What AI tools do today</th><th>Our system</th></tr></thead>
+    <tbody>
+      <tr><td>1. Go / no-go</td><td>Read the call, check fit and eligibility, decide to bid</td><td>Summarize, score fit</td><td>Discover (M2) + Analyze verdict (M1)</td></tr>
+      <tr><td>2. Shred the RFP</td><td>Copy every "shall", the instructions and the scoring criteria into a <b>compliance matrix</b></td><td>Extract them automatically (the most-used AI feature)</td><td>Analyze brief, every item quoted with its page</td></tr>
+      <tr><td>3. Outline, win themes</td><td>Kickoff; the pink team checks the outline</td><td>Suggest an outline; people decide</td><td>Sections come from the brief</td></tr>
+      <tr><td>4. Find evidence</td><td>Dig through old proposals, reports, CVs (days)</td><td>A searchable <b>content library</b></td><td><b>Company corpus + retrieval (what M3 measures)</b></td></tr>
+      <tr><td>5. First draft</td><td>Writers draft each section</td><td>Draft from library content, linked to sources</td><td><b>Cited draft + gaps + unsupported-sentence flags</b></td></tr>
+      <tr><td>6. Reviews</td><td>Red team scores against the criteria; gold team signs off</td><td>Compliance checks; people rewrite</td><td>Approval step + AI-use notice on every export</td></tr>
+      <tr><td>7. Submit</td><td>A person certifies the content is true</td><td>Not automated</td><td>Not automated</td></tr>
+    </tbody>
+  </table></div>
+  <p><b>Why evidence and gaps matter more than nice prose:</b> evaluators score what you have proven (results, past performance, named people), and false statements to the government are a legal risk. Agencies also have rules about AI: NIH (2025) won't consider applications substantially developed by AI; NSF encourages disclosing AI use. So Analyze now quotes any <b>AI-use clause</b> it finds, and every draft starts with "AI-assisted first draft. Human review and rewrite required before submission."</p>
+
+  <h3>The two designs being compared (ADR-0018)</h3>
+  <div class="grid2">
+    <div class="panel"><span class="eyebrow">B0</span><h3>Long context: read everything</h3>
+      <p>All 345 company passages (≈ 54k tokens) go into one <b>Gemini context cache</b>, built once. Each section is one Flash call that cites passages by label ([C12]) and lists unsupported requirements as gaps. Simple; it relies on the model to notice that a 2021 document is outdated.</p></div>
+    <div class="panel"><span class="eyebrow">B1</span><h3>Corrective RAG: search, check, retry</h3>
+      <p>For each requirement: write search queries, run hybrid search over the passages, have a cheap model (Flash-Lite) <b>grade</b> each hit relevant / partly / not, and if fewer than 2 are relevant, rewrite the query (at most twice). Whatever is still unsupported becomes a gap. Then Flash drafts from the relevant passages only.</p></div>
+  </div>
+
+  <h3>How we know which is better (without trusting an AI's opinion)</h3>
+  <ul class="tight">
+    <li><b>The corpus was built to a plan.</b> 75 documents: the 13 originals, 35 current ones, 15 <b>outdated</b> traps (2020–22: "18 employees", "LGL-BMS2", "900 sq ft"), 12 <b>off-topic</b> ones (lease, travel policy). Each new document had to contain specific phrases, checked by code.</li>
+    <li><b>12 draft tasks, 46 requirements.</b> 36 can be proven with an exact phrase ("32 employees", "99.2%", "UL 1741 SB"); <b>10 are deliberate gaps</b> (hydrogen, cybersecurity, offshore wind, Phase III, CMMC) that no document mentions.</li>
+    <li><b>Scored by code:</b> gaps caught (gap recall/precision), evidence found (evidence recall), citations that point at outdated or off-topic documents (distractor rate).</li>
+    <li><b>Scored by an AI judge (silver):</b> faithfulness, the share of claims their cited passages support.</li>
+    <li><b>Checked by you:</b> 40 (requirement, passage) pairs you label on a local page; Cohen's κ says how far to trust the Flash-Lite grader.</li>
+  </ul>
+
+  <h3>Where we are</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Step</th><th>Status</th><th>Cost</th></tr></thead>
+    <tbody>
+      <tr><td>Code: 14 tasks, 268 tests (search, generator, B0, B1, judge, workflow, MCP server, metrics, labeling page)</td><td><span class="pill done">done</span></td><td class="num">$0</td></tr>
+      <tr><td>Corpus generated (62 docs) and checked; 345 passages loaded and embedded</td><td><span class="pill done">done</span></td><td class="num">$0.58</td></tr>
+      <tr><td>B1 run on the 12 tasks</td><td><span class="pill now">running</span></td><td class="num">≈ $0.25</td></tr>
+      <tr><td>You label 40 pairs (15–20 min)</td><td><span class="pill todo">next</span></td><td class="num">$0</td></tr>
+      <tr><td>B0 run, report, 2 real-solicitation demos, MCP check, docs</td><td><span class="pill todo">to do</span></td><td class="num">≈ $0.45</td></tr>
+    </tbody>
+  </table></div>
+  <p class="muted">GPU? Not needed in M3: every step is a Gemini call on Google's servers. The GPU mattered in M2 only because EmbeddingGemma 2 ran on our own machine.</p>
 </section>
 
 <section id="m2">

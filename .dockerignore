@@ -1,0 +1,12 @@
+.git
+.venv
+**/__pycache__
+web/node_modules
+web/dist
+data/
+reports/
+legacy/
+.superpowers/
+deployment/terraform/**/.terraform
+.env
+*.log

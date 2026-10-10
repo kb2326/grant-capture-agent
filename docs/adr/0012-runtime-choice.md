@@ -1,6 +1,6 @@
 # ADR-0012: Runtime choice
 
-- Status: Accepted
+- Status: Accepted. Target: Cloud Run for the API and UI, Agent Runtime for the agents (Analyze as its own A2A service). Designed and validated with `terraform plan` in M4, not deployed (ADR-0021)
 - Date: 2026-10-07
 - Deciders: Karthick Balaje
 

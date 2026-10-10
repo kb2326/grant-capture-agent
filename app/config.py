@@ -93,6 +93,10 @@ class Settings(BaseSettings):
     draft_max_rewrites: int = 2
     draft_variant: Literal["B0", "B1"] = "B0"  # set by the M3 ablation (ADR-0018)
     draft_thinking_budget: int = 1024  # thinking tokens are billed as output; M3 runs showed up to 13k per section
+    # ---- M4 local UI ----
+    ui_session_budget_usd: float = (
+        0.50  # live UI actions stop once this is spent in one API process
+    )
 
     @model_validator(mode="after")
     def _secrets_from_secret_manager(self) -> "Settings":

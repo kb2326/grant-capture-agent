@@ -1,0 +1,24 @@
+Shutdown inventory, project grant-capture-agent, 2026-10-10 (read-only; personal account)
+
+Running / billed-while-idle compute: none
+  Cloud Run services: 0 · Cloud Run jobs: 0 · Cloud SQL instances: 0 · Cloud Scheduler jobs: 0
+  Agent Runtime (reasoning engines): 0 · Vertex context caches: 0
+
+Storage (billed per GB-month):
+  gs://grant-capture-agent-raw          127.1 MB  raw API downloads (re-downloadable)      -> proposed: delete objects, keep bucket (Terraform-managed)
+  gs://grant-capture-agent_cloudbuild     0.6 MB  Cloud Build source uploads               -> proposed: delete objects
+  gs://grant-capture-agent-tfstate        0.04 MB Terraform state                          -> keep
+  Artifact Registry grant-capture       262.8 MB  image ingest:m0                          -> proposed: delete image, keep repository (Terraform-managed)
+
+Kept so the project can resume (about $0.20/month or less):
+  secrets db-app-password, sam-api-key, simpler-grants-api-key; the tfstate bucket; the budget alert.
+  BigQuery dataset adk_agent_analytics: table agent_events, 8 rows, 4.9 KB (written by the agent's analytics plugin, app/agent.py,
+    during playground runs) + 24 views -> keep (inside the 10 GB free tier; no cost)
+
+Actions taken after the user's approval ("build leftovers only"):
+  - deleted Artifact Registry image grant-capture/ingest (tag m0); repository kept, now empty
+  - deleted all objects in gs://grant-capture-agent_cloudbuild; bucket kept, now empty
+  - kept gs://grant-capture-agent-raw (127 MB) so `python -m ingest replay` can rebuild the database
+After:
+  - Cloud Monitoring model_invocation_count: last Gemini call 2026-10-10T14:49Z (end of the UI session); none since (checked 15:05Z)
+  - Remaining monthly cost: storage and secrets, about $0.20 or less. To stop everything: disable billing (docs/deploy/05-teardown.md).

@@ -1,0 +1,34 @@
+# Deploy to production (M4 spec §3.3). DISABLED: every job has `if: false` (ADR-0021).
+# To enable later: remove the `if: false` lines, keep `workflow_dispatch` (manual), and confirm the
+# Workload Identity Federation provider and CI service account from deployment/terraform/foundation.
+name: deploy
+on:
+  workflow_dispatch: {}
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  build:
+    if: false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.CI_SA_EMAIL }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: Build and push the API + UI image
+        run: gcloud builds submit --tag us-central1-docker.pkg.dev/grant-capture-agent/grant-capture/app:${{ github.sha }} --file Dockerfile.api .
+  plan:
+    if: false
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - name: Terraform plan
+        working-directory: deployment/terraform/prod
+        run: terraform init -input=false && terraform plan -input=false -var image=us-central1-docker.pkg.dev/grant-capture-agent/grant-capture/app:${{ github.sha }}
+  # apply: intentionally absent. A funded M4b would add a protected-environment job that runs
+  # `terraform apply` after a human approves the plan, then `agents-cli deploy` for the agents.

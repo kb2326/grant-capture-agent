@@ -13,7 +13,7 @@ An architecture decision record (ADR) is a short note that captures one signific
 | [0007](0007-offline-index-live-fallback.md) | Offline index + live fallback | Accepted |
 | [0008](0008-demo-access.md) | Demo access | Accepted |
 | [0009](0009-single-prod-project.md) | Single prod project | Accepted |
-| [0012](0012-runtime-choice.md) | Runtime choice | Accepted |
+| [0012](0012-runtime-choice.md) | Runtime choice | Accepted; designed and validated, not deployed (0021) |
 | [0013](0013-analyze-as-a2a-service.md) | Analyze as an A2A service | Accepted for M2 locally (direct/A2A switch); deployed in M4 |
 | [0014](0014-per-agent-identity.md) | Per-agent identity | Proposed (decided in M4) |
 | [0015](0015-sources-and-normalized-format.md) | Sources and normalized format | Accepted |
@@ -22,3 +22,4 @@ An architecture decision record (ADR) is a short note that captures one signific
 | [0018](0018-draft-architecture-by-ablation.md) | Draft architecture chosen by ablation | Accepted; M3 outcome: long context (B0) |
 | [0019](0019-local-docker-terraform-cloud.md) | Docker locally, Terraform-managed Google Cloud for anything shared or deployed | Accepted |
 | [0020](0020-embedding-choice.md) | Embedding model chosen by measurement (gemini-embedding-001 over EmbeddingGemma 2) | Accepted |
+| [0021](0021-deployment-designed-not-executed.md) | Deployment designed to production standard and validated, not executed | Accepted |

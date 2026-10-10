@@ -1,4 +1,4 @@
-# grant-capture-agent
+# Grant Capture Agent
 
 **Find federal funding a small R&D company can actually win, rule out the ones it can't, and draft the proposal from the company's own evidence.**
 
@@ -95,7 +95,7 @@ Each workflow was built as a simple baseline (B0) and a richer variant (B1), and
 | **Discover: workflow** ([ADR-0017](docs/adr/0017-discover-architecture-by-ablation.md)) | single pass | Plan → Execute → Verify loop | the loop refined 0 of 15 times: its count-based check never failed on a 2,700-row index | **inconclusive**, B0 default |
 | **Draft** ([ADR-0018](docs/adr/0018-draft-architecture-by-ablation.md)) | whole corpus in a cached context | corrective RAG (retrieve, grade, rewrite, gap) | both flagged 10/10 true gaps; B0 more faithful (0.83 vs 0.78), fewer outdated citations (1.4% vs 3.5%), 2x faster | **B0** |
 
-Two lessons: **the simple baseline won or tied every time** at this scale, and **one evaluation found a bug in our own rules, not the model** (a bulleted list of eligible applicant types was read as several "only X may apply" rules; fixing it took knockout precision from 0.45 to 0.91).
+Two lessons: **the simpler architecture matched or outperformed every advanced variant** at this scale (the only richer choice kept is a model: Gemini embeddings over a free local model), and **one evaluation found a bug in our own rules, not the model** (a bulleted list of eligible applicant types was read as several "only X may apply" rules; fixing it took knockout precision from 0.45 to 0.91).
 
 ## Results
 

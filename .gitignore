@@ -375,3 +375,5 @@ data/drafts/
 web/node_modules/
 web/dist/
 .inspiration-names
+# personal drafts (article, post, video) stay local
+docs/writing/

@@ -109,7 +109,7 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
   <p class="lede">An AI system that finds federal funding a small R&amp;D company can actually win, rules out the ones it is not allowed to win, and drafts the proposal from the company's own evidence. It is an open, measured take on the workflow commercial GovCon platforms sell, built on Google ADK and Google Cloud, and run the way an AI product team would run it.</p>
   <div class="meta">
     <span>Owner: Karthick Balaje (kb2326)</span>
-    <span>Current phase: M3 Draft in progress (live run)</span>
+    <span>Current phase: M3 Draft complete · M4 Ship next</span>
     <span>Last updated: 9 Oct 2026</span>
   </div>
 </header>
@@ -163,7 +163,7 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
 </section>
 
 <section id="m3">
-  <header><span class="eyebrow">Section 01·M3</span><h2>M3 Draft: write a first draft from the company's own evidence</h2></header>
+  <header><span class="eyebrow">Section 01·M3</span><h2>M3 Draft: built, measured, merged</h2></header>
   <p><b>The goal:</b> pick an analyzed opportunity and a section ("Technical Approach"). Get back a <b>first draft</b> where every claim cites a company document, a list of <b>gaps</b> (requirements with no evidence, so nothing gets invented), and <b>flags</b> on any sentence its own sources don't support. It is a starting point for a human writer, not something to submit.</p>
 
   <h3>How real proposal teams and tools do it</h3>
@@ -198,18 +198,33 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
     <li><b>Checked by you:</b> 40 (requirement, passage) pairs you label on a local page; Cohen's κ says how far to trust the Flash-Lite grader.</li>
   </ul>
 
-  <h3>Where we are</h3>
+  <h3>What the measurement showed</h3>
   <div class="tablewrap"><table>
-    <thead><tr><th>Step</th><th>Status</th><th>Cost</th></tr></thead>
+    <thead><tr><th>12 controlled tasks (46 requirements, 10 true gaps)</th><th>B0 long context</th><th>B1 corrective RAG</th></tr></thead>
     <tbody>
-      <tr><td>Code: 14 tasks, 268 tests (search, generator, B0, B1, judge, workflow, MCP server, metrics, labeling page)</td><td><span class="pill done">done</span></td><td class="num">$0</td></tr>
-      <tr><td>Corpus generated (62 docs) and checked; 345 passages loaded and embedded</td><td><span class="pill done">done</span></td><td class="num">$0.58</td></tr>
-      <tr><td>B1 run on the 12 tasks</td><td><span class="pill now">running</span></td><td class="num">≈ $0.25</td></tr>
-      <tr><td>You label 40 pairs (15–20 min)</td><td><span class="pill todo">next</span></td><td class="num">$0</td></tr>
-      <tr><td>B0 run, report, 2 real-solicitation demos, MCP check, docs</td><td><span class="pill todo">to do</span></td><td class="num">≈ $0.45</td></tr>
+      <tr><td>True gaps flagged / gaps invented</td><td class="num"><b>10 of 10 / 0</b></td><td class="num">10 of 10 / 0</td></tr>
+      <tr><td>Evidence found for supported requirements</td><td class="num">94%</td><td class="num">94%</td></tr>
+      <tr><td>Citations to outdated or off-topic documents</td><td class="num"><b>1.4%</b></td><td class="num">3.5%</td></tr>
+      <tr><td>Faithfulness (claims their sources support; AI judge)</td><td class="num"><b>0.83</b></td><td class="num">0.78</td></tr>
+      <tr><td>Time per section (median)</td><td class="num"><b>41 s</b></td><td class="num">84 s</td></tr>
     </tbody>
   </table></div>
-  <p class="muted">GPU? Not needed in M3: every step is a Gemini call on Google's servers. The GPU mattered in M2 only because EmbeddingGemma 2 ran on our own machine.</p>
+  <div class="grid2">
+    <div class="panel"><h3>What we learned</h3>
+      <ul class="tight">
+        <li><b>RAG has to earn its place.</b> With 75 documents (about 54k tokens) the whole corpus fits in one cached prompt, and reading everything beat search-grade-retry on faithfulness, outdated citations and speed. Corrective RAG stays in the code for when the library grows about tenfold.</li>
+        <li><b>Gaps are the safety feature.</b> Both designs flagged every requirement the company can't prove (hydrogen, cybersecurity, offshore wind) and never invented evidence.</li>
+        <li><b>Your 40 labels calibrated the grader:</b> κ 0.63, above the 0.6 bar. When you disagreed, the grader was stricter than you, the safe direction for gap finding.</li>
+        <li><b>Thinking tokens cost money.</b> Flash "thinking" (billed as output, up to 13k per section) made the long-context run cost 2.7x its estimate. Drafting now caps thinking at 1,024 tokens.</li>
+      </ul></div>
+    <div class="panel"><h3>Also built</h3>
+      <ul class="tight">
+        <li>Analyze quotes any <b>AI-use clause</b>; every draft starts with an AI-use notice</li>
+        <li>ADK 2 workflow with a draft-approval step and Markdown export; <code>draft_section</code> agent tool</li>
+        <li><b>MCP server</b> <code>grant-capture</code> in <code>.mcp.json</code>, verified from a real MCP client</li>
+        <li>M3 spend about $1.6-2.0; October total about $11.2-11.6, over the $10 target, so the paid demo moved to M4</li>
+      </ul></div>
+  </div>
 </section>
 
 <section id="m2">
@@ -784,7 +799,7 @@ flowchart LR
       <tr><td><b>M0 Foundation</b></td><td>Part A (laptop): scaffold, settings, Postgres schema, Grants.gov + SAM.gov ingestion, fake company documents, eval harness, ADRs, CI. Part B (cloud): Terraform, Cloud Storage, Secret Manager, Cloud SQL, service accounts, keyless GitHub sign-in, ingestion as a Cloud Run Job.</td><td>Data pipelines, schema design, Terraform, IAM, CI</td><td><span class="pill done">done</span></td></tr>
       <tr><td><b>M1 Analyze</b></td><td>Parsing and chunking, Solicitation agent, knockout rules, labeled set of 25+ solicitations</td><td>Document parsing, structured extraction, labeling, precision/recall</td><td><span class="pill done">done</span></td></tr>
       <tr><td><b>M2 Discover</b></td><td>Hybrid search, reranking, ADK 2 workflow with approval step, three ablations, local A2A, preferences</td><td>Retrieval engineering, agent graphs, human-in-the-loop</td><td><span class="pill done">done</span></td></tr>
-      <tr><td><b>M3 Draft</b></td><td>Corrective RAG over company documents, faithfulness check, MCP server</td><td>CRAG, LLM judges, citation design, MCP</td><td><span class="pill todo">to do</span></td></tr>
+      <tr><td><b>M3 Draft</b></td><td>Long context vs. corrective RAG over a 75-doc corpus, gap flags, faithfulness check, grader calibration, MCP server</td><td>CRAG, LLM judges, citation design, MCP</td><td><span class="pill done">done</span></td></tr>
       <tr><td><b>M4 Ship</b></td><td>Agent Runtime deploy, web UI, Terraform, tracing, CI eval gate, red-team set, eval report</td><td>Production deployment, LLMOps, AI security</td><td><span class="pill todo">to do</span></td></tr>
       <tr><td><b>M5 Specialize</b></td><td>Fine-tune the grader and compare it with the prompted version; Gemini reads scanned PDF pages directly, compared with Docling</td><td>Fine-tuning and multimodal, two skills that show up often in AI engineer job postings</td><td><span class="pill todo">to do</span></td></tr>
     </tbody>
@@ -863,6 +878,7 @@ flowchart LR
       <tr><td class="num">2026-10-09</td><td>OKF deferred to M3; EmbeddingGemma 2 joins the M2 embedding comparison.</td></tr>
       <tr><td class="num">2026-10-10</td><td>M2 measured: Gemini embeddings over EmbeddingGemma 2 (ADR-0020, directional), reranker off, Plan-Execute-Verify inconclusive because its loop never ran, single pass stays default (ADR-0017). M2 cost about $1.02.</td></tr>
       <tr><td class="num">2026-10-10</td><td>Local embeddings run on Kaggle's free T4 GPU instead of the laptop CPU (6 min vs ~9 h).</td></tr>
+      <tr><td class="num">2026-10-10</td><td>M3 measured: long-context drafting (B0) kept over corrective RAG (ADR-0018); grader κ 0.63 against hand labels; thinking tokens capped for drafting; October spend over the $10 target, paid demo moved to M4.</td></tr>
       <tr><td class="num">2026-10-09</td><td>Independent review of the whole M0 branch found 2 critical issues (the SAM.gov key could appear in logs; the SAM.gov daily cap could be exceeded) and 4 important ones (one bad record could end a run; attachment names could collide; failed downloads weren't retried; two SAM sources overwrote each other). All six fixed test-first (65 tests), 11 minor items noted for later. M0 merged into main.</td></tr>
       <tr><td class="num">2026-10-08</td><td>M0 Part B done: Terraform created 41 cloud resources; the loader ran as a Cloud Run Job (500 grants, 0 failures); teardown fixes added; Cloud SQL deleted and off by default. M0 complete.</td></tr>
       <tr><td class="num">2026-10-08</td><td>ADR-0019 written: Docker for local development, tests and CI; Terraform-managed Google Cloud for anything shared or deployed.</td></tr>

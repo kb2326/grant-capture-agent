@@ -50,6 +50,7 @@ class DirectChecker:
 
 
 async def _send_a2a(url: str, text: str, timeout: float) -> str:
+    import httpx
     from google.adk.agents.remote_a2a_agent import (
         AGENT_CARD_WELL_KNOWN_PATH,
         RemoteA2aAgent,
@@ -61,6 +62,8 @@ async def _send_a2a(url: str, text: str, timeout: float) -> str:
         name="analyze_remote",
         agent_card=url.rstrip("/") + AGENT_CARD_WELL_KNOWN_PATH,
         timeout=timeout,
+        # the agent's own default client times out long before Analyze (~60 s) finishes
+        httpx_client=httpx.AsyncClient(timeout=timeout),
     )
     runner = InMemoryRunner(agent=agent, app_name="discover_v4")
     session = await runner.session_service.create_session(

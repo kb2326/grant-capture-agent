@@ -39,4 +39,6 @@ analyze_agent = Agent(
     tools=[analyze_opportunity],
 )
 
-a2a_app = to_a2a(analyze_agent, port=A2A_PORT)
+# 127.0.0.1, not localhost: clients require the card URL and the fetch origin to match,
+# and "localhost" can resolve to IPv6 where uvicorn is not listening.
+a2a_app = to_a2a(analyze_agent, host="127.0.0.1", port=A2A_PORT)

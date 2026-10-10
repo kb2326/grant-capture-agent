@@ -74,14 +74,16 @@ class Settings(BaseSettings):
     price_grader_output_per_m: float = 1.50
     rerank_model: str = "semantic-ranker-default-004"
     price_rank_per_1k: float = 1.0  # Vertex AI Ranking API, per 1,000 queries
-    discover_embedding: Literal["gemini", "local"] = "gemini"  # set by the M2 ablation
-    discover_rerank: bool = True  # set by the M2 ablation
+    discover_embedding: Literal["gemini", "local"] = "gemini"  # M2 ablation, ADR-0020
+    discover_rerank: bool = (
+        False  # M2 ablation: no gain (nDCG@10 0.512 vs 0.514), extra latency
+    )
     discover_tau: float | None = None  # V3 threshold, tuned on dev queries
     discover_k: int = 5
     discover_max_iterations: int = 3
     discover_v4_transport: Literal["direct", "a2a"] = "direct"
     discover_v4_max_checks: int = 5
-    analyze_a2a_url: str = "http://localhost:8001"
+    analyze_a2a_url: str = "http://127.0.0.1:8001"
     discover_eval_budget_usd: float = 1.0  # hard cap per Discover eval stage
 
     @model_validator(mode="after")

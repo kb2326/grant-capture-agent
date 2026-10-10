@@ -53,3 +53,23 @@ def test_analyze_agent_card_is_served():
     with TestClient(a2a_app) as client:
         card = client.get("/.well-known/agent-card.json").json()
     assert card["name"] == "analyze_agent"
+
+
+def test_a2a_service_uses_vertex_ai_from_settings(monkeypatch):
+    import importlib
+    import os
+
+    import app.analyze.a2a_app as a2a_module
+    from app.config import get_settings
+
+    for k in (
+        "GOOGLE_GENAI_USE_VERTEXAI",
+        "GOOGLE_CLOUD_PROJECT",
+        "GOOGLE_CLOUD_LOCATION",
+    ):
+        monkeypatch.delenv(k, raising=False)
+    importlib.reload(a2a_module)
+    s = get_settings()
+    assert os.environ["GOOGLE_GENAI_USE_VERTEXAI"] == "TRUE"
+    assert os.environ["GOOGLE_CLOUD_PROJECT"] == s.google_cloud_project
+    assert os.environ["GOOGLE_CLOUD_LOCATION"] == s.google_cloud_location

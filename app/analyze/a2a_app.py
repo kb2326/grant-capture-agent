@@ -3,6 +3,8 @@
 Run: uv run uvicorn app.analyze.a2a_app:a2a_app --port 8001
 """
 
+import os
+
 from google.adk.a2a.utils.agent_to_a2a import to_a2a
 from google.adk.agents import Agent
 from google.adk.models import Gemini
@@ -13,6 +15,12 @@ from app.config import get_settings
 
 A2A_PORT = 8001
 
+# Run standalone (outside the playground), so point ADK's Gemini client at Vertex AI explicitly.
+_settings = get_settings()
+os.environ.setdefault("GOOGLE_GENAI_USE_VERTEXAI", "TRUE")
+os.environ.setdefault("GOOGLE_CLOUD_PROJECT", _settings.google_cloud_project)
+os.environ.setdefault("GOOGLE_CLOUD_LOCATION", _settings.google_cloud_location)
+
 analyze_agent = Agent(
     name="analyze_agent",
     description=(
@@ -20,7 +28,7 @@ analyze_agent = Agent(
         "requirements, with page citations. Send: 'Analyze opportunity <uuid>.'"
     ),
     model=Gemini(
-        model=get_settings().model_agent,
+        model=_settings.model_agent,
         retry_options=types.HttpRetryOptions(attempts=3),
     ),
     instruction=(

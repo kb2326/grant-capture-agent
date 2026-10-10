@@ -15,6 +15,19 @@
 - **Next: M3 Draft** (brainstorm → spec → plan).
 - Open data items: SAM.gov attachments for the 12 sampled notices were never fetched (quota spent on a failed run, since fixed); retry one notice first: `uv run python -m ingest sam-attachments --notice <id>`. NIH announcements sit behind a bot challenge and are not fetched.
 
+## Deferred minors from the M2 review
+- A2A client: the thread pool's shutdown waits past the result timeout; the `httpx.AsyncClient` is never closed.
+- A negation-only query (`-solar`) gives every card an arbitrary sparse rank (`ts_rank_cd` = 0); skip sparse search when the query has no positive terms.
+- `verify` adds rejected candidates' `source_id` to `seen`, so a later copy is labelled V5 instead of its real reason.
+- A plan edit that is not JSON ("drop defense") silently runs the original plan; say it was ignored or re-prompt.
+- A stored `min_award_usd` floor can never be lowered (max of all stored values).
+- `embed_cards`: a batch returning fewer vectors raises outside the try and aborts the run.
+- `run_arm` loses the spend of a query that raises without `cost_usd`, and always runs the first query.
+- `open_session` builds a new engine per tool call and never disposes of it; cache the engine.
+- `build_cards` loads every row at once; use `yield_per` as the index grows.
+- An empty `why` (the explainer skipped a weak match) shows as blank; label it "weak match".
+- Coverage gaps: AGENCY_ALIASES covers DoD/HHS/DOE/USDA/DHS/NASA/NSF only; an exclusion that matches no agency is not reported.
+
 ## Deferred minors from the M1 review
 - Quote normalization misses curly quotes and bullets; `MIN_QUOTE_CHARS` rejects "Phase II".
 - Prompt-injection: injected text can make the model omit a clause; escape delimiter look-alikes inside documents.

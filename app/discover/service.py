@@ -215,10 +215,13 @@ def discover(
 ) -> DiscoverResult:
     if deps.llm is None:
         raise ValueError("discover needs a planner model")
+    in0, out0 = deps.llm.total_tokens_in, deps.llm.total_tokens_out
     plan = make_plan(deps.llm, request, profile, prefs)
+    plan_in = deps.llm.total_tokens_in - in0
+    plan_out = deps.llm.total_tokens_out - out0
     if approve is not None:
         plan = approve(plan)
-    return run_plan(
+    result = run_plan(
         deps,
         request,
         plan,
@@ -226,4 +229,14 @@ def discover(
         profile=profile,
         prefs=prefs,
         explain_top=explain_top,
+    )
+    s = deps.settings  # the planning call happens before run_plan starts counting
+    return result.model_copy(
+        update={
+            "tokens_in": result.tokens_in + plan_in,
+            "tokens_out": result.tokens_out + plan_out,
+            "cost_usd": result.cost_usd
+            + plan_in * s.price_agent_input_per_m / 1e6
+            + plan_out * s.price_agent_output_per_m / 1e6,
+        }
     )

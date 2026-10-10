@@ -158,3 +158,16 @@ def test_cost_counts_llm_embeddings_and_rerank_calls(patched):
     r = _run(d, "B0", first=("a", "b"))
     expected = 20 * s.price_embedding_per_m / 1e6 + 1 * s.price_rank_per_1k / 1000
     assert r.cost_usd == pytest.approx(expected)
+
+
+def test_discover_cost_includes_the_planning_call(patched):
+    from app.discover.service import discover
+
+    s = Settings(_env_file=None)
+    d = deps(llm=PlanLLM(plan("a")))
+    r = discover(d, "req", variant="B0", profile={}, prefs=[], explain_top=False)
+    assert (r.tokens_in, r.tokens_out) == (100, 10)
+    expected = (
+        100 * s.price_agent_input_per_m / 1e6 + 10 * s.price_agent_output_per_m / 1e6
+    )
+    assert r.cost_usd == pytest.approx(expected + 1 * s.price_rank_per_1k / 1000)

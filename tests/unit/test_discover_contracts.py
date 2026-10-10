@@ -14,7 +14,7 @@ def test_discover_settings_defaults():
         5,
     )
     assert s.model_embedding_local == "google/embeddinggemma-2"
-    assert s.discover_embedding == "gemini" and s.discover_rerank is True
+    assert s.discover_embedding == "gemini" and s.discover_rerank is False
     assert s.discover_eval_budget_usd <= 2.0
 
 

@@ -365,6 +365,7 @@ credentials*.json
 data/blobs/
 reports/*
 !reports/m1/
+!reports/m2/
 .terraform/
 *.tfstate*
 data/cache/

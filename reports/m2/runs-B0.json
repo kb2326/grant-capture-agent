@@ -1,0 +1,1289 @@
+[
+ {
+  "query_id": "q01",
+  "ranked": [
+   "80eb42c8-a9ec-4b25-88f8-2edc04ed17d4",
+   "aede51e0-0d98-4708-86a5-8b29dff5421b",
+   "c57a87c2-76fc-4d66-820e-7558c1fd569a",
+   "e3003745-a3c9-4d0d-a679-5ce605dff8b7",
+   "37e6b864-dbb4-45fa-b71f-88396755d291",
+   "dce95aa2-7cab-4168-b53a-d336b17ac668",
+   "e6c20464-a917-4418-8ec7-5835d28242e2",
+   "2ed3b77d-36f5-4897-9910-c8936ebee078",
+   "6ebbadc7-895e-4e8e-8d3c-7202a9ea9e31",
+   "faeca99c-6056-45b5-8a05-ef8d8864e1cd"
+  ],
+  "iterations": 1,
+  "plans": [
+   {
+    "intent": "Identify DOE ARPA-E funding opportunities targeting solid-state battery management systems and controls for utility-scale grid energy storage.",
+    "queries": [
+     {
+      "text": "ARPA-E solid state battery management grid storage",
+      "kinds": [
+       "grant",
+       "sbir",
+       "sttr"
+      ],
+      "agencies": [
+       "Advanced Research Projects Agency Energy",
+       "Department of Energy"
+      ],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "utility scale battery management system energy storage",
+      "kinds": [
+       "grant",
+       "sbir",
+       "sttr"
+      ],
+      "agencies": [
+       "Department of Energy"
+      ],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "solid-state battery degradation monitoring grid storage controls",
+      "kinds": [
+       "grant",
+       "sbir",
+       "sttr"
+      ],
+      "agencies": [
+       "Department of Energy"
+      ],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     }
+    ],
+    "must_have": [
+     "Department of Energy or ARPA-E funding"
+    ],
+    "exclude": []
+   }
+  ],
+  "cost_usd": 0.00376665,
+  "latency_s": 12.077999999979511
+ },
+ {
+  "query_id": "q02",
+  "ranked": [
+   "274e835c-b396-41b9-a650-a75a32fbff55",
+   "6f2437e0-c7de-4f6e-8777-1378340e3c1d",
+   "dbc452c9-fbe7-4abb-bd82-bff93f370818",
+   "23a76bbf-4ba4-49dc-bb3a-7e68bc7c86d6",
+   "7eed3be4-4317-4459-8923-89ae837adab5",
+   "91f8a334-8d04-4ba9-9fda-0eca5b786e87",
+   "48b74c13-a789-488a-b8fb-ff37ec04ba9e",
+   "a1fba611-c966-4598-9461-e3895615195d",
+   "a28bd326-0104-4590-a76a-2b825cd0c2a0",
+   "eecc6729-c14b-43ff-9060-95574cca324b"
+  ],
+  "iterations": 1,
+  "plans": [
+   {
+    "intent": "Find DOE Office of Electricity SBIR/STTR opportunities for advanced battery management system (BMS) telemetry and state-of-health monitoring in solid-state batteries.",
+    "queries": [
+     {
+      "text": "solid-state battery management system BMS telemetry state of health",
+      "kinds": [
+       "sbir",
+       "sttr"
+      ],
+      "agencies": [
+       "Department of Energy"
+      ],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "BMS sensor telemetry state of health monitoring grid storage",
+      "kinds": [
+       "sbir",
+       "sttr"
+      ],
+      "agencies": [
+       "Department of Energy"
+      ],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "solid state energy storage battery degradation monitoring diagnostics",
+      "kinds": [
+       "sbir",
+       "sttr"
+      ],
+      "agencies": [
+       "Department of Energy"
+      ],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     }
+    ],
+    "must_have": [
+     "Department of Energy (DOE)",
+     "SBIR or STTR",
+     "BMS telemetry or state-of-health monitoring"
+    ],
+    "exclude": []
+   }
+  ],
+  "cost_usd": 0.0035697,
+  "latency_s": 12.625
+ },
+ {
+  "query_id": "q03",
+  "ranked": [
+   "274e835c-b396-41b9-a650-a75a32fbff55",
+   "2a5e36cc-aba1-4247-aea6-43deef693f6e",
+   "dbc452c9-fbe7-4abb-bd82-bff93f370818",
+   "48b74c13-a789-488a-b8fb-ff37ec04ba9e",
+   "de353503-fbc1-48fa-b9de-f75f65d89a60",
+   "7eed3be4-4317-4459-8923-89ae837adab5",
+   "a28bd326-0104-4590-a76a-2b825cd0c2a0",
+   "0a1b8b31-2459-4d77-a330-e102db6d0acf",
+   "23a76bbf-4ba4-49dc-bb3a-7e68bc7c86d6",
+   "a1fba611-c966-4598-9461-e3895615195d"
+  ],
+  "iterations": 1,
+  "plans": [
+   {
+    "intent": "Find DoD SBIR Phase I funding opportunities for high-frequency silicon carbide power converters in expeditionary microgrid applications.",
+    "queries": [
+     {
+      "text": "silicon carbide expeditionary microgrid power converter",
+      "kinds": [
+       "sbir"
+      ],
+      "agencies": [
+       "Department of Defense"
+      ],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "high frequency SiC power electronics tactical microgrid",
+      "kinds": [
+       "sbir"
+      ],
+      "agencies": [
+       "Department of Defense"
+      ],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "wide bandgap power converter expeditionary energy storage",
+      "kinds": [
+       "sbir"
+      ],
+      "agencies": [
+       "Department of Defense"
+      ],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "grid forming inverter silicon carbide tactical microgrid",
+      "kinds": [
+       "sbir"
+      ],
+      "agencies": [
+       "Department of Defense"
+      ],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     }
+    ],
+    "must_have": [
+     "Department of Defense",
+     "SBIR Phase I"
+    ],
+    "exclude": []
+   }
+  ],
+  "cost_usd": 0.0048216,
+  "latency_s": 16.858999999938533
+ },
+ {
+  "query_id": "q04",
+  "ranked": [
+   "2a8e455c-27fa-4714-8698-de3fdc4bb8a6",
+   "795976fe-2426-4487-b343-b12577549f7e",
+   "e3003745-a3c9-4d0d-a679-5ce605dff8b7",
+   "034d3a9c-7145-4139-a178-c84e9287cfa9",
+   "ad935dbe-ee6d-449b-a7fb-16896a841c19",
+   "aede51e0-0d98-4708-86a5-8b29dff5421b",
+   "94b46471-18ba-4811-b9a7-380184352bd8",
+   "b32990e0-1c15-4c85-86ae-ff5694248614",
+   "eb370cbd-596e-49b6-9461-04370a904218",
+   "87fc9dd4-53a5-46b6-a281-9f63c3c5a3e8"
+  ],
+  "iterations": 1,
+  "plans": [
+   {
+    "intent": "Find Office of Naval Research BAA funding opportunities for GaN-based power conversion and compact shipboard inverters.",
+    "queries": [
+     {
+      "text": "gallium nitride power conversion shipboard",
+      "kinds": [
+       "grant",
+       "contract"
+      ],
+      "agencies": [
+       "Office of Naval Research",
+       "Department of the Navy"
+      ],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "GaN compact power electronics inverter",
+      "kinds": [
+       "grant",
+       "contract"
+      ],
+      "agencies": [
+       "Office of Naval Research",
+       "Department of the Navy"
+      ],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "naval wide bandgap power converter BAA",
+      "kinds": [
+       "grant",
+       "contract"
+      ],
+      "agencies": [
+       "Office of Naval Research",
+       "Department of the Navy"
+      ],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     }
+    ],
+    "must_have": [
+     "Office of Naval Research"
+    ],
+    "exclude": []
+   }
+  ],
+  "cost_usd": 0.0036670500000000003,
+  "latency_s": 35.78200000000652
+ },
+ {
+  "query_id": "q05",
+  "ranked": [
+   "87fc9dd4-53a5-46b6-a281-9f63c3c5a3e8",
+   "aede51e0-0d98-4708-86a5-8b29dff5421b",
+   "e3003745-a3c9-4d0d-a679-5ce605dff8b7",
+   "80eb42c8-a9ec-4b25-88f8-2edc04ed17d4",
+   "e6c20464-a917-4418-8ec7-5835d28242e2",
+   "0438c58d-3cb2-4150-b349-6190000deb89",
+   "6ead3ef6-8026-4aec-926a-0d82d1549525",
+   "96ede6bf-2081-49ca-a66b-27bbb0d1f504",
+   "6ebbadc7-895e-4e8e-8d3c-7202a9ea9e31",
+   "7ff906bd-0edd-462f-b08b-9a94daa8611d"
+  ],
+  "iterations": 1,
+  "plans": [
+   {
+    "intent": "Find DOE Solar Energy Technologies Office grant opportunities for grid-forming inverter controls supporting black-start and synthetic inertia capabilities.",
+    "queries": [
+     {
+      "text": "grid-forming inverter black start synthetic inertia",
+      "kinds": [
+       "grant"
+      ],
+      "agencies": [
+       "Department of Energy"
+      ],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "Solar Energy Technologies Office grid-forming inverters",
+      "kinds": [
+       "grant"
+      ],
+      "agencies": [
+       "Department of Energy"
+      ],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "inverter-based resources black start grid-forming controls",
+      "kinds": [
+       "grant"
+      ],
+      "agencies": [
+       "Department of Energy"
+      ],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     }
+    ],
+    "must_have": [
+     "Department of Energy or SETO",
+     "grid-forming inverters"
+    ],
+    "exclude": []
+   }
+  ],
+  "cost_usd": 0.0040624500000000004,
+  "latency_s": 12.577999999979511
+ },
+ {
+  "query_id": "q06",
+  "ranked": [
+   "94b46471-18ba-4811-b9a7-380184352bd8",
+   "a0ac3622-237c-4bfe-b8d6-f444c5d173d4",
+   "d07407d1-4f6f-4a08-9da8-e244076245cc",
+   "aede51e0-0d98-4708-86a5-8b29dff5421b",
+   "e91be801-041d-487f-ae53-5e5e8f9d10f1",
+   "67a0d60e-de38-4e0a-94e4-32d88cd57ba0",
+   "6ebbadc7-895e-4e8e-8d3c-7202a9ea9e31",
+   "cac94eb7-971c-4002-bbb6-a808a998e902",
+   "b3492fc2-cdec-4892-9c1d-f1160d93c746",
+   "e6f1349c-4886-4303-8652-0970dcfa8ef4"
+  ],
+  "iterations": 1,
+  "plans": [
+   {
+    "intent": "Identify DOD ESTCP and defense funding opportunities for field testing and demonstration of grid-forming inverters on military microgrids.",
+    "queries": [
+     {
+      "text": "ESTCP grid-forming inverter microgrid demonstration",
+      "kinds": [
+       "contract",
+       "grant"
+      ],
+      "agencies": [
+       "Department of Defense"
+      ],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "installation energy resilience microgrid grid-forming",
+      "kinds": [
+       "contract",
+       "grant"
+      ],
+      "agencies": [
+       "Department of Defense"
+      ],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "ESTCP installation energy battery energy storage inverter",
+      "kinds": [
+       "contract",
+       "grant"
+      ],
+      "agencies": [
+       "Department of Defense"
+      ],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     }
+    ],
+    "must_have": [
+     "ESTCP or DoD installation microgrid demonstration"
+    ],
+    "exclude": []
+   }
+  ],
+  "cost_usd": 0.00303,
+  "latency_s": 9.625
+ },
+ {
+  "query_id": "q07",
+  "ranked": [
+   "2a8e455c-27fa-4714-8698-de3fdc4bb8a6",
+   "67a0d60e-de38-4e0a-94e4-32d88cd57ba0",
+   "94b46471-18ba-4811-b9a7-380184352bd8",
+   "37bb1615-6639-4668-8abe-b77162bb8862",
+   "ad935dbe-ee6d-449b-a7fb-16896a841c19",
+   "d07407d1-4f6f-4a08-9da8-e244076245cc",
+   "bd566d51-ce77-4e30-982a-4aa9f537f445",
+   "e91be801-041d-487f-ae53-5e5e8f9d10f1",
+   "fe20fec0-6e85-44df-ab27-033b6b667b0d",
+   "68e176f8-44b0-431e-b107-44864c871668"
+  ],
+  "iterations": 1,
+  "plans": [
+   {
+    "intent": "Find AFRL contract opportunities for controller hardware-in-the-loop (CHIL) testing of high-voltage aircraft power electronics.",
+    "queries": [
+     {
+      "text": "controller hardware-in-the-loop aircraft power electronics",
+      "kinds": [
+       "contract"
+      ],
+      "agencies": [
+       "Department of the Air Force"
+      ],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "CHIL high voltage power distribution testing",
+      "kinds": [
+       "contract"
+      ],
+      "agencies": [
+       "Department of the Air Force"
+      ],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "hardware-in-the-loop wide bandgap aircraft converters",
+      "kinds": [
+       "contract"
+      ],
+      "agencies": [
+       "Department of the Air Force"
+      ],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     }
+    ],
+    "must_have": [
+     "Air Force Research Laboratory or Air Force solicitation",
+     "Hardware-in-the-loop or power electronics focus"
+    ],
+    "exclude": []
+   }
+  ],
+  "cost_usd": 0.00400575,
+  "latency_s": 11.14000000001397
+ },
+ {
+  "query_id": "q08",
+  "ranked": [
+   "0153f75d-71d4-44c9-ae6c-61847d7b0334",
+   "8a768752-a299-4a8c-bde4-02e51d94f78c",
+   "94b46471-18ba-4811-b9a7-380184352bd8",
+   "e3003745-a3c9-4d0d-a679-5ce605dff8b7",
+   "1fd4fd51-1e10-469b-9406-e2fa717c217f",
+   "68e176f8-44b0-431e-b107-44864c871668",
+   "269e3040-b4ee-4bc0-a317-260d33d42b1a",
+   "a42aba09-69c4-47ec-bc05-e20ccdc97e53",
+   "aede51e0-0d98-4708-86a5-8b29dff5421b",
+   "eee9c17a-20b0-47dc-816c-dccd581151c2"
+  ],
+  "iterations": 1,
+  "plans": [
+   {
+    "intent": "Find DOE EERE funding opportunities focused on hardware-in-the-loop testing and validation of smart inverters and power conditioning systems.",
+    "queries": [
+     {
+      "text": "hardware-in-the-loop smart inverter",
+      "kinds": [],
+      "agencies": [
+       "Department of Energy"
+      ],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "power conditioning system inverter validation",
+      "kinds": [],
+      "agencies": [
+       "Department of Energy"
+      ],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "grid-forming inverter HIL testing",
+      "kinds": [],
+      "agencies": [
+       "Department of Energy"
+      ],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "power electronics hardware in the loop simulation",
+      "kinds": [],
+      "agencies": [
+       "Department of Energy"
+      ],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     }
+    ],
+    "must_have": [
+     "Department of Energy or EERE",
+     "Hardware-in-the-loop or smart inverter validation"
+    ],
+    "exclude": []
+   }
+  ],
+  "cost_usd": 0.0035103,
+  "latency_s": 11.40700000000652
+ },
+ {
+  "query_id": "q09",
+  "ranked": [
+   "48b74c13-a789-488a-b8fb-ff37ec04ba9e",
+   "dbc452c9-fbe7-4abb-bd82-bff93f370818",
+   "274e835c-b396-41b9-a650-a75a32fbff55",
+   "91f8a334-8d04-4ba9-9fda-0eca5b786e87",
+   "a28bd326-0104-4590-a76a-2b825cd0c2a0",
+   "a1fba611-c966-4598-9461-e3895615195d",
+   "23a76bbf-4ba4-49dc-bb3a-7e68bc7c86d6",
+   "2a5e36cc-aba1-4247-aea6-43deef693f6e",
+   "7eed3be4-4317-4459-8923-89ae837adab5",
+   "de353503-fbc1-48fa-b9de-f75f65d89a60"
+  ],
+  "iterations": 1,
+  "plans": [
+   {
+    "intent": "Find NSF Phase I SBIR opportunities for AI and machine learning-driven battery degradation modeling and grid-scale storage cycling analytics.",
+    "queries": [
+     {
+      "text": "battery degradation modeling artificial intelligence machine learning",
+      "kinds": [
+       "sbir"
+      ],
+      "agencies": [
+       "National Science Foundation"
+      ],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "grid energy storage battery health state of health cycling",
+      "kinds": [
+       "sbir"
+      ],
+      "agencies": [
+       "National Science Foundation"
+      ],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "predictive battery management system grid storage degradation",
+      "kinds": [
+       "sbir"
+      ],
+      "agencies": [
+       "National Science Foundation"
+      ],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     }
+    ],
+    "must_have": [
+     "NSF",
+     "SBIR Phase I"
+    ],
+    "exclude": []
+   }
+  ],
+  "cost_usd": 0.00303435,
+  "latency_s": 10.297000000020489
+ },
+ {
+  "query_id": "q10",
+  "ranked": [
+   "c57a87c2-76fc-4d66-820e-7558c1fd569a",
+   "39962c14-ed79-46c3-a99f-1ca83c50c080",
+   "aede51e0-0d98-4708-86a5-8b29dff5421b",
+   "d83fc3e4-815e-4f2b-9f7b-cc944ed63026",
+   "640c3696-54a0-4a3d-aa65-7c04f3de41e5",
+   "a5bcbc82-6ebc-4b79-96e9-2bd456fa832f",
+   "fd0d9f61-753d-4388-b205-8073f52dbe09",
+   "0b0afc78-0f4d-4b97-9552-7edfd43fad85",
+   "e6c20464-a917-4418-8ec7-5835d28242e2",
+   "fa702342-a50a-4fc7-b834-87ef4f3ef577"
+  ],
+  "iterations": 1,
+  "plans": [
+   {
+    "intent": "Find DOE Vehicle Technologies Office grants supporting prognostic modeling of solid-state lithium battery degradation.",
+    "queries": [
+     {
+      "text": "solid state battery degradation modeling Vehicle Technologies Office",
+      "kinds": [
+       "grant"
+      ],
+      "agencies": [
+       "Department of Energy"
+      ],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "solid-state lithium battery lifetime prognostic modeling",
+      "kinds": [
+       "grant",
+       "sbir"
+      ],
+      "agencies": [
+       "Department of Energy"
+      ],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "advanced battery management state of health degradation prediction",
+      "kinds": [
+       "grant"
+      ],
+      "agencies": [
+       "Department of Energy"
+      ],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     }
+    ],
+    "must_have": [
+     "Department of Energy or Vehicle Technologies Office"
+    ],
+    "exclude": []
+   }
+  ],
+  "cost_usd": 0.00434685,
+  "latency_s": 13.045999999972992
+ },
+ {
+  "query_id": "q11",
+  "ranked": [
+   "94b46471-18ba-4811-b9a7-380184352bd8",
+   "e6c20464-a917-4418-8ec7-5835d28242e2",
+   "8df07876-4c4a-4469-b3c2-3c2857a6ea24",
+   "aede51e0-0d98-4708-86a5-8b29dff5421b",
+   "e3003745-a3c9-4d0d-a679-5ce605dff8b7",
+   "67a0d60e-de38-4e0a-94e4-32d88cd57ba0",
+   "87fc9dd4-53a5-46b6-a281-9f63c3c5a3e8",
+   "fe20fec0-6e85-44df-ab27-033b6b667b0d",
+   "a94e0517-7ba7-4354-a826-f2a9a76cf7e5",
+   "d07407d1-4f6f-4a08-9da8-e244076245cc"
+  ],
+  "iterations": 1,
+  "plans": [
+   {
+    "intent": "Find federal funding opportunities to support research and development of advanced power converters and inverters.",
+    "queries": [
+     {
+      "text": "wide bandgap power converters inverter SiC GaN",
+      "kinds": [
+       "grant",
+       "sbir",
+       "sttr",
+       "contract"
+      ],
+      "agencies": [],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "grid forming inverter controls power electronics",
+      "kinds": [
+       "grant",
+       "sbir",
+       "sttr",
+       "contract"
+      ],
+      "agencies": [],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "advanced power electronics inverter grid energy storage",
+      "kinds": [
+       "grant",
+       "sbir",
+       "sttr",
+       "contract"
+      ],
+      "agencies": [],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "hardware in the loop testing power converters",
+      "kinds": [
+       "grant",
+       "sbir",
+       "sttr",
+       "contract"
+      ],
+      "agencies": [],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     }
+    ],
+    "must_have": [],
+    "exclude": []
+   }
+  ],
+  "cost_usd": 0.0033074999999999997,
+  "latency_s": 13.0
+ },
+ {
+  "query_id": "q12",
+  "ranked": [
+   "604485b0-403f-4809-8fef-c600d4742b64",
+   "c57a87c2-76fc-4d66-820e-7558c1fd569a",
+   "15b7bbf4-3ce3-4c61-b801-5e48bdd7c21a",
+   "80eb42c8-a9ec-4b25-88f8-2edc04ed17d4",
+   "aede51e0-0d98-4708-86a5-8b29dff5421b",
+   "256a8edd-75e4-4122-bc53-2b6200933eba",
+   "e3003745-a3c9-4d0d-a679-5ce605dff8b7",
+   "30c26f99-74a1-4461-bbf2-8ed74810b200",
+   "e6c20464-a917-4418-8ec7-5835d28242e2",
+   "f8d08d74-b264-4aa0-b53b-4cae0f2c8b33"
+  ],
+  "iterations": 1,
+  "plans": [
+   {
+    "intent": "Find federal grants and SBIR/STTR opportunities to support research and development of next-generation battery management systems.",
+    "queries": [
+     {
+      "text": "battery management system BMS",
+      "kinds": [
+       "grant",
+       "sbir",
+       "sttr"
+      ],
+      "agencies": [],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "solid-state battery management energy storage",
+      "kinds": [
+       "grant",
+       "sbir",
+       "sttr"
+      ],
+      "agencies": [],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "battery state of charge health degradation modeling",
+      "kinds": [
+       "grant",
+       "sbir",
+       "sttr"
+      ],
+      "agencies": [],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     }
+    ],
+    "must_have": [],
+    "exclude": []
+   }
+  ],
+  "cost_usd": 0.00215745,
+  "latency_s": 7.407000000006519
+ },
+ {
+  "query_id": "q13",
+  "ranked": [
+   "ca86c0c4-85ed-488b-b389-25310ee4f464",
+   "0b945e31-6034-4080-b4d6-2db133b9df0e",
+   "9155774b-7f5c-4801-b282-24b7aeed9d18",
+   "94b46471-18ba-4811-b9a7-380184352bd8",
+   "269e3040-b4ee-4bc0-a317-260d33d42b1a",
+   "ac9023d4-8fc6-4ac1-a10a-a8d29c564ce1",
+   "cac94eb7-971c-4002-bbb6-a808a998e902",
+   "d07407d1-4f6f-4a08-9da8-e244076245cc",
+   "fe20fec0-6e85-44df-ab27-033b6b667b0d",
+   "0153f75d-71d4-44c9-ae6c-61847d7b0334"
+  ],
+  "iterations": 1,
+  "plans": [
+   {
+    "intent": "Identify federal solicitations for testing, hardware-in-the-loop validation, and simulation of clean energy hardware, power electronics, and energy storage systems.",
+    "queries": [
+     {
+      "text": "hardware in the loop testing power electronics",
+      "kinds": [],
+      "agencies": [],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "battery energy storage testing simulation modeling",
+      "kinds": [],
+      "agencies": [],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "grid forming inverter laboratory testing validation",
+      "kinds": [],
+      "agencies": [],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "power converter simulation testing clean energy",
+      "kinds": [],
+      "agencies": [],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     }
+    ],
+    "must_have": [],
+    "exclude": []
+   }
+  ],
+  "cost_usd": 0.0028814999999999995,
+  "latency_s": 7.531000000075437
+ },
+ {
+  "query_id": "q14",
+  "ranked": [
+   "cac94eb7-971c-4002-bbb6-a808a998e902",
+   "93311ad3-c25b-4ae7-998b-c2482d366309",
+   "94b46471-18ba-4811-b9a7-380184352bd8",
+   "b808e8d7-01a4-4109-8142-50906a36ba19",
+   "b754bfcf-223e-4999-a9b1-57ea99ce7e03",
+   "c57a87c2-76fc-4d66-820e-7558c1fd569a",
+   "5fb619d5-6c96-4fa3-b901-7d13f7d8a123",
+   "711284ae-e052-4462-845e-9c1a253cc04e",
+   "fe99c7f9-4cbe-4dc6-9565-acd31eb4d7d8",
+   "e1cae15a-a073-4aa6-af11-fb23754cfc10"
+  ],
+  "iterations": 1,
+  "plans": [
+   {
+    "intent": "Find federal funding opportunities for software and algorithms focused on battery degradation modeling and remaining useful life prediction.",
+    "queries": [
+     {
+      "text": "battery degradation modeling software lifetime prediction",
+      "kinds": [
+       "grant",
+       "sbir",
+       "sttr",
+       "contract"
+      ],
+      "agencies": [],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "battery remaining useful life state of health prognostics",
+      "kinds": [
+       "grant",
+       "sbir",
+       "sttr",
+       "contract"
+      ],
+      "agencies": [],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "battery management system lifetime analytics modeling",
+      "kinds": [
+       "grant",
+       "sbir",
+       "sttr",
+       "contract"
+      ],
+      "agencies": [],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     }
+    ],
+    "must_have": [],
+    "exclude": []
+   }
+  ],
+  "cost_usd": 0.0019428000000000002,
+  "latency_s": 5.140999999945052
+ },
+ {
+  "query_id": "q15",
+  "ranked": [
+   "94b46471-18ba-4811-b9a7-380184352bd8",
+   "0153f75d-71d4-44c9-ae6c-61847d7b0334",
+   "cac94eb7-971c-4002-bbb6-a808a998e902",
+   "e6c20464-a917-4418-8ec7-5835d28242e2",
+   "e91be801-041d-487f-ae53-5e5e8f9d10f1",
+   "6084b2cc-7a81-4309-9933-5e9d636124a4",
+   "67a0d60e-de38-4e0a-94e4-32d88cd57ba0",
+   "aede51e0-0d98-4708-86a5-8b29dff5421b",
+   "87fc9dd4-53a5-46b6-a281-9f63c3c5a3e8",
+   "d07407d1-4f6f-4a08-9da8-e244076245cc"
+  ],
+  "iterations": 1,
+  "plans": [
+   {
+    "intent": "Identify federal funding and contract opportunities for technologies supporting electrical grid stability, renewable integration, power electronics, and battery storage.",
+    "queries": [
+     {
+      "text": "grid-forming inverter renewable integration",
+      "kinds": [],
+      "agencies": [],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "battery energy storage grid stability management",
+      "kinds": [],
+      "agencies": [],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "wide-bandgap power converter grid reliability",
+      "kinds": [],
+      "agencies": [],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "hardware-in-the-loop power electronics grid simulation",
+      "kinds": [],
+      "agencies": [],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     }
+    ],
+    "must_have": [],
+    "exclude": []
+   }
+  ],
+  "cost_usd": 0.00210165,
+  "latency_s": 7.155999999959022
+ },
+ {
+  "query_id": "d01",
+  "ranked": [
+   "2b989bdd-3f04-48ec-9d99-9aff837809ad",
+   "bce9ce3e-2b75-433d-bb3a-530a0bd9e3a3",
+   "1b4d5c2b-a72b-4988-a78e-890f72808917",
+   "b4b0da2d-7b4c-416b-a286-e20d9dca9869",
+   "0a2ea42e-70b6-47bf-8729-2e472fe10f32",
+   "e72084c8-24a0-4039-8d94-133c15198d0b",
+   "03443d3c-a447-4686-bda6-c79e28296f93",
+   "d9ec3d41-9e53-4322-befd-190cf0c536de",
+   "328fa5b1-85f2-41ea-9706-54106777616c",
+   "8718502e-117f-4654-86d8-0df29c9bb997"
+  ],
+  "iterations": 1,
+  "plans": [
+   {
+    "intent": "Find DARPA solicitations for ultra-compact wide-bandgap power conversion modules operable in extreme environments.",
+    "queries": [
+     {
+      "text": "DARPA wide-bandgap power electronic conversion extreme environment",
+      "kinds": [],
+      "agencies": [
+       "DARPA",
+       "Defense Advanced Research Projects Agency"
+      ],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "ultra-compact power converter GaN SiC extreme",
+      "kinds": [],
+      "agencies": [
+       "DARPA",
+       "Defense Advanced Research Projects Agency"
+      ],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "high power density wide bandgap power electronics DARPA",
+      "kinds": [],
+      "agencies": [
+       "DARPA",
+       "Defense Advanced Research Projects Agency"
+      ],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     }
+    ],
+    "must_have": [
+     "DARPA",
+     "wide-bandgap power electronics"
+    ],
+    "exclude": []
+   }
+  ],
+  "cost_usd": 0.0038079000000000003,
+  "latency_s": 11.828000000095926
+ },
+ {
+  "query_id": "d02",
+  "ranked": [
+   "aede51e0-0d98-4708-86a5-8b29dff5421b",
+   "2ed3b77d-36f5-4897-9910-c8936ebee078",
+   "87fc9dd4-53a5-46b6-a281-9f63c3c5a3e8",
+   "e6c20464-a917-4418-8ec7-5835d28242e2",
+   "6ebbadc7-895e-4e8e-8d3c-7202a9ea9e31",
+   "e3003745-a3c9-4d0d-a679-5ce605dff8b7",
+   "37e6b864-dbb4-45fa-b71f-88396755d291",
+   "6ead3ef6-8026-4aec-926a-0d82d1549525",
+   "0438c58d-3cb2-4150-b349-6190000deb89",
+   "10e12c5d-7a76-4539-852d-6a86b8a566a8"
+  ],
+  "iterations": 1,
+  "plans": [
+   {
+    "intent": "Find ARPA-E OPEN and related funding opportunities focused on wide-bandgap power electronics and power converters for distributed energy resources.",
+    "queries": [
+     {
+      "text": "ARPA-E OPEN wide-bandgap power electronics",
+      "kinds": [
+       "grant"
+      ],
+      "agencies": [
+       "Department of Energy"
+      ],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "ARPA-E wide bandgap inverter distributed energy resources",
+      "kinds": [
+       "grant"
+      ],
+      "agencies": [
+       "Department of Energy"
+      ],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "ARPA-E SiC GaN power converter grid",
+      "kinds": [
+       "grant"
+      ],
+      "agencies": [
+       "Department of Energy"
+      ],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "ARPA-E high-efficiency power conversion distributed generation",
+      "kinds": [
+       "grant"
+      ],
+      "agencies": [
+       "Department of Energy"
+      ],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     }
+    ],
+    "must_have": [
+     "ARPA-E"
+    ],
+    "exclude": []
+   }
+  ],
+  "cost_usd": 0.00404985,
+  "latency_s": 13.640999999945052
+ },
+ {
+  "query_id": "d03",
+  "ranked": [
+   "94b46471-18ba-4811-b9a7-380184352bd8",
+   "cac94eb7-971c-4002-bbb6-a808a998e902",
+   "67a0d60e-de38-4e0a-94e4-32d88cd57ba0",
+   "aede51e0-0d98-4708-86a5-8b29dff5421b",
+   "d07407d1-4f6f-4a08-9da8-e244076245cc",
+   "e91be801-041d-487f-ae53-5e5e8f9d10f1",
+   "4ace6ff9-c963-47b7-8ae0-af729ef1bcb7",
+   "367bda73-4a21-4201-9914-10e5dfc7381b",
+   "e3003745-a3c9-4d0d-a679-5ce605dff8b7",
+   "806f71a9-8e09-47a3-9ef0-1c63569d2bd6"
+  ],
+  "iterations": 1,
+  "plans": [
+   {
+    "intent": "Identify DOE and Grid Modernization Laboratory Consortium (GMLC) funding opportunities for utility-scale battery inverter firmware and grid-forming control development.",
+    "queries": [
+     {
+      "text": "grid modernization laboratory consortium battery inverter firmware",
+      "kinds": [
+       "grant",
+       "contract",
+       "sbir"
+      ],
+      "agencies": [],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "utility-scale battery grid-forming inverter controls firmware DOE",
+      "kinds": [
+       "grant",
+       "contract"
+      ],
+      "agencies": [],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "GMLC power electronics energy storage inverter controls",
+      "kinds": [
+       "grant",
+       "contract"
+      ],
+      "agencies": [],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "grid modernization lab call battery storage power converter firmware",
+      "kinds": [
+       "grant",
+       "contract",
+       "sbir"
+      ],
+      "agencies": [],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     }
+    ],
+    "must_have": [
+     "utility-scale battery or power converter inverter firmware/controls"
+    ],
+    "exclude": []
+   }
+  ],
+  "cost_usd": 0.00288315,
+  "latency_s": 9.125
+ },
+ {
+  "query_id": "d04",
+  "ranked": [
+   "80eb42c8-a9ec-4b25-88f8-2edc04ed17d4",
+   "aede51e0-0d98-4708-86a5-8b29dff5421b",
+   "c57a87c2-76fc-4d66-820e-7558c1fd569a",
+   "e3003745-a3c9-4d0d-a679-5ce605dff8b7",
+   "7ae4ba47-8b51-42dc-aabf-e1a81886eed8",
+   "87fc9dd4-53a5-46b6-a281-9f63c3c5a3e8",
+   "e6c20464-a917-4418-8ec7-5835d28242e2",
+   "5fa48b9a-e05a-40e7-8c23-3613e273920c",
+   "2ed3b77d-36f5-4897-9910-c8936ebee078",
+   "37e6b864-dbb4-45fa-b71f-88396755d291"
+  ],
+  "iterations": 1,
+  "plans": [
+   {
+    "intent": "Find federal grant and SBIR/STTR opportunities supporting small business development of novel energy storage electronics and battery power systems.",
+    "queries": [
+     {
+      "text": "energy storage power electronics inverter converter",
+      "kinds": [
+       "grant",
+       "sbir",
+       "sttr"
+      ],
+      "agencies": [],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "battery management system grid energy storage BMS",
+      "kinds": [
+       "grant",
+       "sbir",
+       "sttr"
+      ],
+      "agencies": [],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "wide bandgap power conversion solid state battery",
+      "kinds": [
+       "grant",
+       "sbir",
+       "sttr"
+      ],
+      "agencies": [],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     }
+    ],
+    "must_have": [],
+    "exclude": []
+   }
+  ],
+  "cost_usd": 0.00287265,
+  "latency_s": 9.562000000034459
+ },
+ {
+  "query_id": "d05",
+  "ranked": [
+   "328fa5b1-85f2-41ea-9706-54106777616c",
+   "a42aba09-69c4-47ec-bc05-e20ccdc97e53",
+   "d07407d1-4f6f-4a08-9da8-e244076245cc",
+   "927aaf08-f8c1-46de-9c30-891bde16dd9a",
+   "b6da682a-7375-46a3-810c-96e97c35d471",
+   "e91be801-041d-487f-ae53-5e5e8f9d10f1",
+   "61487568-db36-41f9-968a-3a020704e4c9",
+   "67a0d60e-de38-4e0a-94e4-32d88cd57ba0",
+   "88a07149-b18c-4054-82c5-0a6c7f6b77a1",
+   "0a3b1124-eae6-461b-842e-98dea436220f"
+  ],
+  "iterations": 1,
+  "plans": [
+   {
+    "intent": "Find federal research contract opportunities focused on wide-bandgap semiconductors, SiC/GaN components, and high-efficiency power electronics.",
+    "queries": [
+     {
+      "text": "wide bandgap semiconductor power converter",
+      "kinds": [
+       "contract"
+      ],
+      "agencies": [],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "silicon carbide GaN power electronics",
+      "kinds": [
+       "contract"
+      ],
+      "agencies": [],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     },
+     {
+      "text": "high efficiency semiconductor power module",
+      "kinds": [
+       "contract"
+      ],
+      "agencies": [],
+      "min_days_to_close": 14,
+      "award_min": 50000.0
+     }
+    ],
+    "must_have": [],
+    "exclude": []
+   }
+  ],
+  "cost_usd": 0.0043113,
+  "latency_s": 13.125
+ }
+]

@@ -313,6 +313,16 @@ def cmd_report() -> None:
         f"(nDCG@10 B0 {ndcg_of('B0', 'all')} vs B1 {ndcg_of('B1', 'all')}; "
         f"vague {ndcg_of('B0', 'vague')} vs {ndcg_of('B1', 'vague')})."
     )
+    b1_runs = [r for r in _runs("B1") if not r.get("error")]
+    refined = sum(1 for r in b1_runs if r.get("iterations", 1) > 1)
+    notes.append(
+        f"B1 refined its plan on {refined} of {len(b1_runs)} queries; it refines only when fewer than "
+        f"{settings.discover_k} candidates pass the rules, which a 2,700-opportunity index rarely causes."
+    )
+    notes.append(
+        "Workflow rows are not comparable with retrieval rows: the workflow applies the plan's filters "
+        "(14 days to close, minimum award) that the labeler ignores, and searches the planner's queries."
+    )
     path = write_ablation(
         OUT,
         [

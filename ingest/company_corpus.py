@@ -3,6 +3,8 @@
 import json
 from pathlib import Path
 
+from pydantic import BaseModel
+
 BANNER = "> Synthetic document for grant-capture-agent evaluation. All people, numbers and results are fictional."
 GAP_TERMS = [
     "hydrogen",
@@ -104,3 +106,82 @@ def check_tasks(tasks: list[dict], plan: dict, docs_dir: Path) -> list[str]:
     if len(k) != len(plan["originals"]) + len(plan["new"]):
         problems.append("duplicate file names in the corpus plan")
     return problems
+
+
+class DocText(BaseModel):
+    markdown: str
+
+
+KIND_GUIDE = {
+    "on_topic": "It is current (2024-2025) and must agree with every fact in the facts table.",
+    "outdated": "It is an OLD document from the year in its title. State that year near the top. Its numbers are the old ones it was written with.",
+    "off_topic": "It is an ordinary internal company document that has nothing to do with proposals or technology.",
+}
+
+
+def doc_prompt(entry: dict, facts_table: str) -> str:
+    phrases = "\n".join(f"- {p}" for p in entry["phrases"]) or "- (none)"
+    return (
+        "You write one internal document for Lumen Grid Labs, a fictional small R&D company. Plain English, "
+        "concrete numbers, Markdown with a # title and ## headings, 300-700 words.\n"
+        f"The first line must be exactly:\n{BANNER}\n\n"
+        f"Company facts table (authoritative for current documents):\n{facts_table}\n\n"
+        f"Document: {entry['title']}\nWhat it covers: {entry['brief']}\n{KIND_GUIDE[entry['kind']]}\n"
+        f"It must contain each of these phrases exactly as written:\n{phrases}\n"
+        "Never mention hydrogen, fuel cells, electrolyzers, cybersecurity or anything cyber, offshore wind, "
+        "salt fog, CMMC, NIST 800-171 or Phase III. Contact details may only use @example.com emails and "
+        "555-01xx phone numbers. Return the document as `markdown`."
+    )
+
+
+def generate_missing(
+    plan: dict,
+    docs_dir: Path,
+    llm,
+    facts_table: str,
+    *,
+    price_in_per_m: float,
+    price_out_per_m: float,
+    max_usd: float,
+) -> dict:
+    stats: dict = {
+        "written": 0,
+        "skipped": 0,
+        "failed": 0,
+        "cost_usd": 0.0,
+        "stopped": None,
+    }
+    in0, out0 = llm.total_tokens_in, llm.total_tokens_out
+
+    def spent() -> float:
+        return (
+            (llm.total_tokens_in - in0) * price_in_per_m
+            + (llm.total_tokens_out - out0) * price_out_per_m
+        ) / 1e6
+
+    for entry in plan["new"]:
+        path = docs_dir / entry["file"]
+        if path.exists():  # never overwrite
+            stats["skipped"] += 1
+            continue
+        if spent() >= max_usd:
+            stats["stopped"] = "budget"
+            break
+        prompt, problems = doc_prompt(entry, facts_table), ["not generated"]
+        for _ in range(2):  # one retry, told what was wrong
+            text = llm.generate(
+                DocText,
+                prompt,
+                "Write the document."
+                if problems == ["not generated"]
+                else "Fix these problems: " + "; ".join(problems),
+            ).markdown.strip()
+            problems = check_doc(text, entry)
+            if not problems:
+                path.write_text(text + "\n", encoding="utf-8", newline="\n")
+                stats["written"] += 1
+                break
+        else:
+            stats["failed"] += 1
+        stats["cost_usd"] = spent()
+    return stats

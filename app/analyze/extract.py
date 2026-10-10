@@ -11,7 +11,7 @@ from app.analyze.quotes import PageText, squash
 from app.config import Settings
 from app.contracts import ModelBrief, SolicitationBrief, to_brief
 
-PROMPT_VERSION = "brief_v1"
+PROMPT_VERSION = "brief_v2"
 PDF_PAGE_TOKENS = 258
 _PROMPT = Path(__file__).with_name("prompts") / f"{PROMPT_VERSION}.md"
 _LIST_FIELDS = (

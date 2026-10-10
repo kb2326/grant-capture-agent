@@ -1,0 +1,362 @@
+[
+ {
+  "task_id": "T06",
+  "requirement_id": "R2",
+  "requirement": "State sales targets.",
+  "chunk_id": "66681693-bca8-430f-9ee7-1e352bce21ef",
+  "text": "To reach commercial readiness, Lumen Grid Labs is raising a $1,500,000 seed round. Capital proceeds will be allocated across three primary categories:\n\n- **Laboratory Infrastructure ($650,000):** Lease and outfitting of an 1,800 sq ft power-electronics testing facility in Golden, Colorado. This budget includes the acquisition of high-voltage DC supplies, initial hardware-in-the-loop test benches, and precision calibration instruments.\n- **Research & Development ($550,000):** Fabrication of initial BMS printed circuit boards, firmware development, and packaging of prototype 250 kW inverter modules.\n- **Operating Capital ($300,000):** General administrative expenses, patent filings, legal structuring, and regulatory certification planning.\n\nThis seed round provides a projected 18-month runway, positioning the company to secure federal research grants and strategic utility partnerships.",
+  "grader": "not",
+  "pair_id": 0
+ },
+ {
+  "task_id": "T10",
+  "requirement_id": "R1",
+  "requirement": "State the current number of employees.",
+  "chunk_id": "32497078-8e5b-4933-ac85-dcf22f23a591",
+  "text": "During the second quarter of 2025, Lumen Grid Labs, LLC continued its planned transition from research prototypes to field-deployed hardware. Based in Golden, Colorado, our 32 employees remain committed to advancing American energy infrastructure as a 100% U.S.-owned entity (UEI: LGLSYNTH0001, founded in 2019). This quarter marked two operational milestones: the shipment of our first commercial grid-forming inverters and the operational start of the field pilot for our solid-state battery management platform.",
+  "grader": "relevant",
+  "pair_id": 1
+ },
+ {
+  "task_id": "T03",
+  "requirement_id": "R2",
+  "requirement": "State whether prior award milestones were met.",
+  "chunk_id": "23c5e1a5-5835-49c2-a23a-7a7054954d90",
+  "text": "The first firmware build on the inverter processor missed the 100 ms estimator deadline by a small margin. Ravi Deshmukh reduced the sample window, which restored the deadline at a small cost in accuracy. The test campaign finished one week later than planned, and the final report was delivered on time.",
+  "grader": "partly",
+  "pair_id": 2
+ },
+ {
+  "task_id": "T07",
+  "requirement_id": "R4",
+  "requirement": "Describe offshore wind workforce training programs.",
+  "chunk_id": "505dc0b6-a3d0-4073-8ba1-b3bad9162f89",
+  "text": "Progress across all educational milestones will be reviewed quarterly to evaluate enrollment, diversity metrics, and full-time hiring conversion rates.\n\nFor program inquiries and partnership coordination, please contact:\n- Dr. Maya Okafor, Chief Executive Officer: maya.okafor@example.com | 555-0142\n- Jordan Lee, Test Engineer & Education Lead: jordan.lee@example.com | 555-0188",
+  "grader": "not",
+  "pair_id": 3
+ },
+ {
+  "task_id": "T07",
+  "requirement_id": "R4",
+  "requirement": "Describe offshore wind workforce training programs.",
+  "chunk_id": "9ae08fff-4f81-45f0-b202-f16c637832c3",
+  "text": "All experimental validation will occur in our 1,800 sq ft power-electronics lab located in Golden, Colorado. Testing leverages our 500 kW regenerative grid simulator and OPAL-RT hardware-in-the-loop rig to emulate utility distribution conditions.\n\n- **Task 1: Module Characterization & Grading (Months 1\u20136)**: Elena Brandt will screen retired automotive packs into balanced 50 kWh sub-strings.\n- **Task 2: Accelerated Stress Testing (Months 7\u201316)**: Jordan Lee will subject twelve prototype sub-strings to a rigorous 1,000-cycle accelerated aging protocol across temperature ranges from 15\u00b0C to 45\u00b0C. Degradation curves will validate active capacity preservation.\n- **Task 3: Hardware-in-the-Loop Validation (Months 14\u201320)**: Ravi Deshmukh will connect the LGL-BMS3 and HelioLink 250 to the OPAL-RT hardware-in-the-loop rig and the 500 kW regenerative grid simulator, verifying seamless frequency response.\n- **Task 4: Utility Demonstration Setup (Months 19\u201324)**: In collaboration with Front Range Utility Cooperative (letter of support 2025), Lumen Grid Labs will deploy a 250 kW / 500 kWh prototype at a cooperative substation site.",
+  "grader": "not",
+  "pair_id": 4
+ },
+ {
+  "task_id": "T02",
+  "requirement_id": "R3",
+  "requirement": "Describe black-start capability.",
+  "chunk_id": "99f7bcf6-ec2e-4407-aeb1-61ead1a7d692",
+  "text": "Sub-assemblies built in Longmont will be transferred to our 1,800 sq ft power-electronics lab in Golden, Colorado for final integration, control firmware loading, and validation. Jordan Lee (test engineer) will lead end-of-line unit testing using our 500 kW regenerative grid simulator and OPAL-RT hardware-in-the-loop rig.\n\nValidation procedures include:\n- Full-power 250 kW continuous burn-in across standard 480 V three-phase utility profiles.\n- Verification of autonomous black-start and grid-forming dynamics developed in research collaboration with Colorado School of Mines (STTR research partner).\n- System coupling validation with our LGL-BMS3 solid-state battery management system (cell balancing \u00b12 mV, SoC estimation error \u2264 1.5%), led by Elena Brandt (lead battery scientist).",
+  "grader": "partly",
+  "pair_id": 5
+ },
+ {
+  "task_id": "T05",
+  "requirement_id": "R4",
+  "requirement": "Describe current lab safety practices.",
+  "chunk_id": "096bed7c-f00c-4d1c-9956-bdd9cf745881",
+  "text": "Given the physical constraints of our current 900 sq ft laboratory footprint, strict test protocols govern all high-voltage operations. Battery cell cycling is limited to a maximum aggregate capacity of 2.5 kWh under active charge/discharge. The space is equipped with localized exhaust ventilation, class D dry-powder fire extinguishers, emergency power shutoff buttons at both exit doors, and clear line-of-sight safety interlocks across all test benches.",
+  "grader": "partly",
+  "pair_id": 6
+ },
+ {
+  "task_id": "T02",
+  "requirement_id": "R4",
+  "requirement": "Describe experience integrating offshore wind farms.",
+  "chunk_id": "bfac99f0-bd3a-4250-a0c2-2782f1f56ce7",
+  "text": "1. Derive an online grid-strength estimator that converges within 100 ms of a disturbance.\n2. Design an adaptive virtual impedance controller that stays stable for short-circuit ratios from 1.5 to 5.\n3. Show at least 10% faster fault ride-through than a baseline fixed-impedance controller under the same test conditions.\n4. Document the test procedure so an independent laboratory can repeat it.",
+  "grader": "not",
+  "pair_id": 7
+ },
+ {
+  "task_id": "T01",
+  "requirement_id": "R1",
+  "requirement": "Report the measured state-of-charge accuracy from prior work.",
+  "chunk_id": "8926842d-9962-4efc-9f9d-9f72dad90f53",
+  "text": "At the end of Phase I we expected a working LGL-BMS3 prototype with the new layer, measured data on two packs, and a clear estimate of the pack life gained, which would feed the Phase II plan.\n\nLumen Grid Labs developed the LGL-BMS3 as a commercial-grade management system for new cells, and it already balances cells to within plus or minus 2 mV with state-of-charge error at or below 1.5% on matched cells. Phase I would test whether these figures can be held on retired modules, which is a much harder case because each cell has a different capacity and resistance. Dr. Elena Brandt's earlier work on incremental capacity features showed that capacity can be estimated from ordinary charging, and the patent application on ranking retired cells covers the first step of that approach.",
+  "grader": "relevant",
+  "pair_id": 8
+ },
+ {
+  "task_id": "T09",
+  "requirement_id": "R1",
+  "requirement": "Describe how risks are tracked.",
+  "chunk_id": "fe13bd13-c747-4921-923a-b74e53aa5508",
+  "text": "The main technical risk is that the grid-strength estimator becomes noisy during a fault, which would make the impedance change in the wrong direction. We will limit the rate of change of the impedance and freeze the estimate during a fault. A second risk is damage to hardware during early tests, which we will reduce by running every new controller on the hardware-in-the-loop rig first and by starting at 25% power on the grid simulator.",
+  "grader": "not",
+  "pair_id": 9
+ },
+ {
+  "task_id": "T02",
+  "requirement_id": "R4",
+  "requirement": "Describe experience integrating offshore wind farms.",
+  "chunk_id": "1ad74fc2-d7f4-44eb-81c4-3463d689236b",
+  "text": "As more solar and storage connect through inverters, parts of the distribution system have become weak: the grid voltage moves a lot when current changes, and conventional inverters that follow the grid voltage can become unstable. Grid-forming inverters set their own voltage and frequency and can hold up a weak feeder, but their behavior during faults is a known difficulty. Their current must be limited to protect the silicon-carbide switches, and the limiting action can make the inverter lose synchronism or trip when it should stay connected. We proposed a new current-limiting and recovery method for the HelioLink 250 that keeps the inverter connected through faults on weak feeders.",
+  "grader": "not",
+  "pair_id": 10
+ },
+ {
+  "task_id": "T03",
+  "requirement_id": "R3",
+  "requirement": "Name a customer reference.",
+  "chunk_id": "7cf6e434-f5a6-4259-852c-5dc88a816724",
+  "text": "Lumen Grid Labs is currently advancing pilot field configurations with Front Range Utility Cooperative (letter of support 2025) and our STTR research partner, Colorado School of Mines. Project leadership is provided by CEO Dr. Maya Okafor (CEO, PI on both awards).\n\n- Dr. Maya Okafor, CEO & Principal Investigator: maya.okafor@example.com | 555-0144\n- Ravi Deshmukh, CTO, Power Electronics: ravi.deshmukh@example.com | 555-0182",
+  "grader": "relevant",
+  "pair_id": 11
+ },
+ {
+  "task_id": "T05",
+  "requirement_id": "R1",
+  "requirement": "Describe the laboratory space.",
+  "chunk_id": "2e44526b-771e-4e85-97e0-2ce138bf15a0",
+  "text": "This document provides an internal summary of the commercial real estate lease held by Lumen Grid Labs, LLC for its headquarters and engineering facilities in Golden, Colorado. Lumen Grid Labs currently occupies Suite 200 at 1400 Research Parkway, Golden, CO 80401.\n\nThe total leased space comprises 8,200 rentable square feet, partitioned into two primary functional areas:\n- **Administrative and Engineering Offices:** 6,400 sq ft containing open-plan workstations, conference rooms, private executive offices, and employee break facilities accommodating the current staff of 32 employees.\n- **Laboratory and Testing Space:** 1,800 sq ft power-electronics lab built with reinforced concrete flooring, isolated grounding, and electrical distribution sized to support specialized test benches, including the 500 kW regenerative grid simulator and the OPAL-RT hardware-in-the-loop rig.",
+  "grader": "relevant",
+  "pair_id": 12
+ },
+ {
+  "task_id": "T08",
+  "requirement_id": "R2",
+  "requirement": "Describe protected intellectual property.",
+  "chunk_id": "46451bc4-772c-490e-9423-cb613a2ad8dc",
+  "text": "- Okafor, M., and Brandt, E. \"Degradation-aware balancing for second-life lithium-ion packs.\" Journal of Power Sources (fictional), 2022.\n- Okafor, M. \"Online capacity estimation under irregular duty cycles.\" IEEE Transactions on Control Systems Technology (fictional), 2017.\n- U.S. Patent 11,000,001 (fictional), \"Method for ranking retired cells by remaining usable capacity.\"",
+  "grader": "relevant",
+  "pair_id": 13
+ },
+ {
+  "task_id": "T03",
+  "requirement_id": "R2",
+  "requirement": "State whether prior award milestones were met.",
+  "chunk_id": "a24983fa-e8ff-4af4-bdac-b3b7426883fc",
+  "text": "| Objective | Target | Result |\n|---|---|---|\n| Grid-strength estimator convergence | within 100 ms | 82 ms median, 97 ms worst case |\n| Stable operation range | short-circuit ratio 1.5 to 5 | stable across the full range in 120 of 120 runs |\n| Fault ride-through improvement | at least 10% faster | 14% faster than baseline |\n| Repeatable test procedure | documented | procedure issued as version 1.0 |",
+  "grader": "relevant",
+  "pair_id": 14
+ },
+ {
+  "task_id": "T09",
+  "requirement_id": "R2",
+  "requirement": "Describe supply chain risk mitigation.",
+  "chunk_id": "4c9ec921-2414-4e66-81aa-4de2f6a3e2d8",
+  "text": "Lumen Grid Labs, LLC (Golden, Colorado; founded 2019; 32 employees; 100% U.S.-owned; UEI LGLSYNTH0001) maintains rigorous procurement controls to ensure uninterrupted production and prototyping schedules. This document formalizes inventory strategies for long-lead components supporting our flagship hardware platforms:\n- **HelioLink 250**: 250 kW SiC grid-forming inverter delivering 98.7% peak efficiency.\n- **LGL-BMS3**: Solid-state battery management system delivering active cell balancing to \u00b12 mV and SoC estimation error \u2264 1.5%.\n\nAll component verification occurs on-site in our 1,800 sq ft power-electronics lab, utilizing our 500 kW regenerative grid simulator and OPAL-RT hardware-in-the-loop rig.",
+  "grader": "partly",
+  "pair_id": 15
+ },
+ {
+  "task_id": "T07",
+  "requirement_id": "R1",
+  "requirement": "Describe student training.",
+  "chunk_id": "c0258cac-b05f-4426-b705-5265a85cfba4",
+  "text": "Weak-grid operation limits how much solar and storage rural cooperatives can add. A control method that makes inverters stay online during faults helps these utilities connect more local generation without costly feeder upgrades. The project will also support two summer undergraduate interns from Colorado School of Mines, where the company is an STTR research partner, and we will release our test procedure and anonymized waveforms for use in teaching.",
+  "grader": "relevant",
+  "pair_id": 16
+ },
+ {
+  "task_id": "T10",
+  "requirement_id": "R2",
+  "requirement": "Describe the products and their key specifications.",
+  "chunk_id": "48c7c704-9f31-4650-8435-bcdb504a1b19",
+  "text": "- **Continuous Rated AC Output:** 100 kW\n- **Peak Efficiency:** 96.5% peak efficiency\n- **CEC Weighted Efficiency:** 95.8%\n- **Nominal Grid Voltage:** 480 VAC, 3-phase, 4-wire\n- **Nominal Frequency:** 60 Hz (57.0\u201363.0 Hz operating window)\n- **Total Harmonic Distortion (THD):** < 3.0% at rated power\n- **Power Factor Range:** 0.8 leading to 0.8 lagging (adjustable)\n- **DC Bus Operating Range:** 550 VDC to 950 VDC\n- **Maximum DC Input Voltage:** 1,000 VDC\n- **Semiconductor Topology:** Silicon IGBT dual-bridge topology switching at 16 kHz\n- **Enclosure:** NEMA 4X / IP66 rated for outdoor mounting\n- **Cooling:** Forced air with redundant variable-speed brushless fans\n- **Operating Temperature Range:** -25\u00b0C to +50\u00b0C (linear derating above 40\u00b0C)",
+  "grader": "relevant",
+  "pair_id": 17
+ },
+ {
+  "task_id": "T06",
+  "requirement_id": "R3",
+  "requirement": "Describe how the product will be manufactured.",
+  "chunk_id": "e5b7f8f1-835a-45a8-8386-93e0ae02a771",
+  "text": "Lumen Grid Labs, LLC (Golden, Colorado, founded 2019, 32 employees, 100% U.S.-owned, UEI LGLSYNTH0001) has finalized the manufacturing and assembly strategy for the HelioLink 250, our 250 kW SiC grid-forming inverter operating at 98.7% peak efficiency. Following the completion of our NSF SBIR Phase I 2024 award (\"Grid-forming control for weak grids\", $275,000; 14% faster fault ride-through than baseline), this plan establishes the commercial pilot assembly pipeline to fulfill our partner demonstration commitments with Front Range Utility Cooperative (letter of support 2025).",
+  "grader": "partly",
+  "pair_id": 18
+ },
+ {
+  "task_id": "T02",
+  "requirement_id": "R3",
+  "requirement": "Describe black-start capability.",
+  "chunk_id": "1ad74fc2-d7f4-44eb-81c4-3463d689236b",
+  "text": "As more solar and storage connect through inverters, parts of the distribution system have become weak: the grid voltage moves a lot when current changes, and conventional inverters that follow the grid voltage can become unstable. Grid-forming inverters set their own voltage and frequency and can hold up a weak feeder, but their behavior during faults is a known difficulty. Their current must be limited to protect the silicon-carbide switches, and the limiting action can make the inverter lose synchronism or trip when it should stay connected. We proposed a new current-limiting and recovery method for the HelioLink 250 that keeps the inverter connected through faults on weak feeders.",
+  "grader": "not",
+  "pair_id": 19
+ },
+ {
+  "task_id": "T07",
+  "requirement_id": "R1",
+  "requirement": "Describe student training.",
+  "chunk_id": "a938407f-ac28-4fda-8122-e79a57f66a5d",
+  "text": "On behalf of the Colorado School of Mines, I am pleased to submit this formal letter of commitment confirming our role as the STTR research partner alongside Lumen Grid Labs, LLC (Golden, Colorado; founded 2019; 32 employees; 100% U.S.-owned; UEI LGLSYNTH0001). Our institution has closely observed the technical advancements achieved by Lumen Grid Labs, particularly under Dr. Maya Okafor's leadership across prior efforts including the DOE SBIR Phase I 2023 award (\"Degradation-aware BMS for second-life batteries\", $200,000; met all milestones) and the NSF SBIR Phase I 2024 award (\"Grid-forming control for weak grids\", $275,000; achieved 14% faster fault ride-through than baseline).\n\nUnder this joint STTR proposal, Colorado School of Mines commits to conducting collaborative research centered on advanced inverter control algorithms and solid-state battery characterization. We will interface directly with Lumen Grid Labs' CTO, Ravi Deshmukh, lead battery scientist Elena Brandt, and test engineer Jordan Lee to align theoretical modeling with hardware execution.",
+  "grader": "partly",
+  "pair_id": 20
+ },
+ {
+  "task_id": "T05",
+  "requirement_id": "R1",
+  "requirement": "Describe the laboratory space.",
+  "chunk_id": "ad327b0f-d667-4194-84f6-ec7d76a54632",
+  "text": "To accommodate the hardware development operations overseen by Dr. Maya Okafor and CTO Ravi Deshmukh, specific lease covenants govern lab infrastructure:\n- **Electrical Capacity:** Landlord provides dedicated 480V, 3-phase, 800A utility service connected directly to the lab subpanel.\n- **HVAC and Cooling:** Supplementary rooftop cooling units provide dedicated 15-ton cooling capacity for heavy power-stage testing. Filter maintenance and mechanical inspections occur quarterly.\n- **Access Control:** Keycard access provides 24/7 entry to the building exterior and lab suite for authorized technical staff, including lead battery scientist Elena Brandt and test engineer Jordan Lee.",
+  "grader": "partly",
+  "pair_id": 21
+ },
+ {
+  "task_id": "T01",
+  "requirement_id": "R1",
+  "requirement": "Report the measured state-of-charge accuracy from prior work.",
+  "chunk_id": "ef84b1c8-e753-48e3-a0bf-3534711d53d8",
+  "text": "* **TP-002: Cell Balancing Precision Verification**\n  * *Target Asset:* LGL-BMS3 solid-state battery management system.\n  * *Lead:* Elena Brandt.\n  * *Description:* Validates dynamic active balancing across multi-cell solid-state modules to ensure voltage delta does not exceed \u00b12 mV under rapid charge-discharge profiles.\n* **TP-005: State of Charge (SoC) Drift and Estimation Accuracy**\n  * *Target Asset:* LGL-BMS3.\n  * *Lead:* Elena Brandt.\n  * *Description:* Measures state-of-charge estimation tracking over 100 continuous cycles against thermal chambers; confirms SoC estimation error remains \u2264 1.5%.\n* **TP-009: Second-Life Degradation Parameter Identification**\n  * *Target Asset:* Second-life battery test benches.\n  * *Lead:* Elena Brandt.\n  * *Description:* Characterizes capacity retention and impedance growth protocols established under our 2023 DOE SBIR Phase I project ($200,000 award).",
+  "grader": "partly",
+  "pair_id": 22
+ },
+ {
+  "task_id": "T10",
+  "requirement_id": "R1",
+  "requirement": "State the current number of employees.",
+  "chunk_id": "5d4d7ae4-b04c-4cc4-98a4-380452b05145",
+  "text": "Our team grew steadily throughout 2021. With four new hires onboarded during the quarter, Lumen Grid Labs now employs 18 employees located at our Golden facility. The newly added positions focus on firmware integration, circuit board design, and high-voltage safety compliance.\n\nFacility modifications to our main power electronics testing area were finalized in November 2021. Upgraded 480 V three-phase distribution lines were certified, and preliminary thermal isolation barriers were installed to safely accommodate accelerated cycle testing of high-voltage battery modules.",
+  "grader": "partly",
+  "pair_id": 23
+ },
+ {
+  "task_id": "T05",
+  "requirement_id": "R2",
+  "requirement": "Describe hardware-in-the-loop test equipment.",
+  "chunk_id": "516739c7-f559-4071-889d-1facb00ba1d3",
+  "text": "Testing was conducted under standard laboratory conditions (ambient temperature: 23.4 \u00b0C, relative humidity: 31%). \n\n* **Unit Under Test (UUT):** HelioLink 250 production-intent prototype (Serial: HL250-PROT-04)\n* **DC Source:** 500 kW programmable regenerative DC power supply (nominal bus set at 800 V DC)\n* **AC Grid Interface:** 500 kW regenerative grid simulator tied to the facility feed\n* **Control and Monitoring:** OPAL-RT hardware-in-the-loop rig running real-time grid-forming control algorithms\n* **Power Measurement:** Dual calibrated multichannel precision power analyzers (Yokogawa WT5000)",
+  "grader": "relevant",
+  "pair_id": 24
+ },
+ {
+  "task_id": "T11",
+  "requirement_id": "R1",
+  "requirement": "Describe hardware-in-the-loop test coverage.",
+  "chunk_id": "0c38dcd3-ab66-4a05-a904-c31b268cd8d3",
+  "text": "Lumen Grid Labs, LLC (Golden, Colorado; founded 2019; 32 employees; 100% U.S.-owned; UEI LGLSYNTH0001) completed a hardware-in-the-loop (HIL) testing campaign validating advanced grid-forming control algorithms for the HelioLink 250. The HelioLink 250 is a 250 kW SiC grid-forming inverter designed for weak-grid environments, featuring a 98.7% peak efficiency. This validation builds directly upon findings from our NSF SBIR Phase I 2024 award, \"Grid-forming control for weak grids\" ($275,000), which achieved 14% faster fault ride-through than baseline benchmarks. The test run was executed to verify performance under high-stress distribution dynamics prior to field demonstration with our utility partner, Front Range Utility Cooperative.",
+  "grader": "partly",
+  "pair_id": 25
+ },
+ {
+  "task_id": "T04",
+  "requirement_id": "R3",
+  "requirement": "Describe the firmware lead's experience.",
+  "chunk_id": "76da66f5-f28e-48f4-b55f-2a9f1445cd2f",
+  "text": "- **Role:** Lead Firmware Engineer\n- **Email:** s.ramirez@example.com\n- **Direct Line:** 555-0148\n- **Facility:** Lumen Grid Labs, LLC, Golden, Colorado",
+  "grader": "relevant",
+  "pair_id": 26
+ },
+ {
+  "task_id": "T07",
+  "requirement_id": "R2",
+  "requirement": "Describe education partnerships.",
+  "chunk_id": "c003c57c-a680-47b2-8a06-42831510d368",
+  "text": "* **Front Range Utility Cooperative:** Active field-testing collaborator (letter of support 2025) providing pilot sites for HelioLink 250 feeder deployments.\n* **Colorado School of Mines:** Ongoing STTR research partner collaborating on advanced power conversion topologies and co-simulation methodologies.",
+  "grader": "partly",
+  "pair_id": 27
+ },
+ {
+  "task_id": "T02",
+  "requirement_id": "R4",
+  "requirement": "Describe experience integrating offshore wind farms.",
+  "chunk_id": "b554503e-7997-4292-9a3c-1cabbc435b14",
+  "text": "Published grid-forming methods fall into three groups. Droop-based controllers are simple but have weak fault behavior. Virtual synchronous machine controllers model inertia but still need current limiting. Virtual impedance methods limit current well but use fixed values chosen for a nominal grid. We found few studies of adaptive virtual impedance tested on real hardware below a short-circuit ratio of 2, and almost none that report repeatable test conditions. This gap is where our results should add the most.",
+  "grader": "not",
+  "pair_id": 28
+ },
+ {
+  "task_id": "T02",
+  "requirement_id": "R3",
+  "requirement": "Describe black-start capability.",
+  "chunk_id": "306dbf69-8de7-43a5-bede-fc3b0fadc683",
+  "text": "Distribution feeders with high penetrations of inverter-based generation experience severe voltage fluctuations and low effective inertia. In rural and edge-of-grid distribution networks, high line impedances create conditions where a short-circuit ratio below 2 causes phase-locked loop (PLL) tracking instability in legacy grid-following inverters. Under these conditions, small load steps or line faults routinely trigger undervoltage trips and harmonic interactions.",
+  "grader": "not",
+  "pair_id": 29
+ },
+ {
+  "task_id": "T10",
+  "requirement_id": "R4",
+  "requirement": "Describe experience with power electronics for hydrogen electrolyzers.",
+  "chunk_id": "2b3d8d0c-af8b-4286-b6db-056fb5be4d43",
+  "text": "The HelioLink 100 is a 100 kW silicon carbide (SiC) based power conversion unit designed for distributed energy resources, battery energy storage interfaces, and commercial grid-tied microgrids.\n\n* **Base Unit List Price:** $42,000 per unit\n* **Unit Normalized Rating:** $0.42 per watt\n* **Factory Calibration Fee:** $1,800 per shipment\n* **Standard 3-Year Hardware Warranty:** Included\n* **Extended 5-Year Hardware Warranty:** $4,500 per unit",
+  "grader": "not",
+  "pair_id": 30
+ },
+ {
+  "task_id": "T11",
+  "requirement_id": "R3",
+  "requirement": "Reference documented test procedures.",
+  "chunk_id": "b9d29fbb-e27e-4504-93b2-f5a5bd247f85",
+  "text": "Dr. Maya Okafor (CEO, Principal Investigator), Ravi Deshmukh (CTO, power electronics), Elena Brandt (lead battery scientist), Jordan Lee (test engineer).\n\nDr. Maya Okafor, maya.okafor@example.com, 303-555-0142\n\nWe keep a written test plan for every high-power test and store raw measurement files with the test conditions, the instrument serial numbers and the firmware version that was running. This makes it possible to repeat a result months later or to hand the data to an independent reviewer. Firmware is kept under version control, and every release used in a test is tagged so that results can be traced to code. Lab safety follows NFPA 70E, and all staff who enter the high-power area complete arc flash training before their first day on the floor.",
+  "grader": "relevant",
+  "pair_id": 31
+ },
+ {
+  "task_id": "T05",
+  "requirement_id": "R1",
+  "requirement": "Describe the laboratory space.",
+  "chunk_id": "23cdc569-ef51-4e3a-bdc9-374b7fcb9a27",
+  "text": "The laboratory covers 1,800 sq ft and is wired for three-phase power at 480 V. It has separate benches for low-voltage control work, for battery packs and for high-power inverter testing, with a marked safety perimeter around the high-power area.\n\n- 500 kW regenerative grid simulator, able to emulate weak grids, sags, phase jumps and faults.\n- OPAL-RT hardware-in-the-loop rig for real-time simulation of feeders and controllers.\n- Battery cyclers for packs up to 100 V, and thermal chambers for cycling at set temperatures.\n- Power analyzers, high-bandwidth current probes and differential voltage probes, calibrated annually.\n- Prototype assembly area for the LGL-BMS3 and the HelioLink 250, including a reflow oven and inspection microscope.",
+  "grader": "relevant",
+  "pair_id": 32
+ },
+ {
+  "task_id": "T06",
+  "requirement_id": "R1",
+  "requirement": "Quantify the cost advantage for customers.",
+  "chunk_id": "769f7ad9-f4d2-467a-81b4-4891ab1a4513",
+  "text": "This cost reduction is only viable when cycle life is maximized despite cell-to-cell capacity variance. Built upon outcomes from our DOE SBIR Phase I 2023 project (\"Degradation-aware BMS for second-life batteries\", $200,000; met all milestones), the LGL-BMS3 delivers:\n\n- Active cell balancing to within **\u00b12 mV**, preventing premature string cutoff.\n- State-of-Charge (SoC) estimation error **\u2264 1.5%**, optimizing usable capacity windows.\n\nHardware validation was completed in our 1,800 sq ft power-electronics lab utilizing our 500 kW regenerative grid simulator and OPAL-RT hardware-in-the-loop rig. Testing coupled the storage packs to our **HelioLink 250** 250 kW SiC grid-forming inverter (98.7% peak efficiency). The integrated architecture demonstrated stable grid integration, building directly on controls validated during our NSF SBIR Phase I 2024 project (\"Grid-forming control for weak grids\", $275,000; 14% faster fault ride-through than baseline).",
+  "grader": "partly",
+  "pair_id": 33
+ },
+ {
+  "task_id": "T07",
+  "requirement_id": "R4",
+  "requirement": "Describe offshore wind workforce training programs.",
+  "chunk_id": "bb2df067-bc55-4c8a-9fa1-95fc75fd8ee4",
+  "text": "Personnel must treat all electrical assemblies as energized until a zero-energy state is formally verified using calibrated multimeters. Work conducted on energized circuits must strictly adhere to NFPA 70E-2018 standards for electrical safety in the workplace.\n\nMandatory compliance requirements include:\n- **Boundaries:** Arc flash and shock approach boundaries designated under NFPA 70E-2018 must be clearly demarked with yellow-and-black floor striping around the 60 kW DC bench power supply.\n- **Personal Protective Equipment (PPE):** Arc-rated face shields (minimum 8 cal/cm\u00b2 rating), NFPA-compliant safety glasses with side shields, and Class 0 (1,000 V rated) insulating rubber gloves with leather outer protectors are mandatory within the restricted approach boundary.\n- **Lockout/Tagout (LOTO):** Energy isolation devices on the primary 208 V 3-phase wall disconnect and prototype DC bus links must be locked and tagged out before any manual probe adjustment or lead relocation.\n- **Two-Person Rule:** Any active test exceeding 100 V DC or 20 A requires a second qualified team member trained in CPR and first aid to be present within direct line of sight.",
+  "grader": "not",
+  "pair_id": 34
+ },
+ {
+  "task_id": "T07",
+  "requirement_id": "R2",
+  "requirement": "Describe education partnerships.",
+  "chunk_id": "43d2022b-5c25-4d5f-b347-c2113860323e",
+  "text": "To address the acute regional shortage of certified power electronics and battery assembly technicians, Lumen Grid Labs is launching a technical apprenticeship program targeting Colorado community colleges. Dr. Maya Okafor will coordinate direct curriculum modules with vocational instructors, focusing on practical lab competence and real-world safety:\n\n- **Laboratory Internships**: Sponsoring four paid student internships annually at our Golden facility, supervised by Jordan Lee and Ravi Deshmukh, focusing on hardware-in-the-loop validation and high-power inverter testing.\n- **Applied Energy Curriculum**: Providing open-access instructional materials derived from HelioLink 250 inverter controls and LGL-BMS3 battery telemetry to Colorado community colleges to align vocational training with next-generation power infrastructure needs.\n- **Continuing Education Seminars**: Hosting bi-monthly technical workshops led by Elena Brandt on battery pack safety, electrochemical balancing, and non-destructive testing.",
+  "grader": "relevant",
+  "pair_id": 35
+ },
+ {
+  "task_id": "T08",
+  "requirement_id": "R1",
+  "requirement": "Name the repository where data will be shared.",
+  "chunk_id": "5c2ee7e7-7125-4a6d-9062-887797d58e57",
+  "text": "All research activities are executed within our 1,800 sq ft power-electronics lab using specialized infrastructure, notably our 500 kW regenerative grid simulator and OPAL-RT hardware-in-the-loop rig. Data streams fall into two primary hardware domains:\n\n1. **Battery Management Systems**: Supervised by Elena Brandt (lead battery scientist), datasets capture cell voltage telemetry, thermal logs, and degradation metrics for the LGL-BMS3 solid-state battery management system. Verification testing tracks cell balancing \u00b12 mV and SoC estimation error \u2264 1.5%, building on results from our DOE SBIR Phase I 2023 project (\"Degradation-aware BMS for second-life batteries\", $200,000; met all milestones).\n2. **Inverter and Power Electronics**: Supervised by Ravi Deshmukh (CTO, power electronics) and Jordan Lee (test engineer), datasets capture time-domain waveform captures, thermal dissipation, and switching profiles for the HelioLink 250 250 kW SiC grid-forming inverter (98.7% peak efficiency). This infrastructure also records dynamic transient responses benchmarked against our NSF SBIR Phase I 2024 project (\"Grid-forming control for weak grids\", $275,000; 14% faster fault ride-through than baseline).",
+  "grader": "not",
+  "pair_id": 36
+ },
+ {
+  "task_id": "T09",
+  "requirement_id": "R1",
+  "requirement": "Describe how risks are tracked.",
+  "chunk_id": "505dc0b6-a3d0-4073-8ba1-b3bad9162f89",
+  "text": "Progress across all educational milestones will be reviewed quarterly to evaluate enrollment, diversity metrics, and full-time hiring conversion rates.\n\nFor program inquiries and partnership coordination, please contact:\n- Dr. Maya Okafor, Chief Executive Officer: maya.okafor@example.com | 555-0142\n- Jordan Lee, Test Engineer & Education Lead: jordan.lee@example.com | 555-0188",
+  "grader": "not",
+  "pair_id": 37
+ },
+ {
+  "task_id": "T03",
+  "requirement_id": "R2",
+  "requirement": "State whether prior award milestones were met.",
+  "chunk_id": "fc8b5af7-ecc2-47f6-b23f-153f2c5aa5d6",
+  "text": "Chief Executive Officer Dr. Maya Okafor, serving as PI on both awards, reported that all commercialization and research deliverables for Q2 2025 were delivered within budget. For Q3 2025, priorities include gathering 1,000 hours of continuous operational data from the installed HelioLink 250 units and expanding battery pack telemetry integration.\n\n**Contact:** Dr. Maya Okafor, CEO \u00b7 maya.okafor@example.com \u00b7 (555) 0128  \nLumen Grid Labs, LLC \u00b7 Golden, CO",
+  "grader": "partly",
+  "pair_id": 38
+ },
+ {
+  "task_id": "T04",
+  "requirement_id": "R3",
+  "requirement": "Describe the firmware lead's experience.",
+  "chunk_id": "8e5224aa-86b3-4796-a4d0-1a9f63c16122",
+  "text": "Ramirez has contributed essential control code to Lumen Grid Labs' federally funded research initiatives under Principal Investigator Dr. Maya Okafor. During the DOE SBIR Phase I 2023 award (\"Degradation-aware BMS for second-life batteries\", $200,000), she met all milestones by delivering dynamic cell-level health evaluation firmware. On the subsequent NSF SBIR Phase I 2024 project (\"Grid-forming control for weak grids\", $275,000), she collaborated with test engineer Jordan Lee and academic partners at the Colorado School of Mines to embed virtual synchronous machine controls, validating a 14% faster fault ride-through than baseline. Ramirez also coordinates integration specifications with engineering staff at Front Range Utility Cooperative, who provided a formal letter of support in 2025.",
+  "grader": "relevant",
+  "pair_id": 39
+ }
+]

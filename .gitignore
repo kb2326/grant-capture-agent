@@ -372,3 +372,5 @@ reports/*
 data/cache/
 tfplan
 data/drafts/
+web/node_modules/
+web/dist/

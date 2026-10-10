@@ -3,10 +3,16 @@
 *Read this first in any new session (local or cloud).*
 
 ## Where we are
-- *Updated 2026-10-09.* **M0 Foundation and M1 Analyze complete** (M1 merged from branch `m1-analyze`).
-- M1 results (`reports/m1/ablation.md`, AI-labeled silver set of 40): knockout recall 1.00 (10/10), strict precision 0.91 (0.45 before the bullet-list rules fix), requirement recall 0.15 whole-document vs 0.69 page windows (n=7), quote fidelity 0.93, $0.04 per solicitation. ADR-0016: B0 for eligibility; hybrid (windows for requirements) planned for M3.
-- Spend: M1 ~$8.60 of the $10/month budget (measured from Cloud Monitoring token counts). **From M2 on: cost-minimal** — small samples, Flash/Flash-Lite, local EmbeddingGemma 2, hard `eval_budget_usd` caps, estimate shown before any run > $0.50.
-- **Next: M2 Discover** (brainstorm → spec → plan).
+- *Updated 2026-10-10.* **M0 Foundation, M1 Analyze and M2 Discover complete** (M2 merged from branch `m2-discover`).
+- M2 results (`reports/m2/ablation.md`, 15 golden queries, AI-labeled silver set of 719 judgments):
+  - Embeddings (ADR-0020): `gemini-embedding-001` nDCG@10 0.514 vs EmbeddingGemma 2 0.472 (local was better on the 5 vague queries, 0.499 vs 0.441). Gemini chosen; the `emb_local` column stays for a later re-test. `gemini-embedding-2` works in location `global` (unmeasured).
+  - Rerank: Vertex Ranking API gave no gain (0.512 vs 0.514); built but off (`discover_rerank=False`).
+  - Workflow (ADR-0017): B0 single pass kept; B1 never refined (0 of 20) because the verifier only counts passing candidates. Next idea: an LLM-graded sufficiency check.
+  - Discover P@10 0.50 (target 0.70, not met); one request ~$0.003, p50 11 s (the Flash planner dominates).
+  - Analyze over local A2A works behind `discover_v4_transport` (direct by default); preferences persist in `preferences` and an ADK memory service.
+- Spend: M2 ≈ $1.02 (Flash $0.58, Flash-Lite labels $0.13, embeddings $0.22, ranker ≈ $0.09; Cloud Monitoring token counts + our own counters). The project stays **cost-minimal**.
+- EmbeddingGemma 2 on CPU would take ~9 h for 2,737 cards; it was run on Kaggle's free T4 (6 min) from a private dataset and notebook. Kaggle token lives in `.env` (`KAGGLE_API_TOKEN`).
+- **Next: M3 Draft** (brainstorm → spec → plan).
 - Open data items: SAM.gov attachments for the 12 sampled notices were never fetched (quota spent on a failed run, since fixed); retry one notice first: `uv run python -m ingest sam-attachments --notice <id>`. NIH announcements sit behind a bot challenge and are not fetched.
 
 ## Deferred minors from the M1 review

@@ -267,6 +267,8 @@ plan (LLM → SearchPlan)
                      iter=3    → present with what passed + explanation
 ```
 
+**As built in M2** (spec `docs/design/m2-discover-spec.md`): search runs over one card per opportunity; the graph is `plan → approve_plan → search → present`, with the execute → verify → refine loop inside `service.run_plan()`; V4 checks at most 5 candidates per request and is off in evals; `Candidate` gains `reranked` and `eligibility`, and `DiscoverResult` carries every plan, iterations, tokens and cost. Measured outcome: ADR-0017, ADR-0020.
+
 **Verifier rules** (`app/rules/verify.py`):
 - V1: status is `open` or `forecasted`.
 - V2: days until close ≥ `min_days_to_close`.

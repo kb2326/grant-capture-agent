@@ -89,6 +89,25 @@ def decide_retrieval(
     return emb, rerank, notes
 
 
+def workflow_verdict(b0: dict, b1: dict, *, refined: int, n: int) -> str:
+    """ADR-0017 line for the report. If the loop never ran, B0 and B1 executed the same code and any
+    gap is planner variation, so the comparison is inconclusive (B0 stays the default as the simpler)."""
+
+    def score_of(s: dict, sl: str) -> str:
+        v = s[sl]["ndcg@10"]
+        return "n/a" if v is None else f"{v:.3f}"
+
+    scores = f"nDCG@10 B0 {score_of(b0, 'all')} vs B1 {score_of(b1, 'all')}; vague {score_of(b0, 'vague')} vs {score_of(b1, 'vague')}"
+    if refined == 0:
+        return (
+            f"Workflow (ADR-0017): inconclusive. B1 refined its plan on 0 of {n} golden queries (it refines "
+            "only when fewer than K candidates pass the rules), so B0 and B1 ran the same code and the gap "
+            f"({scores}) is planner run-to-run variation. B0 stays the default as the simpler design."
+        )
+    winner = "B1 (Plan-Execute-Verify)" if keep_richer(b0, b1) else "B0 (single pass)"
+    return f"Workflow (ADR-0017): {winner}; B1 refined on {refined} of {n} golden queries ({scores})."
+
+
 def _session(settings: Settings):
     from db.session import make_engine, make_session_factory
 
@@ -302,26 +321,19 @@ def cmd_report() -> None:
         a: summarize(_golden(_runs(a), queries), qrels, queries)
         for a in (*RETRIEVAL_ARMS, *WORKFLOW_ARMS)
     }
-    b1 = keep_richer(summ["B0"], summ["B1"])
-
-    def ndcg_of(arm: str, sl: str) -> str:
-        v = summ[arm][sl]["ndcg@10"]
-        return "n/a" if v is None else f"{v:.3f}"
-
+    golden_b1 = [r for r in _golden(_runs("B1"), queries) if not r.get("error")]
+    refined = sum(1 for r in golden_b1 if r.get("iterations", 1) > 1)
     notes.append(
-        f"Workflow (ADR-0017): {'B1 (Plan-Execute-Verify)' if b1 else 'B0 (single pass)'} "
-        f"(nDCG@10 B0 {ndcg_of('B0', 'all')} vs B1 {ndcg_of('B1', 'all')}; "
-        f"vague {ndcg_of('B0', 'vague')} vs {ndcg_of('B1', 'vague')})."
-    )
-    b1_runs = [r for r in _runs("B1") if not r.get("error")]
-    refined = sum(1 for r in b1_runs if r.get("iterations", 1) > 1)
-    notes.append(
-        f"B1 refined its plan on {refined} of {len(b1_runs)} queries; it refines only when fewer than "
-        f"{settings.discover_k} candidates pass the rules, which a 2,700-opportunity index rarely causes."
+        workflow_verdict(summ["B0"], summ["B1"], refined=refined, n=len(golden_b1))
     )
     notes.append(
         "Workflow rows are not comparable with retrieval rows: the workflow applies the plan's filters "
-        "(14 days to close, minimum award) that the labeler ignores, and searches the planner's queries."
+        "(14 days to close, minimum award) that the labeler ignores, searches the planner's queries, "
+        "and presents 10 results, so its Recall@20 is effectively Recall@10."
+    )
+    notes.append(
+        "Run-to-run planner variation is about 0.04 nDCG@10 (B0 and B1 ran identical code), larger than "
+        "the 0.03 decision threshold; read the embedding gap (0.042, deterministic arms) as directional."
     )
     path = write_ablation(
         OUT,

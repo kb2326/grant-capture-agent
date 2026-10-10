@@ -266,7 +266,7 @@ agents-cli playground           # chat with the agent locally
 
 - [x] **M0 Foundation:** scaffold, synthetic company data, Postgres schema, ingestion, CI, eval harness, ADRs
 - [x] **M1 Analyze:** page-tagged text layer, brief extraction (whole-document vs. page-window ablation), quote verification, knockout rules E0–E7, AI-labeled silver set ([report](reports/m1/ablation.md))
-- [x] **M2 Discover:** opportunity cards, hybrid search (pgvector + full text, RRF), three ablations (embeddings, rerank, single pass vs. Plan-Execute-Verify), ADK 2 workflow with plan approval, Analyze over local A2A, remembered preferences ([report](reports/m2/ablation.md))
+- [x] **M2 Discover:** opportunity cards, hybrid search (pgvector + full text, RRF), three ablations (embeddings, rerank, single pass vs. Plan-Execute-Verify, the last inconclusive), ADK 2 workflow with plan approval, Analyze over local A2A, remembered preferences ([report](reports/m2/ablation.md))
 - [ ] **M3 Draft:** corrective RAG, calibrated grader, faithfulness check, MCP server
 - [ ] **M4 Ship:** Agent Runtime + Cloud Run, Terraform, tracing, CI eval gate, red team, eval report
 - [ ] **M5 Specialize:** fine-tuned grader vs. prompted grader; multimodal parsing vs. Docling

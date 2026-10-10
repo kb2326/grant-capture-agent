@@ -177,7 +177,7 @@ ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;max-width:70ch}
     <tbody>
       <tr><td>Cloud or free local embeddings?</td><td>Gemini 0.514 vs EmbeddingGemma 2 0.472 (local better on vague requests: 0.499 vs 0.441)</td><td>Gemini (ADR-0020); local kept for a re-test</td></tr>
       <tr><td>Does a reranker help?</td><td>0.512 with vs 0.514 without</td><td>Off (built and switchable)</td></tr>
-      <tr><td>Single pass or Plan-Execute-Verify?</td><td>0.464 vs 0.425; the loop refined 0 of 20 times</td><td>Single pass (ADR-0017)</td></tr>
+      <tr><td>Single pass or Plan-Execute-Verify?</td><td>The loop refined 0 of 15 times, so both ran the same code (0.464 vs 0.425 is run-to-run noise)</td><td>Inconclusive; single pass stays default (ADR-0017)</td></tr>
     </tbody>
   </table></div>
   <div class="grid2">
@@ -810,7 +810,7 @@ flowchart LR
       <tr><td class="num">2026-10-09</td><td>M1 structured output: the clause constraint became a typed object after a live call showed a free-form one comes back empty.</td></tr>
       <tr><td class="num">2026-10-09</td><td>NIH announcements behind a bot challenge are not fetched; SAM.gov notice descriptions are stored as documents so notices without attachments can still be analyzed and labeled.</td></tr>
       <tr><td class="num">2026-10-09</td><td>OKF deferred to M3; EmbeddingGemma 2 joins the M2 embedding comparison.</td></tr>
-      <tr><td class="num">2026-10-10</td><td>M2 measured: Gemini embeddings over EmbeddingGemma 2 (ADR-0020), reranker off, single pass over Plan-Execute-Verify (ADR-0017). M2 cost about $1.02.</td></tr>
+      <tr><td class="num">2026-10-10</td><td>M2 measured: Gemini embeddings over EmbeddingGemma 2 (ADR-0020, directional), reranker off, Plan-Execute-Verify inconclusive because its loop never ran, single pass stays default (ADR-0017). M2 cost about $1.02.</td></tr>
       <tr><td class="num">2026-10-10</td><td>Local embeddings run on Kaggle's free T4 GPU instead of the laptop CPU (6 min vs ~9 h).</td></tr>
       <tr><td class="num">2026-10-09</td><td>Independent review of the whole M0 branch found 2 critical issues (the SAM.gov key could appear in logs; the SAM.gov daily cap could be exceeded) and 4 important ones (one bad record could end a run; attachment names could collide; failed downloads weren't retried; two SAM sources overwrote each other). All six fixed test-first (65 tests), 11 minor items noted for later. M0 merged into main.</td></tr>
       <tr><td class="num">2026-10-08</td><td>M0 Part B done: Terraform created 41 cloud resources; the loader ran as a Cloud Run Job (500 grants, 0 failures); teardown fixes added; Cloud SQL deleted and off by default. M0 complete.</td></tr>

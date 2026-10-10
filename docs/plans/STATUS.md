@@ -7,7 +7,7 @@
 - M2 results (`reports/m2/ablation.md`, 15 golden queries, AI-labeled silver set of 719 judgments):
   - Embeddings (ADR-0020): `gemini-embedding-001` nDCG@10 0.514 vs EmbeddingGemma 2 0.472 (local was better on the 5 vague queries, 0.499 vs 0.441). Gemini chosen; the `emb_local` column stays for a later re-test. `gemini-embedding-2` works in location `global` (unmeasured).
   - Rerank: Vertex Ranking API gave no gain (0.512 vs 0.514); built but off (`discover_rerank=False`).
-  - Workflow (ADR-0017): B0 single pass kept; B1 never refined (0 of 20) because the verifier only counts passing candidates. Next idea: an LLM-graded sufficiency check.
+  - Workflow (ADR-0017): inconclusive. B1 never refined (0 of 15 golden queries) because the verifier only counts passing candidates, so B0 and B1 ran the same code; B0 stays the default. Planner run-to-run variation is ~0.04 nDCG@10. Next idea: an LLM-graded sufficiency check.
   - Discover P@10 0.50 (target 0.70, not met); one request ~$0.003, p50 11 s (the Flash planner dominates).
   - Analyze over local A2A works behind `discover_v4_transport` (direct by default); preferences persist in `preferences` and an ADK memory service.
 - Spend: M2 ≈ $1.02 (Flash $0.58, Flash-Lite labels $0.13, embeddings $0.22, ranker ≈ $0.09; Cloud Monitoring token counts + our own counters). The project stays **cost-minimal**.

@@ -1,6 +1,6 @@
 # ADR-0017: Discover architecture chosen by ablation
 
-- Status: Accepted. Outcome measured in M2 (2026-10-10): B0 (single pass) is the default; B1 never fired
+- Status: Accepted. M2 outcome (2026-10-10): inconclusive; B1's loop never ran, so B0 (single pass) stays the default as the simpler design
 - Date: 2026-10-07
 - Deciders: Karthick Balaje
 
@@ -25,6 +25,6 @@ Full numbers: `reports/m2/ablation.md`. 15 golden queries (10 specific, 5 vague)
 | P@10 (all) | 0.500 | 0.467 |
 | Cost per request | $0.0033 | $0.0034 |
 | p50 / p95 latency | 11.4 s / 35.8 s | 11.9 s / 15.9 s |
-| Plans refined | – | 0 of 20 queries |
+| Plans refined | – | 0 of 15 golden queries |
 
-**Decision: B0.** B1 never refined: its trigger is "fewer than K=5 candidates pass the rules", and with 2,700 opportunities almost every first plan passes 5. The B0/B1 gap is therefore planner run-to-run variation, not the loop. The lesson is that an evaluator-optimizer loop needs an evaluator that judges *relevance*, not just a count; the next candidate is an LLM-graded sufficiency check (the same Flash-Lite grader used for labels, calibrated against hand labels first). Latency is dominated by the Flash planning call (~10 s); raw hybrid search alone takes ~1 s.
+**Result: inconclusive; B0 stays the default.** B1 never refined (0 of 15 golden queries): its trigger is "fewer than K=5 candidates pass the rules", and with 2,700 opportunities almost every first plan passes 5. B0 and B1 therefore ran the same code, and the gap above is planner run-to-run variation (about 0.04 nDCG@10, larger than the 0.03 decision threshold), not evidence for either design. Workflow Recall@20 is effectively Recall@10 because 10 results are presented. The lesson is that an evaluator-optimizer loop needs an evaluator that judges *relevance*, not just a count; the next candidate is an LLM-graded sufficiency check (the same Flash-Lite grader used for labels, calibrated against hand labels first). Latency is dominated by the Flash planning call (~10 s); raw hybrid search alone takes ~1 s.

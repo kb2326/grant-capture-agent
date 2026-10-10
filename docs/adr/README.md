@@ -18,7 +18,7 @@ An architecture decision record (ADR) is a short note that captures one signific
 | [0014](0014-per-agent-identity.md) | Per-agent identity | Proposed (decided in M4) |
 | [0015](0015-sources-and-normalized-format.md) | Sources and normalized format | Accepted |
 | [0016](0016-analyze-long-context.md) | Analyze reads whole documents in long context | Accepted (decision method); outcome measured in M1 |
-| [0017](0017-discover-architecture-by-ablation.md) | Discover architecture chosen by ablation | Accepted; M2 outcome: single pass (B0) |
+| [0017](0017-discover-architecture-by-ablation.md) | Discover architecture chosen by ablation | Accepted; M2 outcome inconclusive, single pass (B0) stays default |
 | [0018](0018-draft-architecture-by-ablation.md) | Draft architecture chosen by ablation | Accepted (decision method); outcome measured in M3 |
 | [0019](0019-local-docker-terraform-cloud.md) | Docker locally, Terraform-managed Google Cloud for anything shared or deployed | Accepted |
 | [0020](0020-embedding-choice.md) | Embedding model chosen by measurement (gemini-embedding-001 over EmbeddingGemma 2) | Accepted |

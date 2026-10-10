@@ -40,6 +40,6 @@ Pooling: only results that some arm ranked in its top 10 were labeled; unlabeled
 
 - Embeddings: gemini (nDCG@10 gemini 0.514 vs local 0.472).
 - Rerank: off (nDCG@10 0.514 without vs 0.512 with).
-- Workflow (ADR-0017): B0 (single pass) (nDCG@10 B0 0.464 vs B1 0.425; vague 0.599 vs 0.544).
-- B1 refined its plan on 0 of 20 queries; it refines only when fewer than 5 candidates pass the rules, which a 2,700-opportunity index rarely causes.
-- Workflow rows are not comparable with retrieval rows: the workflow applies the plan's filters (14 days to close, minimum award) that the labeler ignores, and searches the planner's queries.
+- Workflow (ADR-0017): inconclusive. B1 refined its plan on 0 of 15 golden queries (it refines only when fewer than K candidates pass the rules), so B0 and B1 ran the same code and the gap (nDCG@10 B0 0.464 vs B1 0.425; vague 0.599 vs 0.544) is planner run-to-run variation. B0 stays the default as the simpler design.
+- Workflow rows are not comparable with retrieval rows: the workflow applies the plan's filters (14 days to close, minimum award) that the labeler ignores, searches the planner's queries, and presents 10 results, so its Recall@20 is effectively Recall@10.
+- Run-to-run planner variation is about 0.04 nDCG@10 (B0 and B1 ran identical code), larger than the 0.03 decision threshold; read the embedding gap (0.042, deterministic arms) as directional.

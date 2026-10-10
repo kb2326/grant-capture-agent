@@ -51,3 +51,13 @@ def test_warm_up_touches_embedder_ranker_and_llm_once():
     assert calls == ["embed", "rerank", "llm"]
     warm_up(SimpleNamespace(embedder=deps.embedder, reranker=deps.reranker, llm=None))
     assert calls[-2:] == ["embed", "rerank"]
+
+
+def test_workflow_verdict_is_inconclusive_when_the_loop_never_ran():
+    from evals.discover import workflow_verdict
+
+    s = {"all": {"ndcg@10": 0.46}, "vague": {"ndcg@10": 0.60}}
+    t = {"all": {"ndcg@10": 0.42}, "vague": {"ndcg@10": 0.54}}
+    text = workflow_verdict(s, t, refined=0, n=15)
+    assert "inconclusive" in text and "0 of 15" in text
+    assert "inconclusive" not in workflow_verdict(s, t, refined=4, n=15)

@@ -7,7 +7,7 @@
 - M4 (`docs/design/m4-ship-spec.md`, ADR-0021):
   - Local live UI: FastAPI product API (`api/`) + React/Vite/TypeScript (`web/`), cost per action, $0.50 session cap, result cache. Live check: search, opportunity brief and one drafted section, screenshots in `docs/assets/`. Spend ≈ $0.23.
   - Deployment designed, not executed: `deployment/terraform/prod/` validated and planned (14 to add, never applied); `Dockerfile.api` builds and serves; `deploy.yml` manual-only and disabled; teaching docs in `docs/deploy/`.
-  - Final README, `docs/writing/medium-article.md`, `docs/writing/linkedin-post.md`.
+  - Final README. The Medium, LinkedIn and video drafts are kept locally (git-ignored `docs/writing/`).
   - Cloud spending stopped (see `docs/deploy/evidence/shutdown-inventory.txt`).
 - M3 results (`reports/m3/ablation.md`, 12 controlled draft tasks, 46 requirements, 10 true gaps, 75-doc corpus):
   - B0 long context (cached corpus) vs. B1 corrective RAG: both flagged 10/10 gaps and invented none; evidence recall 0.944 each; B0 more faithful (0.83 vs 0.78, silver), fewer outdated/off-topic citations (1.4% vs 3.5%), twice as fast (p50 41 s vs 84 s). ADR-0018: B0 is the default.
